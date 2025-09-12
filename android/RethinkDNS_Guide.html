@@ -1,0 +1,791 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>RethinkDNS - privacy-book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">privacy-book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h2 id="rethinkdns-users-guide"><a class="header" href="#rethinkdns-users-guide">RethinkDNS Users Guide</a></h2>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<ul>
+<li><a href="#-key-terms">🔑 Key Terms</a></li>
+<li><a href="#rethinkdns-overview">RethinkDNS Overview</a></li>
+<li><a href="#getting-started">Getting Started</a>
+<ul>
+<li><a href="#dns">DNS</a></li>
+<li><a href="#network">Network</a></li>
+<li><a href="#firewall">Firewall</a></li>
+</ul>
+</li>
+<li><a href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a>
+<ul>
+<li><a href="#apps-that-dont-work">Apps that Don't work</a></li>
+<li><a href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></li>
+<li><a href="#duckduckgo">DuckDuckGo</a>
+<ul>
+<li><a href="#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></li>
+</ul>
+</li>
+<li><a href="#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></li>
+<li><a href="#tor">Tor</a></li>
+</ul>
+</li>
+<li><a href="#"></a>
+<ul>
+<li><a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></li>
+<li><a href="#logs">Logs</a></li>
+<li><a href="#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
+</details>
+<p><img src="images/rethinkdns.png" alt="RethinkDNS" /></p>
+<blockquote>
+<p>I'm not affiliated with RethinkDNS in any way, I'm just a technologist with
+privacy concerns.</p>
+</blockquote>
+<h3 id="-key-terms"><a class="header" href="#-key-terms">🔑 Key Terms</a></h3>
+<details>
+<summary> ✔️ Click to Expand Key Terms </summary>
+<ul>
+<li>
+<p><strong>IP</strong> (Internet Protocol) is the address system of the internet, responsible
+for delivering packets of data from a source device to a target device. IP is
+the main way in which connections are made, and is the backbone of the
+internet. It doesn't check for errors or ensure the packets are in the correct
+order, that's where TCP comes in. When you set an <code>IP rule</code> this is what
+you're setting, a trusted IP address.</p>
+</li>
+<li>
+<p><strong>Port</strong>: A port in networking is a virtual communication endpoint managed by
+a computer's operating system that helps direct network traffic to specific
+apps or services. While an IP address identifies a device on a network, ports
+allow the system to know exactly which app or service should handle the
+incoming or outgoing data. Web traffic commonly uses port 80 (HTTP) or 443
+(HTTPS), so when data arrives for those ports, it's routed to the web server
+application on the device. When we block port 80, we block insecure HTTP
+connections.</p>
+</li>
+<li>
+<p><strong>TCP</strong> (Transmission Control Protocol) is responsible for maintaining a
+connection through a handshake and putting the packets in the correct order.
+TCP will also ask for missing pieces and is known as a reliable but slow
+protocol.</p>
+</li>
+<li>
+<p><strong>UDP</strong> (User Datagram Protocol) (UDP/IP): is a fast protocol used across the
+internet for time-sensitive transmissions such as DNS lookups or VoIP. UDP
+allows a computer to send data straight to another without requiring a
+handshake.</p>
+</li>
+<li>
+<p><strong>DNS Server</strong>: When you search for a domain name (rethinkdns.com) it triggers
+a DNS lookup. Several different types of DNS servers typically work together
+to complete a single DNS lookup.</p>
+</li>
+<li>
+<p><strong>Recursive resolver</strong> (DNS recursor): is typically the first stop in the
+series of the above servers.</p>
+</li>
+<li>
+<p><strong>Interative resolver</strong>: In an iterative DNS query, each DNS server responds
+directly to the client with a referral to another server, and the client
+continues querying successive servers until it receives the IP address for the
+requested domain.</p>
+</li>
+<li>
+<p><strong>Proxy</strong>: A proxy, in relation to Orbot with Rethink, is an intermediary
+service that routes internet traffic from your device through the Tor network
+to provide privacy and anonymity.</p>
+</li>
+<li>
+<p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
+The app that is allowed to bypass will not have it's traffic routed through
+the Rethink encrypted tunnel and will fall back to your systems Private DNS
+setting. Rethink will still be aware of the app but it won't route its
+traffic.</p>
+</li>
+<li>
+<p><code>Bypass Universal</code>: Similar to <code>Bypass DNS and Firewall</code> with the added bypass
+of any filters or blocklists. So your extreme privacy blocklist won't block
+this app. Rethink will still be aware of said app.</p>
+</li>
+<li>
+<p><code>Exclude</code>: Rethink will not be aware of this app and it will not be routed
+through RethinkDNS.</p>
+</li>
+<li>
+<p>🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.</p>
+</li>
+<li>
+<p>📶 (Metered mobile): Mobile data settings, either blocked or allowed.</p>
+</li>
+</ul>
+</details>
+<h2 id="rethinkdns-overview"><a class="header" href="#rethinkdns-overview">RethinkDNS Overview</a></h2>
+<p>The DNS mode routes all DNS traffic generated by all apps to <strong>any</strong> user chosen
+DNS-over-HTTPS, DNS-over-TLS, DNSCrypt, or Oblivious DNS-over-HTTPS resolver.</p>
+<p>Firewalls like Rethink that block both UDP and TCP connections are usually
+sufficient because nearly all applications rely on these two protocols for their
+networking and communication. Almost every app communicates over TCP or UDP, so
+blocking these protocols effectively restricts most network traffic from and to
+apps, preventing them from connecting without permission.</p>
+<p>I will share how I use RethinkDNS, obviously feel free to make changes based on
+your threat model and needs.</p>
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
+<h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
+<p>Go to <code>Configure -&gt; DNS -&gt; Other DNS</code>:</p>
+<ul>
+<li>
+<p>Choose the type of resolver you want, I use DNSCrypt. Once you click you can
+choose the specific resolver you want such as Quad9. You may notice that it
+says <code>Failed: using fallback DNS</code>. This is only because we haven't turned it
+on yet, we will recheck this once we turn it on.</p>
+</li>
+<li>
+<p>If you want a relay in a specific country, you can click the <code>Relays</code> tab. For
+DNSCrypt you are given the choice between the Netherlands, France, Sweden, Los
+Angeles, and Singapore. You might do this if you were trying to circumvent
+censorship.</p>
+</li>
+</ul>
+<p><strong>Rules</strong> set the following:</p>
+<ul>
+<li>
+<p><code>Advanced DNS filtering (experimental)</code>: Assign unique IP per DNS request.</p>
+</li>
+<li>
+<p><code>Prompt on blocklist updates</code></p>
+</li>
+</ul>
+<p>Leave all the <code>Advanced</code> defaults unless you want to turn on <code>Never proxy DNS</code></p>
+<hr />
+<h3 id="network"><a class="header" href="#network">Network</a></h3>
+<p>Go to <code>Configure -&gt; Network</code>:</p>
+<ul>
+<li>
+<p>Set <code>Use all available networks</code> to ON. This enables Wifi and mobile data to
+be used at the same time by Rethink. (Optional, may use more battery)</p>
+</li>
+<li>
+<p><strong>Set your IP version</strong>: The default is <code>IPv4</code>, you can choose between
+<code>IPv6 (experimental)</code> and <code>Auto (experimental)</code> if you use IPv6.</p>
+</li>
+<li>
+<p>Using the <code>Loopback</code> sounds like a good idea but it makes many of the
+resolvers fail.</p>
+</li>
+<li>
+<p><strong>Choose fallback DNS</strong>: When your user-preferred DNS is not reachable,
+fallback DNS will be used.</p>
+</li>
+<li>
+<p>You may want to experiment with shutting off <code>Enable network visibility</code>, just
+keep in mind that some apps may break. Shutting this off prevents apps from
+accessing all available networks, stopping them from bypassing Rethinks
+tunnel. This caused issues with the browser when turned off.</p>
+</li>
+</ul>
+<hr />
+<h3 id="firewall"><a class="header" href="#firewall">Firewall</a></h3>
+<p>Go to <code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following
+to ON:</p>
+<ul>
+<li>
+<p><code>Block all apps when device is locked</code></p>
+</li>
+<li>
+<p><code>Block when DNS is bypassed</code></p>
+</li>
+<li>
+<p><code>Block newly installed apps by default</code> (Optional: If you use this, remember
+that you did)</p>
+</li>
+<li>
+<p><code>Block port 80 (insecure HTTP) traffic</code></p>
+</li>
+</ul>
+<hr />
+<h2 id="turn-on-dns-and-firewall"><a class="header" href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a></h2>
+<p>Go to <code>Home</code> 🏠:</p>
+<ul>
+<li>Click the big <code>Start</code> button on the bottom of the screen and leave it set to
+the default <code>DNS and Firewall (default)</code></li>
+</ul>
+<p>Now that we've started the DNS and Firewall, we can go back to
+<code>Configure -&gt; DNS</code> and ensure the provider we chose started successfully. You
+can also experiment with different types of resolvers, make sure to wait for
+below the chosen resolver to say <code>Connected</code>.</p>
+<p>Now, all of the apps on your device have a default to allow both Wi-Fi and
+mobile data access <strong>through the RethinkDNS encrypted tunnel</strong>. Try some of your
+most used Apps to see if they function correctly.</p>
+<p>RethinkDNS’s firewall blocks or restricts any network traffic that isn’t
+explicitly allowed. Although by default all apps are allowed, some apps require
+special permissions or bypasses due to their network behavior. Many apps rely on
+multiple external services, backend APIs, etc. that may be blocked by the
+firewall.</p>
+<hr />
+<h3 id="apps-that-dont-work"><a class="header" href="#apps-that-dont-work">Apps that Don't work</a></h3>
+<p>I will use Reddit as an example, the process is the same for any app. Reddit’s
+app and website rely on multiple third-party services and external domains
+beyond just <code>reddit.com</code> itself.</p>
+<p>For apps that don't work it's important to ensure that your systems
+<code>Private DNS</code> is set to <code>Automatic</code>.</p>
+<p>Go to <code>Home -&gt; Apps</code>:</p>
+<p>Search for <code>Reddit</code>, click on it and the Firewall Rules For Reddit will pop up.
+Since it is already allowed <code>Unmetered</code> and <code>Metered</code> connections and still
+doesn't work, we can try one setting at a time until it does work and this is
+the same process for other Apps that aren't working.</p>
+<ul>
+<li>
+<p>First, you can try allowing the app to <code>Bypass DNS &amp; Firewall</code>. Try the app
+again, does it work? If not:</p>
+</li>
+<li>
+<p><code>Bypass Universal</code>, this allows it to ignore any filters or blocklists as
+well. If the app still doesn't work you can:</p>
+</li>
+<li>
+<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app and is
+often what is required for Reddit. It is my understanding that after you
+<code>Exclude</code> Reddit for example, your systems Automatic Secure DNS will pick it
+up.</p>
+</li>
+<li>
+<p>You can also <code>Isolate</code> an App, you then have to set up <em>trust | allow</em> rules
+for domains or IPs over a period of time which can take a while. You can go to
+<code>Apps</code> and search for the app in question, click on it and at the bottom of
+the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</p>
+</li>
+</ul>
+<hr />
+<h3 id="firefox-encrypted-dns-through-rethink"><a class="header" href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></h3>
+<p>First, make sure you can visit a few sites in Firefox. If you can, then your
+browser traffic should be routed through the Rethink tunnel, we will check here.
+If you can't, go to <code>Home -&gt; Apps</code> and search for Firefox, is networking
+enabled?</p>
+<p>Sometimes rebooting your phone can help with this, I noticed that I couldn't
+reach any site until a reboot.</p>
+<p><strong>RethinkDNS Settings</strong></p>
+<p>For the best experience routing your browser traffic through your custom
+endpoint (e.g., DNSCrypt) ensure the following are set:</p>
+<ul>
+<li>
+<p>Do not turn on <code>Block any app not in use</code> in the Universal firewall. After
+some Log digging, I found that this causes the browser to fail more often than
+not.</p>
+</li>
+<li>
+<p><code>Configure -&gt; Network -&gt; Enable network visibility</code> set to the default ON. I
+had experimented with turning this off and certain websites wouldn't load when
+on Wi-Fi and none would load on mobile data. Turning it back on seemed to fix
+both with no leaks detected.</p>
+</li>
+</ul>
+<p>Double check that in Rethink's <code>Configure -&gt; DNS</code>, ensure the default,
+<code>Prevent DNS leaks</code> is set as well as the Universal Firewalls
+<code>Block when DNS is bypassed</code>.</p>
+<p><strong>Firefox Settings</strong></p>
+<blockquote>
+<p>In Firefox, plug <code>about:config</code> into the URL bar and scroll down to
+<code>network.ttr.mode</code> and change its value to <code>3</code>. To prevent leaking DNS queries
+to the System resolver. I say scroll because when I did it, the search didn't
+find <code>network.ttr.mode</code>.</p>
+</blockquote>
+<p>In Firefox <code>Settings -&gt; Privacy &amp; Security</code>, set <code>DNS over HTTPS</code> to
+<code>Default Protection</code>, this enables Firefox to use RethinkDNS's DNSCrypt resolver
+or whatever you chose.</p>
+<p><strong>Checking for DNS Leaks</strong></p>
+<p>Go to:</p>
+<pre><code class="language-text">https://dnsleaktest.com
+</code></pre>
+<p>Also crosscheck with:</p>
+<pre><code class="language-text">https://ipleak.net
+</code></pre>
+<p><code>ipleak.net</code> may show many more servers but as long as they are all related to
+your resolver (i.e., WoodyNet for Quad9) you are not leaking to your ISP or
+other third-parties.</p>
+<p>For DNSCrypt with Quad9 Security, <code>dnsleaktest</code> found 5 servers all with the ISP
+<code>WoodyNet</code> indicating success through Quad9. Quad9 relies on Packet Clearing
+House, that's where the <code>WoodyNet</code> name comes from.</p>
+<p>When on mobile data, when going to <code>https://dnsleaktest.com</code> the results may
+show more servers. As long as they are all the same ISP you're good.</p>
+<p>A different solution could be to experiment with more strict RethinkDNS settings
+and just use the browsers built-in DNS over HTTPS on max protection. Having more
+strict defaults for Rethink with all of your apps and configuring your browser
+separate may be a better option, the choice is yours.</p>
+<p>When hunting down a solution you can go to <code>Configure -&gt; Logs</code>, then try to
+visit the site that wouldn't work while watching the logs. You should see
+<code>Firefox</code> pop up, click it, in the top right of the pop up should be the reason
+it was blocked.</p>
+<hr />
+<h3 id="duckduckgo"><a class="header" href="#duckduckgo">DuckDuckGo</a></h3>
+<p>I also tested DuckDuckGo with its stock configuration and <code>dnsleaktest.com</code>
+showed that DDGs traffic was successfully tunneled through Rethink to Quad9s'
+servers.</p>
+<p><code>dnsleaktest.com</code> showed all <code>WoodyNet</code> ISPs indicating success.</p>
+<hr />
+<h4 id="chromium-based-browsers-brave"><a class="header" href="#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></h4>
+<p>Brave would not work when routed through Rethink and Chrome completely ignored
+it. Brave is definitely better if you must use a Chrome derivative.</p>
+<ul>
+<li>
+<p>I tried disabling the Brave Shield <code>Use Secure DNS</code> to see if that helped, it
+didn't. There may be more you could do here to get it working...</p>
+</li>
+<li>
+<p>I do have Chrome and google apps disabled on my main device and only active in
+the Secure Folder which is like a sandboxed environment. This could very well
+be the reason it ignored Rethink, I don't care to test further...</p>
+</li>
+<li>
+<p><a href="https://techstory.in/eu-hits-google-with-3-5-billion-antitrust-fine-over-adtech-practices/">EU Hits Google with 3.5 Billion Antitrust</a></p>
+</li>
+</ul>
+<hr />
+<h3 id="more-fine-grained-control--enhanced-privacy"><a class="header" href="#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></h3>
+<blockquote>
+<p>❗ NOTE: If you are happy with the functionality as is it is unnecessary to
+follow these steps. If you already only install the minimal apps needed on
+your phone (i.e. Only install what you use) you can probably just go to
+individual Apps and block their networking that you are worried about such as
+Facebook and Google. Routing all of your Apps through Rethink already gives
+you great privacy and security benefits.</p>
+</blockquote>
+<p>If you read the following GrapheneOS discussion Forum:</p>
+<ul>
+<li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
+</ul>
+<p>It suggests you Go to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code> click on
+the grayed out 🛜📶 to set a rule to <strong>block both Metered and Unmetered
+connections to all apps by default</strong>.</p>
+<p>The point here is that not every App on your device needs network access all the
+time or at all in some cases. Watch your Logs and see which apps "phone home"
+the most. Think about which Apps would leave you the most vulnerable and either
+block network access completely or block and unblock as needed based on your
+threat model.</p>
+<p>I would recommend removing network access from your password manager until you
+need it or better yet use something completely offline like
+<a href="https://www.keepassdx.com/">KeePassDX</a>.</p>
+<p>I have never used <code>Link to Windows</code> and I <code>Disable</code> &amp; <code>Force Stop</code> it and
+<code>Link to Windows</code> is still my most blocked App of all time by Rethink...</p>
+<p>If you go for the default deny, you will have to search for every app that you
+use and start by enabling networking and then following the
+<code>Apps that don't work</code> section for each app until they work as expected. If you
+really think about it, the number of apps that require constant networking
+should be limited.</p>
+<hr />
+<h3 id="tor"><a class="header" href="#tor">Tor</a></h3>
+<p>If you want to learn how Tor works, I suggest reading the following in this
+order:</p>
+<ol>
+<li>
+<p><a href="https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/">PrivacyGuides In Praise of Tor</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/en/advanced/tor-overview/">PrivacyGuides Tor Overview</a></p>
+</li>
+</ol>
+<p><strong>Tor is at risk, and needs our help</strong>. Despite its strength and history, Tor
+isn't safe from the same attacks oppressive regimes and misinformed legislators
+direct at encryption and many other privacy-enhancing
+technologies.--<a href="https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/#how-to-support-tor">How to Support Tor</a></p>
+<p>{{&lt; details title=" ✔️ Click to Expand Tor Section"&gt;}}</p>
+<details>
+<summary> ✔️ Click to Expand Tor Section</summary>
+<p>The following is a summary of some of the Tor Overview, all credit goes to them.
+It is important to spread the word when you can! You can read the full article
+<a href="https://www.privacyguides.org/en/advanced/tor-overview/">Here</a>. If you are
+interested in learning how Tor works, I suggest starting with [In Praise of Tor]</p>
+<p>If you are fortunate to live outside of oppressive regimes with extreme
+censorship, using Tor for every day, mundane activities is likely safe and won’t
+put you on any harmful “list.” Even if it did, you'd be in good company, these
+lists mostly contain great people working tirelessly to defend human rights and
+online privacy worldwide.</p>
+<p>By using Tor regularly for ordinary browsing, you help strengthen the network,
+making it more robust and anonymous for everyone. This collective support makes
+staying private easier for activists, journalists, and anyone facing online
+surveillance or censorship. The writer of the PrivacyGuides article mentions
+using Tor when he needs to access Google Maps to protect his privacy</p>
+<p>So, consider embracing Tor not only for sensitive browsing but also for daily
+routine tasks. Every user adds valuable noise to the network, helping protect
+privacy and freedom for all.</p>
+<h2 id=""><a class="header" href="#"></details></a></h2>
+<h3 id="setting-up-orbot-with-a-tcp-only-proxy"><a class="header" href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></h3>
+<p>(Edited 09-12-25) My understanding here has changed, I apologize for any
+confusion this caused.</p>
+<p><img src="images/orbot.png" alt="Orbot Logo" /></p>
+<p>TCP-Only Proxies forward all TCP-level connections from selected apps to Orbot.</p>
+<p>They are best for Apps that use multiple TCP protocols beyone just basic web
+browsing (HTTP/HTTPS) like messaging apps (Signal), search apps (DDG), etc.
+Because it proxies all TCP traffic, it can cause some apps to slow down or break
+if they expect direct DNS or UDP.</p>
+<p>First install Orbot, Open <code>Orbot -&gt; More -&gt; Orbot Settings</code> and turn on
+<code>Power User Mode</code>. This is important, if you forget this Rethinks auto Orbot
+will not let you choose between SOCKS and HTTP proxies.</p>
+<p>You should also check <code>Allow Background Starts</code> [x].</p>
+<p>Go to <code>Configure -&gt; Proxy -&gt; Setup Orbot</code>:</p>
+<ul>
+<li>
+<p>Click <code>Add / Remove 0 apps</code>, search for an app that you want to run through
+Orbot. For simple testing I chose DuckDuckGo with a TCP-only Proxy.</p>
+</li>
+<li>
+<p>Set Orbot to <code>Bypass Universal</code></p>
+</li>
+<li>
+<p>On the first time starting Orbot through Rethink, you'll have to click the
+<code>Orbot&gt;</code> to Connect as well as grant permissions. After you start Orbot
+successfully, check out Rethinks Home and below the STOP button should say
+<code>Protected With Tor</code>.</p>
+</li>
+</ul>
+<p>Open DuckDuckGo and go to:</p>
+<pre><code class="language-text">https://dnsleaktest.com
+# Cross-Check
+https://ipcheck.net
+</code></pre>
+<blockquote>
+<p>❗ You may see that ipleaktest initially shows a Tor exit relay location such
+as the Netherlands, once you complete a Standard Test, it still shows WoodyNet
+ISPs. Since I configured Rethink to use DNSCrypt with Quad9 this is completely
+expected. This confirms that my DNS traffic is not leaking to my ISP and is
+properly anonymized through Tor and Quad9. As long as you don't see your
+actual ISP's servers in the results, your setup is working as intended.</p>
+</blockquote>
+<p>Now you can add more apps that would benefit from anonymity such as FairMail,
+RSS feeds, and crypto wallets. I believe for Signal, it requires that you to set
+up the SOCKS5 proxy to work correctly which is pretty straightforward.</p>
+<p>See:
+<a href="https://docs.rethinkdns.com/firewall/orbot/">Orbot Integration Manual Method</a></p>
+<p>Look into an RSS Feed, they give you complete control of the content you
+consume, no algorithm involved! This blog is also in RSS format at
+&lt;tsawyer87.github.io/index.xml&gt;</p>
+<p>This can also be useful on public Wi-Fi or other insecure networks.</p>
+<ul>
+<li>
+<p>You can also open Orbot and <code>Choose How to Connect</code>, if you want to hide Tor
+use.</p>
+</li>
+<li>
+<p>When you're done, you can switch <code>Setup Orbot</code> back to <code>None (default)</code>. If
+you're completely done with it you can click <code>Add / Remove (1 app)</code>, search
+for the Apps you've added and de-select them.</p>
+</li>
+<li>
+<p>Go to <code>Home</code> and now below <code>Stop</code> it should just say <code>Protected</code>.</p>
+</li>
+<li>
+<p>If you live in an area where Tor use isn't discriminated against, consider
+Activating your Orbot <code>Kindness</code> tab so others that are in oppressive regimes
+can use your device as a bridge. This is a great way to give back!</p>
+</li>
+<li>
+<p>A good use for this could to switch it on and off as needed such as when you
+check your online banking, want to send a private email, or browse sensitive
+topics. It has been proven that people that feel like they are being watched
+are less creative and curious.</p>
+</li>
+<li>
+<p>When it really matters consider using Tor Browser through Tails OS or Whonix.</p>
+</li>
+</ul>
+<h3 id="logs"><a class="header" href="#logs">Logs</a></h3>
+<p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
+From there, you can set the log level and choose a notification action.</p>
+<p>If anyone else uses your phone, it's probably a good idea to enable app lock.</p>
+<p>Go to <code>Configure -&gt; Logs</code>, and try to access the app that's not working. You
+should see said app at the top of the Network Logs, click it. In the top right
+of the tab, you'll see the reason why it's not working such as: <code>App Blocked</code>,
+or <code>DNS Bypass</code>.</p>
+<p>This <code>DNS Bypass</code> means that the App in question is trying to bypass the Rethink
+Tunnel and being actively blocked. You can search for said app and try setting
+IP or Port Trust rules.</p>
+<p>You can also go to <code>Home -&gt; Apps</code> and search for the App you need, click on it
+and at the bottom of the screen you will see <code>IP Logs</code>, and <code>Domain Logs</code>.</p>
+<p>Once you click on the log of the app in question, you'll be given 3 drop down
+options. If you set an app to Bypass DNS and Firewall settings, you will see
+that in the first dropdown box.</p>
+<p>The next drop down is <code>Block,trust this IP for this app</code> where you can set a
+rule to <code>Block</code> or <code>Trust</code>.</p>
+<hr />
+<h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
+<ul>
+<li>
+<p><a href="https://research.cloudflare.com/projects/network-privacy/odns/">Oblivious DNS over HTTPS</a></p>
+</li>
+<li>
+<p><a href="https://www.ietf.org/archive/id/draft-denis-dprive-dnscrypt-06.html">DNSCrypt Protocol</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/">PrivacyGuides In Praise of Tor</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/en/advanced/tor-overview/">PrivacyGuides Tor Overview</a></p>
+</li>
+<li>
+<p><a href="https://orbot.app/en/">Orbot app</a></p>
+</li>
+<li>
+<p>Orbot is a free app from the Guardian Project that empowers other apps on your
+device to use the internet more securely. Orbot uses Tor to encrypt your
+internet traffic and hide it by bouncing through a seris of computers around
+the world.
+--<a href="https://support.torproject.org/glossary/orbot/">TorProject Orbot</a></p>
+</li>
+<li>
+<p><a href="https://guardianproject.info/apps/org.torproject.android/">Guardian Project Orbot</a></p>
+</li>
+<li>
+<p>WireGuard is an extremely simple yet fast and modern VPN that utilizes
+state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.com</a></p>
+</li>
+<li>
+<p><a href="https://ssd.eff.org/">EFF Surveillance Self Defense</a></p>
+</li>
+<li>
+<p><a href="https://coveryourtracks.eff.org/">EFF Cover Your Tracks</a></p>
+</li>
+<li>
+<p><a href="https://amiunique.org/">AmIUnique?</a></p>
+</li>
+<li>
+<p><a href="https://noscript.net/">What is NoScript?</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/en/dns/">PrivacyGuides DNS Recommendations</a></p>
+</li>
+<li>
+<p><a href="https://www.cloudflare.com/learning/dns/what-is-a-dns-server/">What is a DNS Server?</a></p>
+</li>
+<li>
+<p><a href="https://www.cloudflare.com/learning/ddos/glossary/user-datagram-protocol-udp/">What is UDP?</a></p>
+</li>
+<li>
+<p><a href="https://network-guides.com/tcp-ip-basics/">Networking-Guides TCP/IP Basics</a></p>
+</li>
+<li>
+<p><a href="https://www.cloudflare.com/learning/dns/what-is-recursive-dns/">Cloudflare What is recursive DNS?</a></p>
+</li>
+</ul>
+</details>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../intro/introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../intro/introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
