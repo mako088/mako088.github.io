@@ -220,6 +220,10 @@ privacy concerns.</p>
 <summary> ✔️ Click to Expand Key Terms </summary>
 <ul>
 <li>
+<p><strong>HTTP</strong> (HyperText Transfer Protocol): is the standard internet protocol you
+would use to access the web.</p>
+</li>
+<li>
 <p><strong>IP</strong> (Internet Protocol) is the address system of the internet, responsible
 for delivering packets of data from a source device to a target device. IP is
 the main way in which connections are made, and is the backbone of the
@@ -270,8 +274,15 @@ service that routes internet traffic from your device through the Tor network
 to provide privacy and anonymity.</p>
 </li>
 <li>
+<p><strong>HTTP(S) Proxy</strong>: An HTTP proxy is an intermediary server that forwards
+HTTP/HTTPS web traffic from a client (e.g., a browser or app) to destination
+servers, allowing for anonymity, filtering, or routing control while masking
+the user's IP.</p>
+</li>
+<li>
 <p><strong>SOCKS5</strong> (Socket Secure 5): Is an internet proxy protocol that transfers
-info from one server to another while redirecting the user's IP address.</p>
+info from one server to another while redirecting the user's IP address. It
+operates at the transport layer (TCP) in contrast to HTTP(S) proxies.</p>
 </li>
 <li>
 <p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
@@ -335,6 +346,7 @@ censorship.</p>
 </ul>
 <p>Leave all the <code>Advanced</code> defaults unless you plan on setting up a SOCKS5 proxy,
 in which case you will want to enable <code>Configure -&gt; DNS -&gt; Prevent DNS leaks</code></p>
+<hr />
 <h3 id="network"><a class="header" href="#network">Network</a></h3>
 <p><code>Configure -&gt; Network</code>:</p>
 <ul>
@@ -436,7 +448,8 @@ If you can't, go to <code>Home -&gt; Apps</code> and search for Firefox, is netw
 enabled?</p>
 <p><strong>RethinkDNS Settings</strong></p>
 <p>For the best experience routing your browser traffic through your custom
-endpoint (e.g., DNSCrypt) ensure the following are set:</p>
+endpoint (e.g., DNSCrypt) on both Wi-Fi and mobile data ensure the following are
+set:</p>
 <ul>
 <li>
 <p>Do not turn on <code>Block any app not in use</code> in the Universal firewall. After
@@ -444,20 +457,19 @@ some Log digging, I found that this causes the browser to fail more often than
 not.</p>
 </li>
 <li>
-<p><code>Configure -&gt; Network -&gt; Enable network visibility</code> set to the default ON. I
-had experimented with turning this off and certain websites wouldn't load when
-on Wi-Fi and none would load on mobile data. Turning it back on seemed to fix
+<p><code>Configure -&gt; Network -&gt; Enable network visibility</code> set to ON. I had
+experimented with turning this off and certain websites wouldn't load when on
+Wi-Fi and none would load on mobile data. Turning it back on seemed to fix
 both with no leaks detected.</p>
 </li>
 </ul>
-<p>Double check that in Rethink's <code>Configure -&gt; DNS</code>, ensure <code>Prevent DNS leaks</code> is
-set as well as the Universal Firewalls <code>Block when DNS is bypassed</code>.</p>
+<p>Double check that in Rethink's <code>Configure -&gt; DNS -&gt; Prevent DNS leaks</code> is ON, as
+well as the Universal Firewalls <code>Block when DNS is bypassed</code> ON.</p>
 <p><strong>Firefox Settings</strong></p>
 <blockquote>
 <p>In Firefox, plug <code>about:config</code> into the URL bar and scroll down to
-<code>network.ttr.mode</code> and change its value to <code>3</code>. To prevent leaking DNS queries
-to the System resolver. I say scroll because when I did it, the search didn't
-find <code>network.ttr.mode</code>.</p>
+<code>network.ttr.mode</code> and change its value to <code>3</code> to prevent leaking DNS queries
+to the System resolver.</p>
 </blockquote>
 <p>In Firefox <code>Settings -&gt; Privacy &amp; Security</code>, set <code>DNS over HTTPS</code> to
 <code>Default Protection</code>, this enables Firefox to use RethinkDNS's DNSCrypt resolver
@@ -655,12 +667,14 @@ are less creative and curious.</p>
 </ul>
 <h2 id="setting-up-a-socks5-proxy"><a class="header" href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></h2>
 <p>If you have Orbot set up through auto mode, you'll have to disable it.</p>
-<p>Go to <code>Configure -&gt; Proxy -&gt; Setup SOCKS5 Proxy</code>.</p>
+<p>Open <code>Orbot -&gt; More</code>: Near the bottom of the screen you'll see <code>HTTP: 8118</code>, and
+<code>SOCKS: 9050</code>, these are the Port numbers. We will compare these to Rethinks
+defaults. (They match).</p>
+<p>Back in Rethink, <code>Configure -&gt; Proxy -&gt; Setup SOCKS5 Proxy</code>.</p>
 <p>In the App dropdown choose <code>Orbot</code>.</p>
-<p>Leave:</p>
 <ul>
 <li>
-<p>Hostname set to: <code>127.0.0.1</code></p>
+<p>Hostname: <code>127.0.0.1</code></p>
 </li>
 <li>
 <p>Port Number: <code>9050</code></p>
@@ -669,7 +683,7 @@ are less creative and curious.</p>
 <p>Leave the rest of the defaults and Hit <code>Set</code></p>
 </li>
 <li>
-<p>Go Home, below the STOP button you should see <code>Protected With Socks Proxy</code>.
+<p>Go <code>Home</code>, below the STOP button you should see <code>Protected With Socks Proxy</code>.
 Now all of your devices traffic that doesn't bypass Rethink is routed through
 the SOCKS5 proxy.</p>
 </li>
