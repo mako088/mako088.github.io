@@ -764,10 +764,9 @@ the SOCKS5 proxy.</p>
 no longer be your ISPs.</p>
 </li>
 <li>
-<p>The SOCKS5 protocol does not encrypt your traffic, it simply routes your data,
-changing your IP for privacy. DNSCrypt for example, encrypts and authenticates
-your DNS queries. Hiding them from your ISP, local network, and potential
-eavesdroppers.</p>
+<p>SOCKS5 alone doesn't encrypt the traffic; it only proxies or routes it. Orbot
+uses SOCKS5 to let apps route traffic into the Tor network. Once inside the
+Tor network, the traffic is encrypted in layers.</p>
 </li>
 <li>
 <p>There is a misconception that Orbot is a "free VPN". It’s actually part of an
