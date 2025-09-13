@@ -537,16 +537,17 @@ be the reason it ignored Rethink, I don't care to test further...</p>
 follow these steps. If you already only install the minimal apps needed on
 your phone (i.e. Only install what you use) you can probably just go to
 individual Apps and block their networking that you are worried about such as
-Facebook and Google. Routing all of your Apps through Rethink already gives
-you great privacy and security benefits.</p>
+Facebook and Google. Routing all of your Apps through RethinkDNS + Firewall
+already gives you great privacy and security benefits.</p>
 </blockquote>
-<p>If you read the following GrapheneOS discussion Forum:</p>
+<p>If you read the following GrapheneOS discussion forum written by an RDNS dev:</p>
 <ul>
 <li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
 </ul>
-<p>It suggests you Go to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code> click on
-the grayed out 🛜📶 to set a rule to <strong>block both Metered and Unmetered
-connections to all apps by default</strong>.</p>
+<p>The post suggests you go to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code>
+click on the grayed out 🛜📶 to set a rule to <strong>block both Metered and Unmetered
+connections to all apps by default</strong>. This will block both Wi-Fi and mobile data
+connections to <strong>all apps</strong> on your device.</p>
 <p>The point here is that not every App on your device needs network access all the
 time or at all in some cases. Watch your Logs and see which apps "phone home"
 the most. Think about which Apps would leave you the most vulnerable and either
@@ -581,9 +582,7 @@ technologies.--<a href="https://www.privacyguides.org/articles/2025/04/30/in-pra
 <details>
 <summary> ✔️ Click to Expand Tor Section</summary>
 <p>The following is a summary of some of the Tor Overview, all credit goes to them.
-It is important to spread the word when you can! You can read the full article
-<a href="https://www.privacyguides.org/en/advanced/tor-overview/">Here</a>. If you are
-interested in learning how Tor works, I suggest starting with [In Praise of Tor]</p>
+It is important to spread the word when you can!</p>
 <p>If you are fortunate to live outside of oppressive regimes with extreme
 censorship, using Tor for every day, mundane activities is likely safe and won’t
 put you on any harmful “list.” Even if it did, you'd be in good company, these
@@ -599,37 +598,35 @@ routine tasks. Every user adds valuable noise to the network, helping protect
 privacy and freedom for all.</p>
 </details>
 <h3 id="setting-up-orbot-with-a-tcp-only-proxy"><a class="header" href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></h3>
-<p>(Edited 09-12-25) My understanding here has changed, I apologize for any
-confusion this caused.</p>
 <p><img src="android/../images/orbot.png" alt="Orbot Logo" /></p>
 <p>TCP-Only Proxies forward all TCP-level connections from selected apps to Orbot.</p>
-<p>They are best for Apps that use multiple TCP protocols beyone just basic web
-browsing (HTTP/HTTPS) like messaging apps (Signal), search apps (DDG), etc.
-Because it proxies all TCP traffic, it can cause some apps to slow down or break
-if they expect direct DNS or UDP.</p>
+<p>TCP-Only Proxies work best for Apps that use multiple TCP protocols beyond just
+basic web browsing (HTTP/HTTPS) like messaging apps (Signal), search apps (DDG),
+etc. Because it proxies all TCP traffic, it can cause some apps to slow down or
+break if they expect direct DNS or UDP.</p>
 <p>First install Orbot, Open <code>Orbot -&gt; More -&gt; Orbot Settings</code> and turn on
-<code>Power User Mode</code>. This is important, if you forget this Rethinks auto Orbot
+<code>Power User Mode</code>. <strong>This is important</strong>, if you forget this Rethinks auto Orbot
 will not let you choose between SOCKS and HTTP proxies.</p>
-<p>You should also check <code>Allow Background Starts</code> [x].</p>
-<p>Go to <code>Configure -&gt; Proxy -&gt; Setup Orbot</code>:</p>
+<p>You should also check <code>Allow Background Starts</code> ON.</p>
+<p>In <code>Configure -&gt; Proxy -&gt; Setup Orbot</code>:</p>
 <ul>
 <li>
 <p>Click <code>Add / Remove 0 apps</code>, search for an app that you want to run through
 Orbot. For simple testing I chose DuckDuckGo with a TCP-only Proxy.</p>
 </li>
 <li>
-<p>Set Orbot to <code>Bypass Universal</code></p>
+<p>In <code>Home -&gt; Apps</code> search for <code>Orbot</code> and set <code> Orbot -&gt; Bypass Universal</code> ON</p>
 </li>
 <li>
 <p>On the first time starting Orbot through Rethink, you'll have to click the
-<code>Orbot&gt;</code> to Connect as well as grant permissions. After you start Orbot
-successfully, check out Rethinks Home and below the STOP button should say
-<code>Protected With Tor</code>.</p>
+<code>Configure -&gt; Proxy -&gt; Setup Orbot -&gt; Orbot&gt;</code> to <code>Connect</code> as well as grant
+initial permissions. After you start Orbot successfully, check out Rethinks
+<code>Home</code> and below the STOP button should say <code>Protected With Tor</code>.</p>
 </li>
 </ul>
 <p>Open DuckDuckGo and go to:</p>
 <pre><code class="language-text">https://dnsleaktest.com
-# Cross-Check
+# CrossCheck
 https://ipcheck.net
 </code></pre>
 <blockquote>
