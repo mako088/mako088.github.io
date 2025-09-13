@@ -254,9 +254,41 @@ allows a computer to send data straight to another without requiring a
 handshake.</p>
 </li>
 <li>
+<p><strong>IP Address</strong> (Internet Protocol Address): Each device connected to a network
+needs a unique identifier so other devices are able to reach it, the IP
+address is that unique identifier.</p>
+</li>
+<li>
+<p><strong>DNS</strong> (Domain Name System): stores domain information in a distributed
+database and translates domain names into IP addresses and vice versa. This
+enables us to only have to remember simple domain names rather than complex IP
+addresses.</p>
+</li>
+</ul>
+<blockquote>
+<p>Domain Name</p>
+<pre><code class="language-text">ssd.eff.org
+ |   |   |
+ |   |  top-level domain
+ |   |
+ |   second-level domain
+ |
+subdomain
+</code></pre>
+<p>☝️ The hierarchy is read from right to left, the TLD is the highest-level
+domain (<code>.org</code> here), the second-level domain (<code>eff</code>) is directly to the left
+of the TLD, and anything further left (like <code>ssd</code>) is a subdomain under that
+second-level domain.</p>
+</blockquote>
+<ul>
+<li>
 <p><strong>DNS Server</strong>: When you search for a domain name (rethinkdns.com) it triggers
 a DNS lookup. Several different types of DNS servers typically work together
 to complete a single DNS lookup.</p>
+</li>
+<li>
+<p><strong>DNS Resolver</strong>: is a server or software component that translates domain
+names into IP addresses that devices use to communicate.</p>
 </li>
 <li>
 <p><strong>Recursive resolver</strong> (DNS recursor): is typically the first stop in the
@@ -276,14 +308,17 @@ to provide privacy and anonymity.</p>
 <li>
 <p><strong>HTTP(S) Proxy</strong>: An HTTP proxy is an intermediary server that forwards
 HTTP/HTTPS web traffic from a client (e.g., a browser or app) to destination
-servers, allowing for anonymity, filtering, or routing control while masking
-the user's IP.</p>
+servers, allowing for privacy, filtering, or routing control while masking the
+user's IP. HTTP proxies only work with web traffic (HTTP/HTTPS).</p>
 </li>
 <li>
 <p><strong>SOCKS5</strong> (Socket Secure 5): Is an internet proxy protocol that transfers
 info from one server to another while redirecting the user's IP address. It
-operates at the transport layer (TCP) in contrast to HTTP(S) proxies.</p>
+supports both UDP and TCP and can actually improve speed in some cases.</p>
 </li>
+</ul>
+<hr />
+<ul>
 <li>
 <p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
 The app that is allowed to bypass will not have its traffic routed through the
@@ -680,12 +715,12 @@ defaults. (They match).</p>
 <p>Leave the rest of the defaults and Hit <code>Set</code></p>
 </li>
 <li>
-<p>Go <code>Home</code>, below the STOP button you should see <code>Protected With Socks Proxy</code>.
+<p>Go <code>Home</code>, below the STOP button you should see <code>Protected With SOCKS Proxy</code>.
 Now all of your devices traffic that doesn't bypass Rethink is routed through
 the SOCKS5 proxy.</p>
 </li>
 <li>
-<p>Go to <code>Configure -&gt; DNS</code> and turn <code>Never proxy DNS</code> ON</p>
+<p>In <code>Configure -&gt; DNS</code> and turn <code>Never proxy DNS</code> ON</p>
 </li>
 <li>
 <p>Open your browser and visit <code>https://dnsleaktest.com</code>, your public IP should
