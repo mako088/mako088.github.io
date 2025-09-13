@@ -191,6 +191,7 @@
 <li><a href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a>
 <ul>
 <li><a href="#apps-that-dont-work">Apps that Don't work</a></li>
+<li><a href="#other-methods">Other Methods</a></li>
 <li><a href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></li>
 <li><a href="#duckduckgo">DuckDuckGo</a>
 <ul>
@@ -220,16 +221,35 @@ privacy concerns.</p>
 <summary> ✔️ Click to Expand Key Terms </summary>
 <ul>
 <li>
-<p><strong>HTTP</strong> (HyperText Transfer Protocol): is the standard internet protocol you
-would use to access the web.</p>
+<p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web
+browsers and servers to transfer web pages and related resources over the
+internet.</p>
 </li>
 <li>
-<p><strong>IP</strong> (Internet Protocol) is the address system of the internet, responsible
-for delivering packets of data from a source device to a target device. IP is
-the main way in which connections are made, and is the backbone of the
-internet. It doesn't check for errors or ensure the packets are in the correct
-order, that's where TCP comes in. When you set an <code>IP rule</code> this is what
-you're setting, a trusted IP address.</p>
+<p><strong>IP</strong> (Internet Protocol): The address system of the internet that routes
+data packets from source to destination devices. IP operates at the network
+layer and does not guarantee delivery order or error checking, which is
+handled by TCP.</p>
+</li>
+<li>
+<p><strong>IP Address</strong> (Internet Protocol Address): A unique numeric label assigned to
+each device on a network, used to identify and locate the device for
+communication.</p>
+</li>
+<li>
+<p><strong>Subnet</strong> (Subnet Range): represents a block of IP addresses grouped together
+under a single rule. Instead of allowing or blocking individual IP addresses
+one by one, you define a subnet to include a wide range of IPs within that
+block.(Useful for apps that you <code>Isolate</code>).</p>
+</li>
+<li>
+<p><strong>Host</strong>: Any device connected to a network with an IP address, capable of
+sending and receiving data, including computers, phones, or servers.</p>
+</li>
+<li>
+<p><strong>Client</strong>: A device or software (often your computer or phone) that initiates
+requests to servers to access resources or services, forming the client-server
+model of communication.</p>
 </li>
 <li>
 <p><strong>Port</strong>: A port in networking is a virtual communication endpoint managed by
@@ -252,11 +272,6 @@ protocol.</p>
 internet for time-sensitive transmissions such as DNS lookups or VoIP. UDP
 allows a computer to send data straight to another without requiring a
 handshake.</p>
-</li>
-<li>
-<p><strong>IP Address</strong> (Internet Protocol Address): Each device connected to a network
-needs a unique identifier so other devices are able to reach it, the IP
-address is that unique identifier.</p>
 </li>
 <li>
 <p><strong>DNS</strong> (Domain Name System): stores domain information in a distributed
@@ -316,9 +331,34 @@ user's IP. HTTP proxies only work with web traffic (HTTP/HTTPS).</p>
 info from one server to another while redirecting the user's IP address. It
 supports both UDP and TCP and can actually improve speed in some cases.</p>
 </li>
-</ul>
-<hr />
-<ul>
+<li>
+<p><a href="https://github.com/pi-hole/pi-hole">pi-hole</a>: a DNS sinkhole that protects
+your devices content without installing any client-side software.</p>
+</li>
+<li>
+<p><a href="https://github.com/evilsocket/opensnitch">OpenSnitch</a>: is a GNU/Linux
+application firewall.</p>
+</li>
+<li>
+<p><em>proxifier</em>: a proxifier acts as a proxy client, routing specific application
+traffic through proxy servers without encrypting data or providing global IP
+masking.</p>
+</li>
+<li>
+<p><em>VPN</em> (Virtual Private Network): a VPN creates an encrypted tunnel that routes
+all network traffic from your device through a remote server, masking your IP
+address and securing your entire connection.</p>
+</li>
+<li>
+<p>WireGuard: a modern VPN encryption protocol, its fast and has gained
+widespread adoption among VPN providers.</p>
+</li>
+<li>
+<p>OpenVPN: an older, more mature VPN protocol that uses SSL/TLS for encryption.
+It's known for being very reliable and highly configurable but tends to be
+slower and more complex than WireGuard. Good VPNs often give you the choice
+between protocols.</p>
+</li>
 <li>
 <p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
 The app that is allowed to bypass will not have its traffic routed through the
@@ -334,6 +374,12 @@ this app. Rethink will still be aware of said app.</p>
 <li>
 <p><code>Exclude</code>: Rethink will not be aware of this app and it will not be routed
 through RethinkDNS.</p>
+</li>
+<li>
+<p><code>Isolate</code>: This is unclear but I believe this functions as an app lockdown
+mode where when you isolate an app, it restricts the app's network access to
+only the IP addresses or domains you explicitly allow. Giving you more control
+over apps that don't work without a <code>Bypass</code>.</p>
 </li>
 <li>
 <p>🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.</p>
@@ -463,7 +509,7 @@ blocked by the firewall.</p>
 <p>I will use Reddit as an example, the process is the same for any app. Reddit’s
 app and website rely on multiple third-party services and external domains
 beyond just <code>reddit.com</code> itself.</p>
-<p>For apps that don't work it's important to ensure that your systems
+<p>For apps that don't work it's important to ensure that your Android systems
 <code>Private DNS</code> is set to <code>Automatic</code>.</p>
 <p><code>Home -&gt; Apps</code>:</p>
 <p>Search for <code>Reddit</code>, click on it and the Firewall Rules For Reddit will pop up.
@@ -492,6 +538,126 @@ for domains or IPs over a period of time which can take a while. You can go to
 the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</p>
 </li>
 </ul>
+<h3 id="other-methods"><a class="header" href="#other-methods">Other Methods</a></h3>
+<p>Rather than watching the logs and setting trust rules over time, you could use
+tools like <code>nslookup</code> and <code>dig</code> to resolve said domain and reveal IP ranges
+used.</p>
+<pre><code class="language-bash">nslookup reddit.com
+Server:         127.0.0.1
+Address:        127.0.0.1#53
+
+Non-authoritative answer:
+Name:   reddit.com
+Address: 151.101.129.140
+Name:   reddit.com
+Address: 151.101.193.140
+Name:   reddit.com
+Address: 151.101.1.140
+Name:   reddit.com
+Address: 151.101.65.140
+Name:   reddit.com
+Address: 2a04:4e42::396
+Name:   reddit.com
+Address: 2a04:4e42:600::396
+Name:   reddit.com
+Address: 2a04:4e42:200::396
+Name:   reddit.com
+Address: 2a04:4e42:400::396
+</code></pre>
+<p>Resolving a domain (like <code>reddit.com</code>) using tools like <code>nslookup</code> or <code>dig</code>
+reveals multiple IPs because large services use multiple servers across CDNs and
+networks for redundancy and performance.</p>
+<p>You can then run <code>whois</code> on one of those IPs (e.g., <code>whois 151.101.129.140</code>) to
+identify the subnet ranges owned by Reddit's CDN provider (Fastly in this case),
+which helps when setting up subnet range allow rules in Rethink.</p>
+<details>
+<summary> ✔️ Click to Expand `whois` Example Output </summary>
+<pre><code class="language-bash">whois 151.101.129.140
+
+#
+# ARIN WHOIS data and services are subject to the Terms of Use
+# available at: https://www.arin.net/resources/registry/whois/tou/
+#
+# If you see inaccuracies in the results, please report at
+# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/
+#
+# Copyright 1997-2025, American Registry for Internet Numbers, Ltd.
+#
+
+
+NetRange:       151.101.0.0 - 151.101.255.255
+CIDR:           151.101.0.0/16
+NetName:        SKYCA-3
+NetHandle:      NET-151-101-0-0-1
+Parent:         RIPE-ERX-151 (NET-151-0-0-0-0)
+NetType:        Direct Allocation
+OriginAS:
+Organization:   Fastly, Inc. (SKYCA-3)
+RegDate:        2016-02-01
+Updated:        2021-12-14
+Ref:            https://rdap.arin.net/registry/ip/151.101.0.0
+
+
+OrgName:        Fastly, Inc.
+OrgId:          SKYCA-3
+Address:        PO Box 78266
+City:           San Francisco
+StateProv:      CA
+PostalCode:     94107
+Country:        US
+RegDate:        2011-09-16
+Updated:        2025-03-25
+Ref:            https://rdap.arin.net/registry/entity/SKYCA-3
+
+
+OrgNOCHandle: FNO19-ARIN
+OrgNOCName:   Fastly Network Operations
+OrgNOCPhone:  +1-415-404-9374
+OrgNOCEmail:  noc@fastly.com
+OrgNOCRef:    https://rdap.arin.net/registry/entity/FNO19-ARIN
+
+OrgTechHandle: FRA19-ARIN
+OrgTechName:   Fastly RIR Administrator
+OrgTechPhone:  +1-415-518-9103
+OrgTechEmail:  rir-admin@fastly.com
+OrgTechRef:    https://rdap.arin.net/registry/entity/FRA19-ARIN
+
+OrgAbuseHandle: ABUSE4771-ARIN
+OrgAbuseName:   Abuse Account
+OrgAbusePhone:  +1-415-496-9353
+OrgAbuseEmail:  abuse@fastly.com
+OrgAbuseRef:    https://rdap.arin.net/registry/entity/ABUSE4771-ARIN
+
+
+#
+# ARIN WHOIS data and services are subject to the Terms of Use
+# available at: https://www.arin.net/resources/registry/whois/tou/
+#
+# If you see inaccuracies in the results, please report at
+# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/
+#
+# Copyright 1997-2025, American Registry for Internet Numbers, Ltd.
+</code></pre>
+<p>We can see that:</p>
+<ul>
+<li>The subnet range for that IP: <code>151.101.0.0 - 151.101.255.255</code> (CIDR notation:
+<code>151.101.0.0/16</code>)</li>
+</ul>
+<p>So as a starting point to get Reddit working we could trust the following subnet
+range:</p>
+<ul>
+<li>
+<p>IPv4: <code>151.101.0.0/16</code></p>
+</li>
+<li>
+<p>This subnet covers the full range from <code>151.101.0.0</code> to <code>151.101.255.255</code>,
+which includes all related IPs Reddit uses via Fastly’s CDN.</p>
+</li>
+<li>
+<p>The owning organization: <code>Fastly, Inc.</code> &amp; More...</p>
+</li>
+</ul>
+</details>
 <hr />
 <h3 id="firefox-encrypted-dns-through-rethink"><a class="header" href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></h3>
 <p>First, make sure you can visit a few sites in Firefox. If you can, then your
@@ -845,6 +1011,12 @@ state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.
 </li>
 <li>
 <p><a href="https://www.cloudflare.com/learning/dns/what-is-recursive-dns/">Cloudflare What is recursive DNS?</a></p>
+</li>
+<li>
+<p><a href="https://github.com/evilsocket/opensnitch">OpenSnitch</a></p>
+</li>
+<li>
+<p><a href="https://github.com/pi-hole/pi-hole">pi-hole</a></p>
 </li>
 </ul>
 </details>
