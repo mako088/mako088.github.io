@@ -209,6 +209,10 @@ unique threat model and varying approaches to conducting threat modeling.</p>
 <li><a href="android/RethinkDNS_Guide.html#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></li>
 <li><a href="android/RethinkDNS_Guide.html#tor">Tor</a></li>
 <li><a href="android/RethinkDNS_Guide.html#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></li>
+</ul>
+</li>
+<li><a href="android/RethinkDNS_Guide.html#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a>
+<ul>
 <li><a href="android/RethinkDNS_Guide.html#logs">Logs</a></li>
 <li><a href="android/RethinkDNS_Guide.html#resources">Resources</a></li>
 </ul>
@@ -264,7 +268,7 @@ to complete a single DNS lookup.</p>
 series of the above servers.</p>
 </li>
 <li>
-<p><strong>Interative resolver</strong>: In an iterative DNS query, each DNS server responds
+<p><strong>Iterative resolver</strong>: In an iterative DNS query, each DNS server responds
 directly to the client with a referral to another server, and the client
 continues querying successive servers until it receives the IP address for the
 requested domain.</p>
@@ -275,9 +279,13 @@ service that routes internet traffic from your device through the Tor network
 to provide privacy and anonymity.</p>
 </li>
 <li>
+<p><strong>SOCKS5</strong> (Socket Secure 5): Is an internet proxy protocol that transfers
+info from one server to another while redirecting the user's IP address.</p>
+</li>
+<li>
 <p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
-The app that is allowed to bypass will not have it's traffic routed through
-the Rethink encrypted tunnel and will fall back to your systems Private DNS
+The app that is allowed to bypass will not have its traffic routed through the
+Rethink encrypted tunnel and will fall back to your systems Private DNS
 setting. Rethink will still be aware of the app but it won't route its
 traffic.</p>
 </li>
@@ -310,7 +318,7 @@ apps, preventing them from connecting without permission.</p>
 your threat model and needs.</p>
 <h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
 <h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
-<p>Go to <code>Configure -&gt; DNS -&gt; Other DNS</code>:</p>
+<p><code>Configure -&gt; DNS -&gt; Other DNS</code>:</p>
 <ul>
 <li>
 <p>Choose the type of resolver you want, I use DNSCrypt. Once you click you can
@@ -334,10 +342,10 @@ censorship.</p>
 <p><code>Prompt on blocklist updates</code></p>
 </li>
 </ul>
-<p>Leave all the <code>Advanced</code> defaults unless you want to turn on <code>Never proxy DNS</code></p>
-<hr />
+<p>Leave all the <code>Advanced</code> defaults unless you plan on setting up a SOCKS5 proxy,
+in which case you will want to enable <code>Configure -&gt; DNS -&gt; Prevent DNS leaks</code></p>
 <h3 id="network"><a class="header" href="#network">Network</a></h3>
-<p>Go to <code>Configure -&gt; Network</code>:</p>
+<p><code>Configure -&gt; Network</code>:</p>
 <ul>
 <li>
 <p>Set <code>Use all available networks</code> to ON. This enables Wifi and mobile data to
@@ -345,7 +353,7 @@ be used at the same time by Rethink. (Optional, may use more battery)</p>
 </li>
 <li>
 <p><strong>Set your IP version</strong>: The default is <code>IPv4</code>, you can choose between
-<code>IPv6 (experimental)</code> and <code>Auto (experimental)</code> if you use IPv6.</p>
+<code>IPv6 (experimental)</code> and <code>Auto (experimental)</code>.</p>
 </li>
 <li>
 <p>Using the <code>Loopback</code> sounds like a good idea but it makes many of the
@@ -364,8 +372,7 @@ tunnel. This caused issues with the browser when turned off.</p>
 </ul>
 <hr />
 <h3 id="firewall"><a class="header" href="#firewall">Firewall</a></h3>
-<p>Go to <code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following
-to ON:</p>
+<p><code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following to ON:</p>
 <ul>
 <li>
 <p><code>Block all apps when device is locked</code></p>
@@ -374,16 +381,12 @@ to ON:</p>
 <p><code>Block when DNS is bypassed</code></p>
 </li>
 <li>
-<p><code>Block newly installed apps by default</code> (Optional: If you use this, remember
-that you did)</p>
-</li>
-<li>
 <p><code>Block port 80 (insecure HTTP) traffic</code></p>
 </li>
 </ul>
 <hr />
 <h2 id="turn-on-dns-and-firewall"><a class="header" href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a></h2>
-<p>Go to <code>Home</code> 🏠:</p>
+<p><code>Home</code> 🏠:</p>
 <ul>
 <li>Click the big <code>Start</code> button on the bottom of the screen and leave it set to
 the default <code>DNS and Firewall (default)</code></li>
@@ -407,7 +410,7 @@ app and website rely on multiple third-party services and external domains
 beyond just <code>reddit.com</code> itself.</p>
 <p>For apps that don't work it's important to ensure that your systems
 <code>Private DNS</code> is set to <code>Automatic</code>.</p>
-<p>Go to <code>Home -&gt; Apps</code>:</p>
+<p><code>Home -&gt; Apps</code>:</p>
 <p>Search for <code>Reddit</code>, click on it and the Firewall Rules For Reddit will pop up.
 Since it is already allowed <code>Unmetered</code> and <code>Metered</code> connections and still
 doesn't work, we can try one setting at a time until it does work and this is
@@ -440,8 +443,6 @@ the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help
 browser traffic should be routed through the Rethink tunnel, we will check here.
 If you can't, go to <code>Home -&gt; Apps</code> and search for Firefox, is networking
 enabled?</p>
-<p>Sometimes rebooting your phone can help with this, I noticed that I couldn't
-reach any site until a reboot.</p>
 <p><strong>RethinkDNS Settings</strong></p>
 <p>For the best experience routing your browser traffic through your custom
 endpoint (e.g., DNSCrypt) ensure the following are set:</p>
@@ -458,9 +459,8 @@ on Wi-Fi and none would load on mobile data. Turning it back on seemed to fix
 both with no leaks detected.</p>
 </li>
 </ul>
-<p>Double check that in Rethink's <code>Configure -&gt; DNS</code>, ensure the default,
-<code>Prevent DNS leaks</code> is set as well as the Universal Firewalls
-<code>Block when DNS is bypassed</code>.</p>
+<p>Double check that in Rethink's <code>Configure -&gt; DNS</code>, ensure <code>Prevent DNS leaks</code> is
+set as well as the Universal Firewalls <code>Block when DNS is bypassed</code>.</p>
 <p><strong>Firefox Settings</strong></p>
 <blockquote>
 <p>In Firefox, plug <code>about:config</code> into the URL bar and scroll down to
@@ -631,11 +631,8 @@ actual ISP's servers in the results, your setup is working as intended.</p>
 <p>Now you can add more apps that would benefit from anonymity such as FairMail,
 RSS feeds, and crypto wallets. I believe for Signal, it requires that you to set
 up the SOCKS5 proxy to work correctly which is pretty straightforward.</p>
-<p>See:
-<a href="https://docs.rethinkdns.com/firewall/orbot/">Orbot Integration Manual Method</a></p>
 <p>Look into an RSS Feed, they give you complete control of the content you
-consume, no algorithm involved! This blog is also in RSS format at
-&lt;tsawyer87.github.io/index.xml&gt;</p>
+consume, no algorithm involved!</p>
 <p>This can also be useful on public Wi-Fi or other insecure networks.</p>
 <ul>
 <li>
@@ -663,6 +660,40 @@ are less creative and curious.</p>
 </li>
 <li>
 <p>When it really matters consider using Tor Browser through Tails OS or Whonix.</p>
+</li>
+</ul>
+<h2 id="setting-up-a-socks5-proxy"><a class="header" href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></h2>
+<p>If you have Orbot set up through auto mode, you'll have to disable it.</p>
+<p>Go to <code>Configure -&gt; Proxy -&gt; Setup SOCKS5 Proxy</code>.</p>
+<p>In the App dropdown choose <code>Orbot</code>.</p>
+<p>Leave:</p>
+<ul>
+<li>
+<p>Hostname set to: <code>127.0.0.1</code></p>
+</li>
+<li>
+<p>Port Number: <code>9050</code></p>
+</li>
+<li>
+<p>Leave the rest of the defaults and Hit <code>Set</code></p>
+</li>
+<li>
+<p>Go Home, below the STOP button you should see <code>Protected With Socks Proxy</code>.
+Now all of your devices traffic that doesn't bypass Rethink is routed through
+the SOCKS5 proxy.</p>
+</li>
+<li>
+<p>Go to <code>Configure -&gt; DNS</code> and turn <code>Never proxy DNS</code> ON</p>
+</li>
+<li>
+<p>Open your browser and visit <code>https://dnsleaktest.com</code>, your public IP should
+no longer be your ISPs.</p>
+</li>
+<li>
+<p>The SOCKS5 protocol does not encrypt your traffic, it simply routes your data,
+changing your IP for privacy. DNSCrypt for example, encrypts and authenticates
+your DNS queries. Hiding them from your ISP, local network, and potential
+eavesdroppers.</p>
 </li>
 </ul>
 <h3 id="logs"><a class="header" href="#logs">Logs</a></h3>
