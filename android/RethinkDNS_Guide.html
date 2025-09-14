@@ -680,9 +680,15 @@ range:</p>
 <p>This subnet covers the full range from <code>151.101.0.0</code> to <code>151.101.255.255</code>,
 which includes all related IPs Reddit uses via Fastly’s CDN.</p>
 </li>
-<li>
-<p>The owning organization: <code>Fastly, Inc.</code> &amp; More...</p>
-</li>
+</ul>
+<blockquote>
+<p>❗ NOTE: There is risk in trusting a large subnet like <code>151.101.0.0/16</code>, you
+are trusting all services hosted on Fastly's CNS, not just Reddit. Start with
+specific IPs from <code>nslookup</code> (e.g. <code>151.101.129.140</code>, <code>151.101.193.140</code>) or
+use domain-based trusts (e.g., <code>reddit.com</code>, <code>*.reddit.com</code>).</p>
+</blockquote>
+<ul>
+<li>The owning organization: <code>Fastly, Inc.</code> &amp; More...</li>
 </ul>
 </details>
 <hr />
