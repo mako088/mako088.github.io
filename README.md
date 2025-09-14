@@ -31,6 +31,8 @@ security journey.
   - KeepassXC
   - BitWarden
 
+- GnuPG
+
 - Proxy Servers
 
 - VPNs
