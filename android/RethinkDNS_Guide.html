@@ -395,10 +395,9 @@ this app. Rethink will still be aware of said app.</p>
 through RethinkDNS.</p>
 </li>
 <li>
-<p><code>Isolate</code>: This is unclear but I believe this functions as an app lockdown
-mode where when you isolate an app, it restricts the apps network access to
-only the IP addresses or domains you explicitly allow. Giving you more control
-over apps that don't work without a <code>Bypass</code>.</p>
+<p><code>Isolate</code>: this effectively sandboxes the app's network access by enforcing a
+"default deny" policy. It blocks all outgoing traffic from that app unless
+you've explicitly added trust rules for specific IPs, domains, or ports.</p>
 </li>
 <li>
 <p>🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.</p>
