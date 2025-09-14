@@ -40,3 +40,14 @@ security journey.
 The mere existence of a surveillance state breeds fear and conformity and
 stifles free
 expression.--[The Intercept](https://theintercept.com/2016/04/28/new-study-shows-mass-surveillance-breeds-meekness-fear-and-self-censorship/)
+
+⚖️ License
+
+This "Privacy-Book" is open-source and licensed under the Apache License 2.0.
+
+This means you are free to use, modify, and distribute this work, provided you
+adhere to the terms of the license. You can find the full text of the license in
+the LICENSE file within this repository:
+
+View the
+[Apache License 2.0](https://github.com/mako088/mako088.github.io/blob/main/LICENSE)
