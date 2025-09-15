@@ -206,6 +206,7 @@
 <li><a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a>
 <ul>
 <li><a href="#logs">Logs</a></li>
+<li><a href="#inspecting-the-souce-code">Inspecting the Souce Code</a></li>
 <li><a href="#resources">Resources</a></li>
 </ul>
 </li>
@@ -216,6 +217,14 @@
 <p>I'm not affiliated with RethinkDNS in any way, I'm just a technologist with
 privacy concerns.</p>
 </blockquote>
+<ul>
+<li>
+<p><a href="https://rethinkdns.com/privacy">RethinkDNS Privacy Policy</a></p>
+</li>
+<li>
+<p><a href="https://www.reddit.com/r/rethinkdns/comments/17h2y6r/rethink_dns_resolver_costs_1500_per_month_to_run/">Business Model sort of</a></p>
+</li>
+</ul>
 <h3 id="-key-terms"><a class="header" href="#-key-terms">🔑 Key Terms</a></h3>
 <details>
 <summary> ✔️ Click to Expand Key Terms </summary>
@@ -1000,6 +1009,11 @@ that in the first dropdown box.</p>
 <p>The next drop down is <code>Block,trust this IP for this app</code> where you can set a
 rule to <code>Block</code> or <code>Trust</code>.</p>
 <hr />
+<h3 id="inspecting-the-souce-code"><a class="header" href="#inspecting-the-souce-code">Inspecting the Souce Code</a></h3>
+<p>I cloned the rethink-app repo to inspect some of it's source code.</p>
+<p>In <code>rethink-app/full/java/com/celzero/bravedns/scheduler/WorkScheduler.kt</code> I can
+see that it purges connection and console logs every few hours to manage storage
+and privacy.</p>
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <details>
 <summary> ✔️ Click to Expand Resources </summary>
