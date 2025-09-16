@@ -179,11 +179,14 @@
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>Welcome to privacy-book!</p>
 <h2 id="threat-modeling"><a class="header" href="#threat-modeling">Threat Modeling</a></h2>
-<p>Threat modeling involves understanding potential adversaries, identifying the
-information or attack paths they might exploit, and developing strategies to
-reduce or prevent those exploits. The collected information and analysis form
-what is known as a threat model. Each individual or organization may have a
-unique threat model and varying approaches to conducting threat modeling.</p>
+<p>Threat modeling is about figuring out who might want to attack you, what
+information or systems they could target, and how they might try to get in. From
+there, you come up with ways to block or minimize those risks. The outcome of
+this process is called a threat model. Since every person or organization faces
+different risks, each one will have its own unique threat model and its own
+approach to building it.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-android"><a class="header" href="#hardening-android">Hardening Android</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="open-source-app-stores"><a class="header" href="#open-source-app-stores">Open-Source App Stores</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="rethinkdns-users-guide"><a class="header" href="#rethinkdns-users-guide">RethinkDNS Users Guide</a></h2>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
@@ -562,17 +565,14 @@ blocked and allow the ones related to Reddit that you trust, a quick search
 can usually tell you what you need to know.</p>
 </li>
 <li>
-<p>If none of the above worked or you just want a quick fix, you can try allowing
-the app to <code>Bypass DNS &amp; Firewall</code>. Did that fix it? If not you can:</p>
+<p><code>Bypass Universal</code>, Bypass only the Firewall. Still no luck, you can try:</p>
 </li>
 <li>
-<p><code>Bypass Universal</code>, this allows it to ignore any filters or blocklists as
-well. If the app still doesn't work you can:</p>
+<p><code>Bypass DNS &amp; Firewall</code>, Bypass both the DNS and Firewall, still?:</p>
 </li>
 <li>
-<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app. It is
-my understanding that after you <code>Exclude</code> Reddit for example, your systems
-Automatic Secure DNS will pick it up.</p>
+<p><code>Exclude</code> the app. This excludes the App from the DNS and Firewall, Rethink
+will no longer be aware of or create logs for said app.</p>
 </li>
 <li>
 <p>You can also <code>Isolate</code> an App, you then have to set up <em>trust | allow</em> rules
