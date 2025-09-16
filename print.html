@@ -231,7 +231,7 @@ privacy concerns.</p>
 <p><a href="https://rethinkdns.com/privacy">RethinkDNS Privacy Policy</a></p>
 </li>
 <li>
-<p><a href="https://www.reddit.com/r/rethinkdns/comments/17h2y6r/rethink_dns_resolver_costs_1500_per_month_to_run/">Business Model sort of</a></p>
+<p><a href="https://www.reddit.com/r/rethinkdns/comments/17h2y6r/rethink_dns_resolver_costs_1500_per_month_to_run/">Business Model of sorts</a></p>
 </li>
 </ul>
 <h3 id="-key-terms"><a class="header" href="#-key-terms">🔑 Key Terms</a></h3>
@@ -397,25 +397,16 @@ slower and more complex than WireGuard. Good VPNs often give you the choice
 between protocols.</p>
 </li>
 <li>
-<p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
-The app that is allowed to bypass will not have its traffic routed through the
-Rethink encrypted tunnel and will fall back to your systems Private DNS
-setting. Rethink will still be aware of the app but it won't route its
-traffic.</p>
+<p><code>Bypass DNS and Firewall</code>: Bypass universal DNS and Firewall Rules.</p>
 </li>
 <li>
-<p><code>Bypass Universal</code>: Similar to <code>Bypass DNS and Firewall</code> with the added bypass
-of any filters or blocklists. So your extreme privacy blocklist won't block
-this app. Rethink will still be aware of said app.</p>
+<p><code>Bypass Universal</code>: Bypasses the Universal Firewall rules.</p>
 </li>
 <li>
-<p><code>Exclude</code>: Rethink will not be aware of this app and it will not be routed
-through RethinkDNS.</p>
+<p><code>Exclude</code>: This app is excluded from DNS and Firewall.</p>
 </li>
 <li>
-<p><code>Isolate</code>: this effectively sandboxes the app's network access by enforcing a
-"default deny" policy. It blocks all outgoing traffic from that app unless
-you've explicitly added trust rules for specific IPs, domains, or ports.</p>
+<p><code>Isolate</code>: When an app is isolate; only trusted IPs are allowed.</p>
 </li>
 <li>
 <p>🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.</p>
@@ -537,10 +528,8 @@ intervention to get everything working correctly.</p>
 <li>Click the big <code>Start</code> button on the bottom of the screen and leave it set to
 the default <code>DNS and Firewall (default)</code></li>
 </ul>
-<p>Now that we've started the DNS and Firewall, we can go back to
-<code>Configure -&gt; DNS</code> and ensure the provider we chose started successfully. You
-can also experiment with different types of resolvers, make sure to wait for
-below the chosen resolver to say <code>Connected</code>.</p>
+<p>Below the <code>Start</code> button should show <code>Protected</code>. If not, check
+<code>Configure -&gt; DNS -&gt; Other DNS</code> and ensure your resolver started successfully.</p>
 <p>Now, all apps on your device by default allow both Wi-Fi and mobile data access
 <strong>through the RethinkDNS encrypted tunnel</strong>. Try some of your most used Apps to
 see if they function correctly.</p>
