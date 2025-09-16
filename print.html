@@ -557,30 +557,44 @@ beyond just <code>reddit.com</code> itself.</p>
 <p>For apps that don't work it's important to ensure that your Android systems
 <code>Private DNS</code> is set to <code>Automatic</code>.</p>
 <p><code>Home -&gt; Apps</code>:</p>
-<p>Search for <code>Reddit</code>, click on it and the Firewall Rules For Reddit will pop up.
-Since it is already allowed <code>Unmetered</code> and <code>Metered</code> connections and still
-doesn't work, we can try one setting at a time until it does work and this is
-the same process for other Apps that aren't working.</p>
+<p>Search for <code>Reddit</code>, click on it and the rules for Reddit will pop up. Since it
+is already allowed <code>Unmetered</code> and <code>Metered</code> connections and still doesn't work,
+we can first examine the Reddit Logs:</p>
 <ul>
 <li>
-<p>First, you can try allowing the app to <code>Bypass DNS &amp; Firewall</code>. Try the app
-again, does it work? If not:</p>
+<p>Search for and select Reddit, at the bottom of the screen click <code>Domain Logs</code>.
+There, you will see the domains associated with Reddit where you can set trust
+rules, etc.</p>
+</li>
+<li>
+<p>While Reddit is still open, in Rethink go to <code>Configure -&gt; Logs -&gt; DNS</code>. Click
+the filter logo, and choose <code>Blocked</code>. Look through which domains are actively
+blocked and allow the ones related to Reddit that you trust, a quick search
+can usually tell you what you need to know.</p>
+</li>
+<li>
+<p>If none of the above worked or you just want a quick fix, you can try allowing
+the app to <code>Bypass DNS &amp; Firewall</code>. Did that fix it? If not you can:</p>
 </li>
 <li>
 <p><code>Bypass Universal</code>, this allows it to ignore any filters or blocklists as
 well. If the app still doesn't work you can:</p>
 </li>
 <li>
-<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app and is
-often what is required for Reddit. It is my understanding that after you
-<code>Exclude</code> Reddit for example, your systems Automatic Secure DNS will pick it
-up.</p>
+<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app. It is
+my understanding that after you <code>Exclude</code> Reddit for example, your systems
+Automatic Secure DNS will pick it up.</p>
 </li>
 <li>
 <p>You can also <code>Isolate</code> an App, you then have to set up <em>trust | allow</em> rules
 for domains or IPs over a period of time which can take a while. You can go to
 <code>Apps</code> and search for the app in question, click on it and at the bottom of
 the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</p>
+</li>
+<li>
+<p>If you do <code>Isolate</code> an app, I recommend setting trust rules for domains as
+there are often many less domains than there are IPs. If that still doesn't
+work you can try allowing subnet ranges, explained next.</p>
 </li>
 </ul>
 <h3 id="other-methods"><a class="header" href="#other-methods">Other Methods</a></h3>
@@ -695,6 +709,12 @@ range:</p>
 <p>IPv4: <code>151.101.0.0/16</code></p>
 </li>
 <li>
+<p>Upon further testing, while Reddit was isolated and only the above subrange
+being trusted seems to give full functionality of Reddit. I tried switching
+back to just allowing unmetered and metered connections and it continued
+working with the same trust rule.</p>
+</li>
+<li>
 <p>This subnet covers the full range from <code>151.101.0.0</code> to <code>151.101.255.255</code>,
 which includes all related IPs Reddit uses via Fastly’s CDN.</p>
 </li>
@@ -758,18 +778,14 @@ or whatever you chose.</p>
 <p>Also crosscheck with:</p>
 <pre><code class="language-text">https://ipleak.net
 </code></pre>
-<p><code>ipleak.net</code> may show many more servers but as long as they are all related to
-your resolver (i.e., WoodyNet for Quad9) you are not leaking to your ISP or
-other third-parties.</p>
 <p>For DNSCrypt with Quad9 Security, <code>dnsleaktest</code> found 5 servers all with the ISP
 <code>WoodyNet</code> indicating success through Quad9. Quad9 relies on Packet Clearing
 House, that's where the <code>WoodyNet</code> name comes from.</p>
-<p>When on mobile data, when going to <code>https://dnsleaktest.com</code> the results may
-show more servers. As long as they are all the same ISP you're good.</p>
-<p>A different solution could be to experiment with more strict RethinkDNS settings
-and just use the browsers built-in DNS over HTTPS on max protection. Having more
-strict defaults for Rethink with all of your apps and configuring your browser
-separate may be a better option, the choice is yours.</p>
+<p>A different solution could be to experiment with more strict RethinkDNS
+settings, <code>Exclude</code> your browser and use the browsers built-in DNS over HTTPS on
+max protection. Having more strict defaults for Rethink with all of your apps
+and configuring your browser separate may be a better option, the choice is
+yours.</p>
 <p>When hunting down a solution you can go to <code>Configure -&gt; Logs</code>, then try to
 visit the site that wouldn't work while watching the logs. You should see
 <code>Firefox</code> pop up, click it, in the top right of the pop up should be the reason
@@ -777,7 +793,7 @@ it was blocked.</p>
 <hr />
 <h3 id="duckduckgo"><a class="header" href="#duckduckgo">DuckDuckGo</a></h3>
 <p>I also tested DuckDuckGo with its stock configuration and <code>dnsleaktest.com</code>
-showed that DDGs traffic was successfully tunneled through Rethink to Quad9s'
+showed that DDGs traffic was successfully tunneled through Rethink to Quad9s
 servers.</p>
 <p><code>dnsleaktest.com</code> showed all <code>WoodyNet</code> ISPs indicating success.</p>
 <hr />
@@ -803,34 +819,33 @@ be the reason it ignored Rethink, I don't care to test further...</p>
 <blockquote>
 <p>❗ NOTE: If you are happy with the functionality as is it is unnecessary to
 follow these steps. If you already only install the minimal apps needed on
-your phone (i.e. Only install what you use) you can probably just go to
-individual Apps and block their networking that you are worried about such as
-Facebook and Google. Routing all of your Apps through RethinkDNS + Firewall
+your phone (i.e. Only install what you use and trust) you can probably just go
+to individual Apps and block their networking that you are worried about such
+as Facebook and Google. Routing all of your Apps through RethinkDNS + Firewall
 already gives you great privacy and security benefits.</p>
 </blockquote>
 <p>If you read the following GrapheneOS discussion forum written by an RDNS dev:</p>
 <ul>
 <li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
 </ul>
-<p>The post suggests you go to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code>
-click on the grayed out 🛜📶 to set a rule to <strong>block both Metered and Unmetered
-connections to all apps by default</strong>. This will block both Wi-Fi and mobile data
-connections to <strong>all apps</strong> on your device.</p>
-<p>The point here is that not every App on your device needs network access all the
-time or at all in some cases. Watch your Logs and see which apps "phone home"
-the most. Think about which Apps would leave you the most vulnerable and either
-block network access completely or block and unblock as needed based on your
-threat model.</p>
+<p>The post suggests that you block network access to all apps by default and only
+enable a limited number of apps permanent network access:</p>
+<ul>
+<li>Going to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code> click on the grayed
+out 🛜📶 to set a rule. This will <strong>block both 🛜 Wi-Fi and 📶 mobile data
+connections to all apps by default</strong>.</li>
+</ul>
+<blockquote>
+<p>❗ Not every app on your phone needs network access, be thoughtful about which
+apps you grant access!</p>
+</blockquote>
 <p>I would recommend removing network access from your password manager until you
 need it or better yet use something completely offline like
 <a href="https://www.keepassdx.com/">KeePassDX</a>.</p>
 <p>I have never used <code>Link to Windows</code> and I <code>Disable</code> &amp; <code>Force Stop</code> it and
 <code>Link to Windows</code> is still my most blocked App of all time by Rethink...</p>
-<p>If you go for the default deny, you will have to search for every app that you
-use and start by enabling networking and then following the
-<code>Apps that don't work</code> section for each app until they work as expected. If you
-really think about it, the number of apps that require constant networking
-should be limited.</p>
+<p>If you go for the default deny as suggested above, you will have to search for
+and grant network access to the apps that need it.</p>
 <hr />
 <h3 id="tor"><a class="header" href="#tor">Tor</a></h3>
 <p>If you want to learn how Tor works, I suggest reading the following in this
