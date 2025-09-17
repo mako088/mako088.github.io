@@ -1098,6 +1098,299 @@ state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.
 </li>
 </ul>
 </details>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="encrypted-arch-linux-installation-w-encrypted-swap"><a class="header" href="#encrypted-arch-linux-installation-w-encrypted-swap">Encrypted Arch Linux Installation w/ Encrypted Swap</a></h1>
+<ol>
+<li><strong>Connect to Wi-Fi</strong>:</li>
+</ol>
+<pre><code class="language-bash">iwctl
+[iwd]# device list
+[iwd]# station wlan0 scan
+[iwd]# station wlan0 connect NETGEAR80
+# Enter your Password
+# Check Connection
+[iwd]# station wlan0 show
+[iwd]# exit
+</code></pre>
+<pre><code class="language-bash">ping -c 3 archlinux.org
+</code></pre>
+<ol start="2">
+<li><strong>Update package databases</strong>:</li>
+</ol>
+<pre><code class="language-bash">pacman -Sy
+</code></pre>
+<ol start="3">
+<li><strong>Set system clock</strong>:</li>
+</ol>
+<pre><code class="language-bash">timedatectl set-ntp true
+</code></pre>
+<ol start="4">
+<li><strong>Partition your Disk</strong>:</li>
+</ol>
+<ul>
+<li>Identify your target disk (eg. <code>/dev/mmcblk0</code>):</li>
+</ul>
+<pre><code class="language-bash">lsblk
+</code></pre>
+<blockquote>
+<p>❗ If you already have an EFI partition you do not have to create another one
+and doing so can cause issues. First check with <code>fdisk -l</code>, before creating a
+new one.</p>
+</blockquote>
+<p>Check your partitions:</p>
+<pre><code class="language-bash"># fdisk -l | less
+Device            Size           Type
+/dev/mmcblk0p1     1G            EFI System
+/dev/mmcblk0p2     57.2G         Linux root (x86-64)
+</code></pre>
+<p>Since I already have an EFI partition, I can just mount it:</p>
+<pre><code class="language-bash">mkdir -p /mnt/boot
+mount /dev/mmcblk0p1 /mnt/boot
+</code></pre>
+<hr />
+<p>If you don't already have an EFI partition, create one here:</p>
+<ol start="5">
+<li>Use <code>fdisk</code>, <code>parted</code>, or <code>cfdisk</code> to create partitions.</li>
+</ol>
+<pre><code class="language-bash">cfdisk /dev/mmcblk0
+</code></pre>
+<ul>
+<li>
+<p>1G boot partition, press <code>b</code> to set boot flag</p>
+</li>
+<li>
+<p>The rest of the Memory Primary <code>/dev/mmcblk0p2</code> btrfs, press <code>p</code> to set
+primary flag.</p>
+</li>
+</ul>
+<ol start="6">
+<li><strong>Format the EFI partition as FAT32</strong>:</li>
+</ol>
+<pre><code class="language-bash">mkfs.fat -F32 /dev/mmcblk0p1
+</code></pre>
+<ul>
+<li>Leave the root partition unformatted for the encryption step next.</li>
+</ul>
+<ol start="7">
+<li><strong>Encrypt the Root Partition and Open it</strong>:</li>
+</ol>
+<pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p2
+cryptsetup open /dev/mmcblk0p2 cryptroot
+</code></pre>
+<p>Create a Filesystem with Compression</p>
+<pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
+mount /dev/mapper/cryptroot /mnt
+</code></pre>
+<ul>
+<li>Later, we will enable compression by mounting with options like
+<code>compress=zstd</code> in <code>fstab</code> or manually.</li>
+</ul>
+<ol start="8">
+<li><strong>Encrypted Swap</strong></li>
+</ol>
+<pre><code class="language-bash">cfdisk /dev/mmcblk0
+</code></pre>
+<ul>
+<li>
+<p>Select <code>New</code> -&gt; Enter size (2x your RAM size) -&gt; Set type to <code>Linux swap</code></p>
+</li>
+<li>
+<p>Select <code>Write</code> -&gt; Type <code>yes</code> -&gt; Select <code>Quit</code></p>
+</li>
+</ul>
+<p>Verify the new partition (e.g., <code>/dev/mmcblk0p3</code>):</p>
+<pre><code class="language-bash">lsblk
+</code></pre>
+<p>Encrypt the swap partition with LUKS:</p>
+<pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p3
+cryptsetup open /dev/mmcblk0p3 cryptswap
+</code></pre>
+<p>Format the decrypted swap partition:</p>
+<pre><code class="language-bash">mkswap /dev/mapper/cryptswap
+</code></pre>
+<p>Enable the swap:</p>
+<pre><code class="language-bash">swapon /dev/mapper/cryptswap
+</code></pre>
+<p>Add the swap to <code>/mnt/etc/fstab</code> (this will be updated later in the <code>genfstab</code>
+step, but you can manually ensure it):</p>
+<pre><code class="language-bash">echo '/dev/mapper/cryptswap none swap defaults 0 0' &gt;&gt; /mnt/etc/fstab
+</code></pre>
+<p>Add the swap partition to the LUKS configuration for automatic unlocking on
+boot:</p>
+<pre><code class="language-bash">echo 'cryptswap /dev/mmcblk0p3 none luks' &gt;&gt; /mnt/etc/crypttab
+</code></pre>
+<blockquote>
+<p>❗ Later, after <code>arch-chroot</code>, ensure the <code>mkinitcpio.conf</code> HOOKS include
+<code>resume</code> (after <code>encrypt</code>) if you plan on using hibernation. This will be
+covered in the initramfs step.</p>
+</blockquote>
+<p>Continue with Arch Installation</p>
+<p><strong>Install the Base System and Essential Packages on <code>/mnt</code> with <code>pacstrap</code></strong></p>
+<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel
+</code></pre>
+<ul>
+<li>Ensure <code>/mnt/boot</code> (EFI) is mounted as above. With <code>mount | grep /mnt/boot</code>
+<ul>
+<li>
+<p>To list all mounts under <code>/mnt</code>: <code>findmnt /mnt</code></p>
+</li>
+<li>
+<p>I had to remount <code>/mnt/boot</code> in order for the fstab to pick it up with:
+<code>mount /dev/mmcblk0p1 /mnt/boot</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<ol start="9">
+<li><strong>Generate the Filesystem Table</strong>:</li>
+</ol>
+<pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+#
+cat /mnt/etc/fstab
+# Add compression
+vim /mnt/etc/fstab
+</code></pre>
+<ul>
+<li><strong>Important</strong>: It should list <code>/dev/mapper/cryptroot</code> mounted on <code>/</code> with
+Btrfs options, and <code>/dev/mmcblk0p1</code> on <code>/boot</code>. If the <code>fstab</code> doesn't show
+both, you need to regenerate it after mounting the missing partition.</li>
+</ul>
+<ol start="10">
+<li>Add compression, <strong>Only for the Encrypted Partition</strong>:</li>
+</ol>
+<pre><code class="language-bash"># fstab
+/dev/mapper/cryptroot    /    btrfs    rw,relatime,compress=zstd,ssd, #...snip
+</code></pre>
+<p>Remount root with compression without rebooting:</p>
+<pre><code class="language-bash">mount -o remount,compress=zstd /mnt
+</code></pre>
+<ol start="11">
+<li><strong>Change Root into the New Installation</strong></li>
+</ol>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<p>Create a user:</p>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
+passwd yourusername
+</code></pre>
+<p>Enable sudo for wheel group:</p>
+<pre><code class="language-bash">EDITOR=vim visudo
+</code></pre>
+<p>If that doesn't work, use <code>vim /etc/sudoers</code> and edit the file accordingly.</p>
+<p>Uncomment the line:</p>
+<pre><code class="language-bash">%wheel ALL=(ALL) ALL
+</code></pre>
+<ol start="12">
+<li>Edit <code>/etc/mkinitcpio.conf</code> in your new system to add the <code>encrypt</code> hook
+before <code>filesystems</code></li>
+</ol>
+<ul>
+<li>
+<p>Locate the <code>HOOKS</code> line (near the top)</p>
+</li>
+<li>
+<p>Insert <code>encrypt</code> <strong>before</strong> <code>filesystems</code></p>
+</li>
+</ul>
+<pre><code class="language-bash">vim /etc/mkinitcpio.conf
+</code></pre>
+<blockquote>
+<p>❗ NOTE how I also added the <code>resume</code> <strong>after</strong> <code>encrypt</code></p>
+</blockquote>
+<pre><code class="language-bash"># mkinitcpio.conf
+# ... snip ...
+HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt resume filesystems fsck)
+# ... snip ...
+</code></pre>
+<ol start="13">
+<li><strong>Regenerate initramfs with</strong>:</li>
+</ol>
+<pre><code class="language-bash">mkinitcpio -p linux-zen
+# Should output
+Initcpio image generation successful
+</code></pre>
+<ol start="14">
+<li><strong>Install Grub and EFI boot manager</strong>, (while still in chroot environment):</li>
+</ol>
+<pre><code class="language-bash">pacman -S grub efibootmgr
+</code></pre>
+<p>Install GRUB for UEFI Systems:</p>
+<pre><code class="language-bash">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+# Should output
+Installation finished. No error reported.
+</code></pre>
+<p>Configure GRUB to unlock LUKS root partition</p>
+<ul>
+<li>Edit <code>/etc/default/grub</code> and modify the line starting with
+<code>GRUB_CMDLINE_LINUX</code> to add:</li>
+</ul>
+<pre><code class="language-bash">cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-bash">GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot"
+</code></pre>
+<p>Generate GRUB configuration:</p>
+<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
+# Should output
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+</code></pre>
+<ol start="15">
+<li><strong>Enable LightDM and NetworkManager</strong></li>
+</ol>
+<pre><code class="language-bash">systemctl enable lightdm
+systemctl enable NetworkManager
+</code></pre>
+<p>Configure LightDM greeter:</p>
+<ul>
+<li>Edit <code>/etc/lightdm/lightdm.conf</code> to add:</li>
+</ul>
+<pre><code class="language-conf"># lightdm.conf
+[Seat:*]
+greeter-session=lightdm-gtk-greeter
+</code></pre>
+<p>Exit <code>arch-chroot</code> with <code>exit</code>.</p>
+<p>Unmount your partitions and reboot:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+</code></pre>
+<ol start="16">
+<li><strong>Reboot</strong></li>
+</ol>
+<h3 id="arch-chroot"><a class="header" href="#arch-chroot">arch-chroot</a></h3>
+<details>
+<summary> ✔️ Click to Expand `arch-chroot` Example </summary>
+<p>Say you forgot something, like forgetting to add a user and password. You reboot
+and go to TTY into your system and are hit with a AHHH I can't log in WTF!</p>
+<p>Lol, don't panic. It's as easy as repeating some of the steps above. Reboot into
+the Live environment (like we just did for the install), remount your partitions
+and arch-chroot back in:</p>
+<p>Open the encrypted root partition:</p>
+<pre><code class="language-bash">cryptsetup open /dev/mmcblk0p2 cryptroot
+</code></pre>
+<p>Mount the decrypted root:</p>
+<pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
+</code></pre>
+<p>Mount the EFI partition:</p>
+<pre><code class="language-bash">mount /dev/mmcblk0p1 /mnt/boot
+</code></pre>
+<p>Chroot into your installed system:</p>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
+passwd yourusername
+</code></pre>
+<p>Uncomment the line <code>%wheel ALL=(ALL) ALL</code> in <code>/etc/sudoers</code></p>
+<p>Exit chroot:</p>
+<pre><code class="language-bash">exit
+</code></pre>
+<p>Unmount and close LUKS:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+reboot
+</code></pre>
+</details>
 
                     </main>
 
