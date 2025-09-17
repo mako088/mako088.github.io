@@ -1115,9 +1115,8 @@ directory is just the same directory where your Arch Linux ISO file is stored.</
 <p>❗ NOTE: If you only want to verify the Arch Linux ISO once, you can
 temporarily import the public key, verify the signature, and then you don’t
 need to keep the key permanently in your keyring or sign it locally. The
-essential goal is just to confirm the ISO’s integrity and authenticity.
-However, for ongoing use and convenience, importing and signing the key is
-recommended.</p>
+essential goal is just to confirm the ISO’s integrity and authenticity. It's
+good practice to sign and publish the key to add to the web of trust.</p>
 </blockquote>
 <p>For example, if you have a folder named <code>ArchLinuxISO</code> where you keep the ISO
 file <code>archlinux-2025-09.01-x86_64.iso</code>, you should also download the PGP
@@ -1148,27 +1147,26 @@ Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre
 
 1 authenticated signature.
 </code></pre>
-<p>This shows that the signature was made by the key with the ID
-<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C</code> (Pierre Schmitz).</p>
 <blockquote>
 <p>❗ To ensure the key is authentic and not spoofed, verify that the key
 fingerprint matches the official Arch Linux signing key fingerprint, which can
 be found on the Arch Linux website or trusted sources.</p>
 </blockquote>
+<p>This shows that the signature was made by the key with the ID
+<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C</code> (Pierre Schmitz).</p>
 <p>You can check the keys fingerprint with:</p>
 <pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
 </code></pre>
 <p>Verify it against the
 <a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></p>
-<p>GPG authenticated that the signature is valid and that the key used to sign is
-trusted in our keyring.</p>
-<p>1 authenticated signature confirms the files integrity and authenticity.</p>
+<p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
+that the key used to sign is trusted in our keyring.</p>
+<p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
 <p>We have successfully verified that the file was signed by Pierr's official Arch
 Linux key and has not been tampered with.</p>
-<p>Since the key has been verified we can now sign it. We will have to import our
-primary key to do so since we are keeping it offline for safety.</p>
-<pre><code class="language-bash">gpg --import backup.gpg
-</code></pre>
+<p>The following is only if you currently already have keys on your gpg keyring.</p>
+<details>
+<summary> ☑️ Click to expand Key Signing and Publishing Example </summary>
 <p>List your keys to get the arch keyID:</p>
 <pre><code class="language-bash">gpg --list-keys
 # ... snip ...
@@ -1190,6 +1188,7 @@ gpg --send-keys 0x76A5EF9054449A5C
 better for the web of trust that gpg uses making the network more secure for
 everyone.</p>
 <h3 id="edit-your-trust-level-of-the-key"><a class="header" href="#edit-your-trust-level-of-the-key">Edit your trust level of the key</a></h3>
+<p>This is just an example, it's not necessary.</p>
 <pre><code class="language-bash">gpg --edit-key pierre@archlinux.org
 gpg&gt; trust
 Please decide how far you trust this user to correctly verify other users' keys
@@ -1209,6 +1208,8 @@ pub  ed25519/0x76A5EF9054449A5C
      trust: marginal      validity: full
 </code></pre>
 <p>You can see that the trust is <code>marginal</code> and validity is <code>full</code>.</p>
+<p>Obviously if you are able to verify the fingerprint in person, you can give that
+key ultimate trust. There are other ways of building trust described above.</p>
 </details>
 <ol>
 <li><strong>Connect to Wi-Fi</strong>:</li>
@@ -1400,7 +1401,7 @@ passwd yourusername
 </code></pre>
 <p>If that doesn't work, use <code>vim /etc/sudoers</code> and edit the file accordingly.</p>
 <p>Uncomment the line:</p>
-<pre><code class="language-bash">%wheel ALL=(ALL) ALL
+<pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
 </code></pre>
 <hr />
 <ol start="12">
@@ -1510,9 +1511,8 @@ environment (like we just did for the install), remount your partitions and
 passwd yourusername
 </code></pre>
 <ul>
-<li>The <code>-s /bin/bash</code> option sets the user's default shell to Bash, which is the
-standard command-line interface. You can use another shell like Zsh
-(<code>/bin/zsh</code>) if installed.</li>
+<li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
+installed.</li>
 </ul>
 <p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
 <p>Exit chroot:</p>
