@@ -1224,16 +1224,19 @@ pub  ed25519/0x76A5EF9054449A5C
 </code></pre>
 <pre><code class="language-bash">ping -c 3 archlinux.org
 </code></pre>
+<hr />
 <ol start="2">
 <li><strong>Update package databases</strong>:</li>
 </ol>
 <pre><code class="language-bash">pacman -Sy
 </code></pre>
+<hr />
 <ol start="3">
 <li><strong>Set system clock</strong>:</li>
 </ol>
 <pre><code class="language-bash">timedatectl set-ntp true
 </code></pre>
+<hr />
 <ol start="4">
 <li><strong>Partition your Disk</strong>:</li>
 </ol>
@@ -1276,6 +1279,7 @@ mount /dev/mmcblk0p1 /mnt/boot
 primary flag.</p>
 </li>
 </ul>
+<hr />
 <ol start="6">
 <li><strong>Format the EFI partition as FAT32</strong>:</li>
 </ol>
@@ -1284,6 +1288,7 @@ primary flag.</p>
 <ul>
 <li>Leave the root partition unformatted for the encryption step next.</li>
 </ul>
+<hr />
 <ol start="7">
 <li><strong>Encrypt the Root Partition and Open it</strong>:</li>
 </ol>
@@ -1298,6 +1303,7 @@ mount /dev/mapper/cryptroot /mnt
 <li>Later, we will enable compression by mounting with options like
 <code>compress=zstd</code> in <code>fstab</code> or manually.</li>
 </ul>
+<hr />
 <ol start="8">
 <li><strong>Encrypted Swap</strong></li>
 </ol>
@@ -1354,6 +1360,7 @@ covered in the initramfs step.</p>
 </ul>
 </li>
 </ul>
+<hr />
 <ol start="9">
 <li><strong>Generate the Filesystem Table</strong>:</li>
 </ol>
@@ -1368,6 +1375,7 @@ vim /mnt/etc/fstab
 Btrfs options, and <code>/dev/mmcblk0p1</code> on <code>/boot</code>. If the <code>fstab</code> doesn't show
 both, you need to regenerate it after mounting the missing partition.</li>
 </ul>
+<hr />
 <ol start="10">
 <li>Add compression, <strong>Only for the Encrypted Partition</strong>:</li>
 </ol>
@@ -1377,6 +1385,7 @@ both, you need to regenerate it after mounting the missing partition.</li>
 <p>Remount root with compression without rebooting:</p>
 <pre><code class="language-bash">mount -o remount,compress=zstd /mnt
 </code></pre>
+<hr />
 <ol start="11">
 <li><strong>Change Root into the New Installation</strong></li>
 </ol>
@@ -1393,6 +1402,7 @@ passwd yourusername
 <p>Uncomment the line:</p>
 <pre><code class="language-bash">%wheel ALL=(ALL) ALL
 </code></pre>
+<hr />
 <ol start="12">
 <li>Edit <code>/etc/mkinitcpio.conf</code> in your new system to add the <code>encrypt</code> hook
 before <code>filesystems</code></li>
@@ -1415,6 +1425,7 @@ before <code>filesystems</code></li>
 HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt resume filesystems fsck)
 # ... snip ...
 </code></pre>
+<hr />
 <ol start="13">
 <li><strong>Regenerate initramfs with</strong>:</li>
 </ol>
@@ -1422,6 +1433,7 @@ HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont blo
 # Should output
 Initcpio image generation successful
 </code></pre>
+<hr />
 <ol start="14">
 <li><strong>Install Grub and EFI boot manager</strong>, (while still in chroot environment):</li>
 </ol>
@@ -1448,6 +1460,7 @@ Installation finished. No error reported.
 Adding boot menu entry for UEFI Firmware Settings ...
 done
 </code></pre>
+<hr />
 <ol start="15">
 <li><strong>Enable LightDM and NetworkManager</strong></li>
 </ol>
@@ -1468,17 +1481,19 @@ greeter-session=lightdm-gtk-greeter
 umount /mnt
 cryptsetup close cryptroot
 </code></pre>
+<hr />
 <ol start="16">
 <li><strong>Reboot</strong></li>
 </ol>
+<hr />
 <h3 id="arch-chroot"><a class="header" href="#arch-chroot">arch-chroot</a></h3>
 <details>
 <summary> ✔️ Click to Expand `arch-chroot` Example </summary>
 <p>Say you forgot something, like forgetting to add a user and password. You reboot
 and go to TTY into your system and are hit with a AHHH I can't log in WTF!</p>
-<p>Lol, don't panic. It's as easy as repeating some of the steps above. Reboot into
-the Live environment (like we just did for the install), remount your partitions
-and arch-chroot back in:</p>
+<p>It's as easy as repeating some of the steps above. Reboot into the Live
+environment (like we just did for the install), remount your partitions and
+<code>arch-chroot</code> back in:</p>
 <p>Open the encrypted root partition:</p>
 <pre><code class="language-bash">cryptsetup open /dev/mmcblk0p2 cryptroot
 </code></pre>
