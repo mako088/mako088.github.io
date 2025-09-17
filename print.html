@@ -1103,11 +1103,6 @@ state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></li>
 </ul>
-<p>The Arch Wiki is an excellent resource, but it often expects you to follow
-multiple links to piece together a complete solution, along with doing your own
-research. Unfortunately, many in the community are not very helpful when you ask
-for support, though they do seem to have plenty of time to criticize or be
-dismissive.</p>
 <ol>
 <li><strong>Connect to Wi-Fi</strong>:</li>
 </ol>
@@ -1392,7 +1387,12 @@ and arch-chroot back in:</p>
 <pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
 passwd yourusername
 </code></pre>
-<p>Uncomment the line <code>%wheel ALL=(ALL) ALL</code> in <code>/etc/sudoers</code></p>
+<ul>
+<li>The <code>-s /bin/bash</code> option sets the user's default shell to Bash, which is the
+standard command-line interface. You can use another shell like Zsh
+(<code>/bin/zsh</code>) if installed.</li>
+</ul>
+<p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
 <p>Exit chroot:</p>
 <pre><code class="language-bash">exit
 </code></pre>
