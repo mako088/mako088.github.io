@@ -284,6 +284,14 @@ everyone.</p>
 </ol>
 <pre><code class="language-bash">pacman -Sy
 </code></pre>
+<p>Save a backup of your current mirrorlist so we can safely update it:</p>
+<pre><code class="language-bash">cat /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+</code></pre>
+<pre><code class="language-bash">pacman -S reflector
+reflector --list-countries
+# Example if you live in the US
+reflector -c US -p https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
+</code></pre>
 <hr />
 <ol start="3">
 <li><strong>Set system clock</strong>:</li>
