@@ -1209,7 +1209,7 @@ everyone.</p>
 <pre><code class="language-bash">pacman -Sy
 </code></pre>
 <p>Save a backup of your current mirrorlist so we can safely update it:</p>
-<pre><code class="language-bash">cat /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+<pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 </code></pre>
 <pre><code class="language-bash">pacman -S reflector
 reflector --list-countries
