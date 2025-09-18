@@ -1112,16 +1112,15 @@ directory is just the same directory where your Arch Linux ISO file is stored.</
 <details>
 <summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
 <blockquote>
-<p>❗ NOTE: If you only want to verify the Arch Linux ISO once, you can
-temporarily import the public key, verify the signature, and then you don’t
-need to keep the key permanently in your keyring or sign it locally. The
-essential goal is just to confirm the ISO’s integrity and authenticity. It's
-good practice to sign and publish the key to add to the web of trust.</p>
+<p>❗ NOTE: If you only want to verify the ISO once, you can temporarily import
+the public key, verify the signature, and then you don’t need to keep the key
+permanently in your keyring or sign it locally. This example is from the last
+release, but the process is the same.</p>
 </blockquote>
-<p>For example, if you have a folder named <code>ArchLinuxISO</code> where you keep the ISO
-file <code>archlinux-2025-09.01-x86_64.iso</code>, you should also download the PGP
-signature file <code>archlinux-2025.09.01-x86_64.iso.sig</code> to the same folder.</p>
-<p>With sequoia, you can get the Arch release signing key with:</p>
+<p>For example, if you have a folder named <code>archISO</code> where you keep the ISO file
+<code>archlinux-2025-09.01-x86_64.iso</code>, you should also download the PGP signature
+file <code>archlinux-2025.09.01-x86_64.iso.sig</code> to the same folder.</p>
+<p>With <code>sequoia</code>(a separate app), you can get the Arch release signing key with:</p>
 <pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
 </code></pre>
 <p>Export the chosen key to a <code>.pgp</code> file:</p>
@@ -1150,7 +1149,7 @@ Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre
 <blockquote>
 <p>❗ To ensure the key is authentic and not spoofed, verify that the key
 fingerprint matches the official Arch Linux signing key fingerprint, which can
-be found on the Arch Linux website or trusted sources.</p>
+is linked below and on the Arch website.</p>
 </blockquote>
 <p>This shows that the signature was made by the key with the ID
 <code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C</code> (Pierre Schmitz).</p>
@@ -1187,29 +1186,6 @@ gpg --send-keys 0x76A5EF9054449A5C
 <p>The more people that verify, sign, and re-export and publish their keys the
 better for the web of trust that gpg uses making the network more secure for
 everyone.</p>
-<h3 id="edit-your-trust-level-of-the-key"><a class="header" href="#edit-your-trust-level-of-the-key">Edit your trust level of the key</a></h3>
-<p>This is just an example, it's not necessary.</p>
-<pre><code class="language-bash">gpg --edit-key pierre@archlinux.org
-gpg&gt; trust
-Please decide how far you trust this user to correctly verify other users' keys
-(by looking at passports, checking fingerprints from different sources, etc.)
-
-  1 = I don't know or won't say
-  2 = I do NOT trust
-  3 = I trust marginally
-  4 = I trust fully
-  5 = I trust ultimately
-  m = back to the main menu
-
-Your decision? 3
-# Output:
-pub  ed25519/0x76A5EF9054449A5C
-     created: 2022-10-31  expires: 2037-10-27  usage: SC
-     trust: marginal      validity: full
-</code></pre>
-<p>You can see that the trust is <code>marginal</code> and validity is <code>full</code>.</p>
-<p>Obviously if you are able to verify the fingerprint in person, you can give that
-key ultimate trust. There are other ways of building trust described above.</p>
 </details>
 <ol>
 <li><strong>Connect to Wi-Fi</strong>:</li>
@@ -1302,7 +1278,7 @@ mount /dev/mapper/cryptroot /mnt
 </code></pre>
 <ul>
 <li>Later, we will enable compression by mounting with options like
-<code>compress=zstd</code> in <code>fstab</code> or manually.</li>
+<code>compress=zstd</code> in <code>fstab</code></li>
 </ul>
 <hr />
 <ol start="8">
@@ -1342,7 +1318,7 @@ boot:</p>
 <blockquote>
 <p>❗ Later, after <code>arch-chroot</code>, ensure the <code>mkinitcpio.conf</code> HOOKS include
 <code>resume</code> (after <code>encrypt</code>) if you plan on using hibernation. This will be
-covered in the initramfs step.</p>
+covered in the <code>initramfs</code> step.</p>
 </blockquote>
 <p>Continue with Arch Installation</p>
 <p><strong>Install the Base System and Essential Packages on <code>/mnt</code> with <code>pacstrap</code></strong></p>
@@ -1356,7 +1332,7 @@ covered in the initramfs step.</p>
 </li>
 <li>
 <p>I had to remount <code>/mnt/boot</code> in order for the fstab to pick it up with:
-<code>mount /dev/mmcblk0p1 /mnt/boot</code></p>
+<code>mount /dev/mmcblk0p1 /mnt/boot</code>.</p>
 </li>
 </ul>
 </li>
@@ -1374,7 +1350,8 @@ vim /mnt/etc/fstab
 <ul>
 <li><strong>Important</strong>: It should list <code>/dev/mapper/cryptroot</code> mounted on <code>/</code> with
 Btrfs options, and <code>/dev/mmcblk0p1</code> on <code>/boot</code>. If the <code>fstab</code> doesn't show
-both, you need to regenerate it after mounting the missing partition.</li>
+<strong>both</strong>, you need to regenerate it after mounting the missing partition.
+Clear your old <code>fstab</code> if its necessary to run <code>genfstab</code> again.</li>
 </ul>
 <hr />
 <ol start="10">
@@ -1382,6 +1359,7 @@ both, you need to regenerate it after mounting the missing partition.</li>
 </ol>
 <pre><code class="language-bash"># fstab
 /dev/mapper/cryptroot    /    btrfs    rw,relatime,compress=zstd,ssd, #...snip
+#...snip...
 </code></pre>
 <p>Remount root with compression without rebooting:</p>
 <pre><code class="language-bash">mount -o remount,compress=zstd /mnt
@@ -1410,7 +1388,7 @@ before <code>filesystems</code></li>
 </ol>
 <ul>
 <li>
-<p>Locate the <code>HOOKS</code> line (near the top)</p>
+<p>Locate the <code>HOOKS</code> line</p>
 </li>
 <li>
 <p>Insert <code>encrypt</code> <strong>before</strong> <code>filesystems</code></p>
@@ -1419,7 +1397,8 @@ before <code>filesystems</code></li>
 <pre><code class="language-bash">vim /etc/mkinitcpio.conf
 </code></pre>
 <blockquote>
-<p>❗ NOTE how I also added the <code>resume</code> <strong>after</strong> <code>encrypt</code></p>
+<p>❗ NOTE how I also added the <code>resume</code> <strong>after</strong> <code>encrypt</code>, that's for if you
+want to set up hibernation.</p>
 </blockquote>
 <pre><code class="language-bash"># mkinitcpio.conf
 # ... snip ...
@@ -1450,10 +1429,9 @@ Installation finished. No error reported.
 <li>Edit <code>/etc/default/grub</code> and modify the line starting with
 <code>GRUB_CMDLINE_LINUX</code> to add:</li>
 </ul>
-<pre><code class="language-bash">cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot
-</code></pre>
-<p>Example:</p>
-<pre><code class="language-bash">GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot"
+<pre><code class="language-bash"># ...snip...
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot"
+# ...snip...
 </code></pre>
 <p>Generate GRUB configuration:</p>
 <pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
