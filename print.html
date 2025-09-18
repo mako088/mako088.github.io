@@ -1109,6 +1109,13 @@ state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.
 directory is just the same directory where your Arch Linux ISO file is stored.</p>
 </li>
 </ul>
+<blockquote>
+<p>Always review the Wiki and never just plug random things suggested by me or
+anyone else without first doing your own research. If you have a ton of RAM
+and don't want hibernation capabilities, you can safely skip the swap section.
+There is no security benefit to using an encrypted swap over zram that I know
+of since zram is stored in RAM it's wiped on power loss.</p>
+</blockquote>
 <details>
 <summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
 <blockquote>
@@ -1293,11 +1300,18 @@ mount /dev/mapper/cryptroot /mnt
 <ol start="8">
 <li><strong>Encrypted Swap</strong></li>
 </ol>
+<blockquote>
+<p>❗ NOTE: If you have a ton of RAM a swap is probably unnecessary unless you
+want hibernation, which requires it. Anything over 16G of RAM and it is
+questionable if you need swap at all and should probably just use zram.</p>
+</blockquote>
 <pre><code class="language-bash">cfdisk /dev/mmcblk0
 </code></pre>
+<p>(Edited: 09-18-25)</p>
 <ul>
 <li>
-<p>Select <code>New</code> -&gt; Enter size (2x your RAM size) -&gt; Set type to <code>Linux swap</code></p>
+<p>Select <code>New</code> -&gt; Enter size (2G more than your RAM is usually safe) -&gt; Set type
+to <code>Linux swap</code></p>
 </li>
 <li>
 <p>Select <code>Write</code> -&gt; Type <code>yes</code> -&gt; Select <code>Quit</code></p>
