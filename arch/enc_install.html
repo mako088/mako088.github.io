@@ -175,8 +175,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="encrypted-arch-linux-installation-w-encrypted-swap"><a class="header" href="#encrypted-arch-linux-installation-w-encrypted-swap">Encrypted Arch Linux Installation w/ Encrypted Swap</a></h1>
-<p>The ultimate installation resource is always going to be the:</p>
+                        <h1 id="encrypted-arch-install-w-encrypted-swap"><a class="header" href="#encrypted-arch-install-w-encrypted-swap">Encrypted Arch Install w/ Encrypted Swap</a></h1>
+<p>The ultimate installation resource is always goint to be the:</p>
 <ul>
 <li>
 <p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
@@ -201,10 +201,7 @@ the public key, verify the signature, and then you don’t need to keep the key
 permanently in your keyring or sign it locally. This example is from the last
 release, but the process is the same.</p>
 </blockquote>
-<p>For example, if you have a folder named <code>archISO</code> where you keep the ISO file
-<code>archlinux-2025-09.01-x86_64.iso</code>, you should also download the PGP signature
-file <code>archlinux-2025.09.01-x86_64.iso.sig</code> to the same folder.</p>
-<p>With <code>sequoia</code>(a separate app), you can get the Arch release signing key with:</p>
+<p>With <code>sequoia</code>, you can get the Arch release signing key with:</p>
 <pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
 </code></pre>
 <p>Export the chosen key to a <code>.pgp</code> file:</p>
@@ -236,12 +233,55 @@ fingerprint matches the official Arch Linux signing key fingerprint, which can
 is linked below and on the Arch website.</p>
 </blockquote>
 <p>This shows that the signature was made by the key with the ID
+<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz)</code></p>
+<p>You can check the keys fingerprint with:</p>
+<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
+</code></pre>
+<ul>
+<li>Verify it against the
+<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
+</ul>
+<p>✔️ Verifying Arch Linux ISO on Other Distributions</p>
+<pre><code>❗ NOTE: If you only want to verify the ISO once, you can temporarily import the public key, verify the signature, and then you don’t need to keep the key permanently in your keyring or sign it locally. This example is from the last release, but the process is the same.
+</code></pre>
+<p>For example, if you have a folder named archISO where you keep the ISO file
+archlinux-2025-09.01-x86_64.iso, you should also download the PGP signature file
+archlinux-2025.09.01-x86_64.iso.sig to the same folder.</p>
+<p>With sequoia(a separate app), you can get the Arch release signing key with:</p>
+<p>sq network wkd search pierre@archlinux.org --output release-key.pgp</p>
+<p>Export the chosen key to a .pgp file:</p>
+<p>sq cert export --keyring=release-key.pgp
+--cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp</p>
+<p>Import into your keychain:</p>
+<pre><code class="language-bash"> gpg --import pierre-archlinux.pgp
+gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
+gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
+gpg: next trustdb check due at 2026-08-23
+</code></pre>
+<ul>
+<li>Now, you should see <a href="mailto:pierre@archlinux.org">pierre@archlinux.org</a> and his keys when you run gpg
+--list-keys</li>
+</ul>
+<p>Finally, verify the signature:</p>
+<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
+Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
+1 authenticated signature.
+</code></pre>
+<blockquote>
+<p>❗ To ensure the key is authentic and not spoofed, verify that the key
+fingerprint matches the official Arch Linux signing key fingerprint, which can
+is linked below and on the Arch website.</p>
+</blockquote>
+<p>This shows that the signature was made by the key with the ID
 <code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C</code> (Pierre Schmitz).</p>
 <p>You can check the keys fingerprint with:</p>
 <pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
 </code></pre>
-<p>Verify it against the
-<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></p>
+<p>Verify it against the Arch Linux master-keys</p>
 <p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
 that the key used to sign is trusted in our keyring.</p>
 <p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
@@ -263,15 +303,13 @@ sub   cv25519/0x7F56ADE50CA3D899 2022-10-31 [E] [expires: 2037-10-27]
 <p>Sign the key:</p>
 <pre><code class="language-bash">gpg --sign-key 0x76A5EF9054449A5C
 </code></pre>
-<p>Now you can Export and publish the new public key and send it to a keyserver:</p>
+<p>Now you can export and publish the new public key and send it to a keyserver:</p>
 <pre><code class="language-bash">gpg --export --armor 0x76A5EF9054449A5C &gt; archlinux-signed.asc
 gpg --send-keys 0x76A5EF9054449A5C
 </code></pre>
 <p>The more people that verify, sign, and re-export and publish their keys the
 better for the web of trust that gpg uses making the network more secure for
 everyone.</p>
-</details>
-</details>
 <ol>
 <li><strong>Connect to Wi-Fi</strong>:</li>
 </ol>
@@ -298,81 +336,73 @@ everyone.</p>
 <pre><code class="language-bash">pacman -S reflector
 reflector --list-countries
 # Example if you live in the US
-reflector -c US -p https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
 </code></pre>
 <hr />
-<ol start="3">
-<li><strong>Set system clock</strong>:</li>
-</ol>
+<p>3 <strong>Set system clock</strong>:</p>
 <pre><code class="language-bash">timedatectl set-ntp true
+timedatectl list-timezones
+# Example
+sudo timedatectl set-timezone America/New_York
 </code></pre>
 <hr />
 <ol start="4">
 <li><strong>Partition your Disk</strong>:</li>
 </ol>
-<ul>
-<li>Identify your target disk (eg. <code>/dev/mmcblk0</code>):</li>
-</ul>
+<p>Identify your target disk (e.g., <code>/dev/mmcblk0</code>):</p>
 <pre><code class="language-bash">lsblk
 </code></pre>
 <blockquote>
 <p>❗ If you already have an EFI partition you do not have to create another one
-and doing so can cause issues. First check with <code>fdisk -l</code>, before creating a
+and doing so can cause issues. First check with fdisk -l, before creating a
 new one.</p>
 </blockquote>
-<p>Check your partitions:</p>
 <pre><code class="language-bash">fdisk -l | less
 Device            Size           Type
 /dev/mmcblk0p1     1G            EFI System
 /dev/mmcblk0p2     57.2G         Linux root (x86-64)
 </code></pre>
-<p>Since I already have an EFI partition, I can just mount it:</p>
+<p>Since I already have a 1G EFI and another root partition with the rest of the
+space, I'll only need cfdisk to resize <code>mmcblk0p2</code> in order to make a swap
+partition.</p>
 <pre><code class="language-bash">mkdir -p /mnt/boot
 mount /dev/mmcblk0p1 /mnt/boot
 </code></pre>
 <hr />
-<p>If you don't already have an EFI partition, create one here:</p>
 <ol start="5">
-<li>Use <code>fdisk</code>, <code>parted</code>, or <code>cfdisk</code> to create partitions.</li>
+<li>If you have a disk with no partitions on it, you'll have to use a
+partitioning tool to create them. I'll use cfdisk as an example:</li>
 </ol>
 <pre><code class="language-bash">cfdisk /dev/mmcblk0
 </code></pre>
-<ul>
-<li>
-<p><a href="https://www.man7.org/linux/man-pages/man8/cfdisk.8.html">cfdisk(8) man page</a></p>
-</li>
-<li>
-<p>1G boot partition, press <code>b</code> to set boot flag</p>
-</li>
-<li>
-<p>The rest of the Memory Primary <code>/dev/mmcblk0p2</code> btrfs, press <code>p</code> to set
-primary flag.</p>
-</li>
-</ul>
+<p><code>Select label type -&gt; gpt</code></p>
+<p><code>Free space -&gt; 1G</code> (1G boot partition)</p>
+<p><code>type -&gt; EFI System</code></p>
+<p>Stay in cfdisk and go to <code>type -&gt; Linux swap</code></p>
+<p><code>Free space -&gt; RAM+2G</code> (RAM+2G Swap)</p>
+<p>Stay in cfdisk <code>type -&gt; Linux filesystem</code></p>
+<p><code>Free space -&gt; The Rest</code> (The Rest Root partition)</p>
+<p><code>Write -&gt; Quit</code></p>
 <hr />
 <ol start="6">
 <li><strong>Format the EFI partition as FAT32</strong>:</li>
 </ol>
 <pre><code class="language-bash">mkfs.fat -F32 /dev/mmcblk0p1
 </code></pre>
-<ul>
-<li>Leave the root partition unformatted for the encryption step next.</li>
-</ul>
+<p>Leave the root partition unformatted for the next step.</p>
 <hr />
 <ol start="7">
-<li><strong>Encrypt the Root Partition and Open it</strong>:</li>
+<li><strong>Encrypt the Root partition and Open it</strong>:</li>
 </ol>
 <pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p2
 cryptsetup open /dev/mmcblk0p2 cryptroot
 </code></pre>
-<p>Create a Filesystem with Compression</p>
+<p>Create a filesystem:</p>
 <pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
 mount /dev/mapper/cryptroot /mnt
 </code></pre>
-<ul>
-<li>Later, we will enable compression by mounting with options like
-<code>compress=zstd</code> in <code>fstab</code></li>
-</ul>
+<p>Later, we will enable compression by mounting with options like <code>compress=zstd</code>
+in <code>fstab</code></p>
 <hr />
 <ol start="8">
 <li><strong>Encrypted Swap</strong></li>
@@ -382,22 +412,10 @@ mount /dev/mapper/cryptroot /mnt
 want hibernation, which requires it. Anything over 16G of RAM and it is
 questionable if you need swap at all and should probably just use zram.</p>
 </blockquote>
-<pre><code class="language-bash">cfdisk /dev/mmcblk0
-</code></pre>
-<p>(Edited: 09-18-25)</p>
-<ul>
-<li>
-<p>Select <code>New</code> -&gt; Enter size (2G more than your RAM is usually safe) -&gt; Set type
-to <code>Linux swap</code></p>
-</li>
-<li>
-<p>Select <code>Write</code> -&gt; Type <code>yes</code> -&gt; Select <code>Quit</code></p>
-</li>
-</ul>
-<p>Verify the new partition (e.g., <code>/dev/mmcblk0p3</code>):</p>
+<p>Verify your swap partition created earlier:</p>
 <pre><code class="language-bash">lsblk
 </code></pre>
-<p>Encrypt the swap partition with LUKS:</p>
+<p>Encrypt the swap partiton with LUKS:</p>
 <pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p3
 cryptsetup open /dev/mmcblk0p3 cryptswap
 </code></pre>
@@ -416,27 +434,21 @@ boot:</p>
 <pre><code class="language-bash">echo 'cryptswap /dev/mmcblk0p3 none luks' &gt;&gt; /mnt/etc/crypttab
 </code></pre>
 <blockquote>
-<p>❗ Later, after <code>arch-chroot</code>, ensure the <code>mkinitcpio.conf</code> HOOKS include
-<code>resume</code> (after <code>encrypt</code>) if you plan on using hibernation. This will be
-covered in the <code>initramfs</code> step.</p>
+<p>❗ Later, after arch-chroot, ensure the mkinitcpio.conf HOOKS include resume
+(after encrypt) if you plan on using hibernation. This will be covered in the
+initramfs step.</p>
 </blockquote>
-<p>Continue with Arch Installation</p>
-<p><strong>Install the Base System and Essential Packages on <code>/mnt</code> with <code>pacstrap</code></strong></p>
+<h2 id="install-the-base-system-on-mnt-with-pacstrap"><a class="header" href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a></h2>
+<p>If you prefer Nvim or a hardened kernel, change it here.</p>
 <pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel
 </code></pre>
-<ul>
-<li>Ensure <code>/mnt/boot</code> (EFI) is mounted as above. With <code>mount | grep /mnt/boot</code>
-<ul>
-<li>
-<p>To list all mounts under <code>/mnt</code>: <code>findmnt /mnt</code></p>
-</li>
-<li>
-<p>I had to remount <code>/mnt/boot</code> in order for the fstab to pick it up with:
-<code>mount /dev/mmcblk0p1 /mnt/boot</code>.</p>
-</li>
-</ul>
-</li>
-</ul>
+<pre><code class="language-bash"># Check if EFI is mounted
+mount | grep /mnt/boot
+# List all mounts under /mnt
+findmnt /mnt
+</code></pre>
+<p>The EFI and root partitions need to be mounted before you generate the
+filesystem table in the next step.</p>
 <hr />
 <ol start="9">
 <li><strong>Generate the Filesystem Table</strong>:</li>
@@ -447,26 +459,22 @@ cat /mnt/etc/fstab
 # Add compression
 vim /mnt/etc/fstab
 </code></pre>
-<ul>
-<li><strong>Important</strong>: It should list <code>/dev/mapper/cryptroot</code> mounted on <code>/</code> with
-Btrfs options, and <code>/dev/mmcblk0p1</code> on <code>/boot</code>. If the <code>fstab</code> doesn't show
-<strong>both</strong>, you need to regenerate it after mounting the missing partition.
-Clear your old <code>fstab</code> if its necessary to run <code>genfstab</code> again.</li>
-</ul>
+<p><strong>Important</strong>: The <code>fstab</code> should list all 3 partitions, if it doesn't you'll
+need to regenerate your fstab again with <code>genfstab</code>.</p>
 <hr />
 <ol start="10">
-<li>Add compression, <strong>Only for the Encrypted Partition</strong>:</li>
+<li>Add compression, <strong>Only for the Root Partition</strong>:</li>
 </ol>
 <pre><code class="language-bash"># fstab
 /dev/mapper/cryptroot    /    btrfs    rw,relatime,compress=zstd,ssd, #...snip
 #...snip...
 </code></pre>
-<p>Remount root with compression without rebooting:</p>
+<p>Remount root with compression:</p>
 <pre><code class="language-bash">mount -o remount,compress=zstd /mnt
 </code></pre>
 <hr />
 <ol start="11">
-<li><strong>Change Root into the New Installation</strong></li>
+<li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
 </ol>
 <pre><code class="language-bash">arch-chroot /mnt
 </code></pre>
@@ -475,7 +483,7 @@ Clear your old <code>fstab</code> if its necessary to run <code>genfstab</code> 
 passwd yourusername
 </code></pre>
 <p>Enable sudo for wheel group:</p>
-<pre><code class="language-bash">EDITOR=vim visudo
+<pre><code>EDITOR=vim visudo
 </code></pre>
 <p>If that doesn't work, use <code>vim /etc/sudoers</code> and edit the file accordingly.</p>
 <p>Uncomment the line:</p>
@@ -483,35 +491,27 @@ passwd yourusername
 </code></pre>
 <hr />
 <ol start="12">
-<li>Edit <code>/etc/mkinitcpio.conf</code> in your new system to add the <code>encrypt</code> hook
-before <code>filesystems</code></li>
+<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>encrypt</code> hook
+before the <code>filesystems</code> attribute.</li>
 </ol>
 <ul>
 <li>
 <p>Locate the <code>HOOKS</code> line</p>
 </li>
 <li>
-<p>Insert <code>encrypt</code> <strong>before</strong> <code>filesystems</code></p>
+<p>Insert <code>encrypt</code> <strong>before</strong> filesystems</p>
 </li>
 </ul>
 <pre><code class="language-bash">vim /etc/mkinitcpio.conf
 </code></pre>
 <blockquote>
-<p>❗ NOTE how I also added the <code>resume</code> <strong>after</strong> <code>encrypt</code>, that's for if you
-want to set up hibernation.</p>
+<p>❗ NOTE how I also added the <code>resume</code> after <code>encrypt</code>, that's required for the
+encrypted swap setup.</p>
 </blockquote>
 <pre><code class="language-bash"># mkinitcpio.conf
 # ... snip ...
 HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt resume filesystems fsck)
 # ... snip ...
-</code></pre>
-<hr />
-<ol start="13">
-<li><strong>Regenerate initramfs with</strong>:</li>
-</ol>
-<pre><code class="language-bash">mkinitcpio -p linux-zen
-# Should output
-Initcpio image generation successful
 </code></pre>
 <hr />
 <ol start="14">
@@ -525,10 +525,8 @@ Initcpio image generation successful
 Installation finished. No error reported.
 </code></pre>
 <p>Configure GRUB to unlock LUKS root partition</p>
-<ul>
-<li>Edit <code>/etc/default/grub</code> and modify the line starting with
-<code>GRUB_CMDLINE_LINUX</code> to add:</li>
-</ul>
+<p>Edit <code>/etc/default/grub</code> and modify line starting with <code>GRUB_CMDLINE_LINUX</code> to
+add:</p>
 <pre><code class="language-bash"># ...snip...
 GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot"
 # ...snip...
@@ -546,33 +544,35 @@ done
 <pre><code class="language-bash">systemctl enable lightdm
 systemctl enable NetworkManager
 </code></pre>
-<p>Configure LightDM greeter:</p>
-<ul>
-<li>Edit <code>/etc/lightdm/lightdm.conf</code> to add:</li>
-</ul>
+<blockquote>
+<p>NOTE: While following these exact steps on a different machine, the above
+commands refused to run. The solution was to exit the chroot environment and
+run the following:</p>
+<pre><code class="language-bash">systemctl --root=/mnt enable lightdm
+systemctl --root=/mnt enable NetworkManager
+</code></pre>
+</blockquote>
+<p>Configure LightDM greeter, edit <code>/et/lightdm/lightdm.conf</code> to add:</p>
 <pre><code class="language-conf"># lightdm.conf
 [Seat:*]
 greeter-session=lightdm-gtk-greeter
 </code></pre>
-<p>Exit <code>arch-chroot</code> with <code>exit</code>.</p>
+<p>Exit <code>arch-chroot</code> with <code>exit</code></p>
 <p>Unmount your partitions and reboot:</p>
 <pre><code class="language-bash">umount /mnt/boot
 umount /mnt
 cryptsetup close cryptroot
 </code></pre>
 <hr />
-<ol start="16">
-<li><strong>Reboot</strong></li>
-</ol>
+<p>16 <strong>Reboot</strong></p>
 <hr />
 <h3 id="arch-chroot"><a class="header" href="#arch-chroot">arch-chroot</a></h3>
 <details>
-<summary> ✔️ Click to Expand `arch-chroot` Example </summary>
+<summary>  ✔️ Click to Expand `arch-chroot` Example </summary>
 <p>Say you forgot something, like forgetting to add a user and password. You reboot
 and go to TTY into your system and are hit with a AHHH I can't log in WTF!</p>
 <p>It's as easy as repeating some of the steps above. Reboot into the Live
-environment (like we just did for the install), remount your partitions and
-<code>arch-chroot</code> back in:</p>
+environment, remount your partitions and <code>arch-chroot</code> back in:</p>
 <p>Open the encrypted root partition:</p>
 <pre><code class="language-bash">cryptsetup open /dev/mmcblk0p2 cryptroot
 </code></pre>
@@ -585,8 +585,7 @@ environment (like we just did for the install), remount your partitions and
 <p>Chroot into your installed system:</p>
 <pre><code class="language-bash">arch-chroot /mnt
 </code></pre>
-<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
-passwd yourusername
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername passwd yourusername
 </code></pre>
 <ul>
 <li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
@@ -597,12 +596,8 @@ installed.</li>
 <pre><code class="language-bash">exit
 </code></pre>
 <p>Unmount and close LUKS:</p>
-<pre><code class="language-bash">umount /mnt/boot
-umount /mnt
-cryptsetup close cryptroot
-reboot
+<pre><code class="language-bash">umount /mnt/boot umount /mnt cryptsetup close cryptroot reboot
 </code></pre>
-</details>
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></li>
