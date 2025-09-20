@@ -418,11 +418,13 @@ in <code>fstab</code></p>
 want hibernation, which requires it. Anything over 16G of RAM and it is
 questionable if you need swap at all and should probably just use zram.</p>
 </blockquote>
-<p>Verify your swap partition created earlier:</p>
-<pre><code class="language-bash">lsblk
+<p>Verify your swap partition created earlier, in this section we assume the swap
+partition is <code>/dev/mmcblk0p3</code>:</p>
+<pre><code class="language-bash">lsblk -f
 </code></pre>
 <p>Encrypt the swap partiton with LUKS:</p>
 <pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p3
+# Open the encrypted swap
 cryptsetup open /dev/mmcblk0p3 cryptswap
 </code></pre>
 <p>Format the decrypted swap partition:</p>
@@ -442,8 +444,39 @@ boot:</p>
 <blockquote>
 <p>❗ Later, after arch-chroot, ensure the mkinitcpio.conf HOOKS include resume
 (after encrypt) if you plan on using hibernation. This will be covered in the
-initramfs step.</p>
+<code>initramfs</code> step.</p>
 </blockquote>
+<hr />
+<h3 id="automating-encrypted-swap-unlock"><a class="header" href="#automating-encrypted-swap-unlock">Automating Encrypted Swap Unlock</a></h3>
+<p>To avoid entering a separate password for the swap on every boot, you can create
+a keyfile that will automatically unlock the swap once the root partition is
+decrypted. This is a recommended practice.</p>
+<ol>
+<li>Create a keyfile: Generate a random keyfile and save it to a secure location,
+like /etc/.</li>
+</ol>
+<pre><code class="language-bash">dd if=/dev/urandom of=/etc/swap.key bs=4096 count=1
+chmod 600 /etc/swap.key
+</code></pre>
+<p>Add the keyfile to the LUKS header: Add the keyfile as a new key to the
+encrypted swap partition.</p>
+<pre><code class="language-bash">cryptsetup luksAddKey /dev/mmcblk0p3 /etc/swap.key
+</code></pre>
+<p>Update <code>crypttab</code>: Modify the <code>/etc/crypttab</code> file to use the keyfile for
+unlocking the swap partition instead of a password.</p>
+<pre><code class="language-bash"># Open /etc/crypttab in a text editor like nano or vim
+# and change the line to:
+cryptswap UUID=&lt;your_swap_UUID&gt; /etc/swap.key luks
+</code></pre>
+<p>Update <code>mkinitcpio</code>:</p>
+<pre><code class="language-bash">sudo mkinitcpio -P
+</code></pre>
+<p>Update <code>grub</code>:</p>
+<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p>Now, when you boot and enter the password for your root partition, the system
+will gain access to the keyfile, which will automatically unlock the encrypted
+swap without requiring a second password.</p>
 <h2 id="install-the-base-system-on-mnt-with-pacstrap"><a class="header" href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a></h2>
 <p>If you prefer Nvim or a hardened kernel, change it here.</p>
 <pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel
