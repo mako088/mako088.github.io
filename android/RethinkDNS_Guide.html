@@ -179,20 +179,20 @@
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <ul>
-<li><a href="#-key-terms">🔑 Key Terms</a></li>
+<li><a href="#-key-termskey-terms">🔑 Key Terms(#key-terms)</a></li>
 <li><a href="#rethinkdns-overview">RethinkDNS Overview</a></li>
 <li><a href="#getting-started">Getting Started</a>
 <ul>
-<li><a href="#dns">DNS</a></li>
-<li><a href="#network">Network</a></li>
-<li><a href="#firewall">Firewall</a></li>
+<li><a href="#dnsdns">DNS(#dns)</a></li>
+<li><a href="#networknetwork">Network(#network)</a></li>
+<li><a href="#firewallfirewall">Firewall(#firewall)</a></li>
 </ul>
 </li>
-<li><a href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a>
+<li><a href="#turn-on-dns-and-firewallturn-on-dns-and-firewall">Turn ON DNS and Firewall(#turn-on-dns-and-firewall)</a>
 <ul>
-<li><a href="#apps-that-dont-work">Apps that Don't work</a></li>
-<li><a href="#other-methods">Other Methods</a></li>
-<li><a href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></li>
+<li><a href="#apps-that-dont-workapps-that-dont-work">Apps that Don't work(#apps-that-don't-work)</a></li>
+<li><a href="#other-methodsother-methods">Other Methods(#other-methods)</a></li>
+<li><a href="#firefox-encrypted-dns-through-rethinkfirefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink(#firefox-encrypted-dns-through-rethink)</a></li>
 <li><a href="#duckduckgo">DuckDuckGo</a>
 <ul>
 <li><a href="#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></li>
@@ -216,7 +216,7 @@
 <p>I'm not affiliated with RethinkDNS in any way, I'm just a technologist and
 privacy advocate.</p>
 </blockquote>
-<h3 id="-key-terms"><a class="header" href="#-key-terms">🔑 Key Terms</a></h3>
+<h3 id="-key-termskey-terms"><a class="header" href="#-key-termskey-terms">🔑 Key Terms(#key-terms)</a></h3>
 <details>
 <summary> ✔️ Click to Expand Key Terms </summary>
 <ul>
@@ -394,7 +394,7 @@ apps, preventing them from connecting without permission.</p>
 <p>I will share how I use RethinkDNS, obviously feel free to make changes based on
 your threat model and needs.</p>
 <h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
-<h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
+<h3 id="dnsdns"><a class="header" href="#dnsdns">DNS(#dns)</a></h3>
 <blockquote>
 <p>❗ NOTE: When you switch to an encrypted DNS resolver, you are shifting your
 trust from your ISP's DNS servers to the third-party DNS provider you choose.
@@ -427,7 +427,7 @@ blocklists.</li>
 <p>Leave all the <code>Advanced</code> defaults unless you plan on setting up a SOCKS5 proxy,
 in which case you will want to enable <code>Configure -&gt; DNS -&gt; Never proxy DNS</code>.</p>
 <hr />
-<h3 id="network"><a class="header" href="#network">Network</a></h3>
+<h3 id="networknetwork"><a class="header" href="#networknetwork">Network(#network)</a></h3>
 <p><code>Configure -&gt; Network</code>:</p>
 <ul>
 <li>Set <code>Use all available networks</code> to ON. This enables Wifi and mobile data to
@@ -445,7 +445,7 @@ accessing all available networks, stopping them from bypassing Rethinks
 tunnel". This caused issues with the browser when turned off.</li>
 </ul>
 <hr />
-<h3 id="firewall"><a class="header" href="#firewall">Firewall</a></h3>
+<h3 id="firewallfirewall"><a class="header" href="#firewallfirewall">Firewall(#firewall)</a></h3>
 <p><code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following to ON:</p>
 <ul>
 <li><code>Block all apps when device is locked</code></li>
@@ -455,7 +455,7 @@ tunnel". This caused issues with the browser when turned off.</li>
 <p>You can get more restrictive from here, but it will take some manual
 intervention to get everything working correctly.</p>
 <hr />
-<h2 id="turn-on-dns-and-firewall"><a class="header" href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a></h2>
+<h2 id="turn-on-dns-and-firewallturn-on-dns-and-firewall"><a class="header" href="#turn-on-dns-and-firewallturn-on-dns-and-firewall">Turn ON DNS and Firewall(#turn-on-dns-and-firewall)</a></h2>
 <p><code>Home</code> 🏠:</p>
 <ul>
 <li>Click the big <code>Start</code> button on the bottom of the screen and leave it set to
@@ -474,7 +474,7 @@ some apps require special permissions or bypasses due to their network behavior.
 Many apps rely on multiple external services, backend APIs, etc. that may be
 blocked by the firewall.</p>
 <hr />
-<h3 id="apps-that-dont-work"><a class="header" href="#apps-that-dont-work">Apps that Don't work</a></h3>
+<h3 id="apps-that-dont-workapps-that-dont-work"><a class="header" href="#apps-that-dont-workapps-that-dont-work">Apps that Don't work(#apps-that-don't-work)</a></h3>
 <p>I will use Reddit as an example, the process is the same for any app. Reddit’s
 app and website rely on multiple third-party services and external domains
 beyond just <code>reddit.com</code> itself.</p>
@@ -499,7 +499,7 @@ for domains or IPs over a period of time which can take a while. You can go to
 <code>Apps</code> and search for the app in question, click on it and at the bottom of
 the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</li>
 </ul>
-<h3 id="other-methods"><a class="header" href="#other-methods">Other Methods</a></h3>
+<h3 id="other-methodsother-methods"><a class="header" href="#other-methodsother-methods">Other Methods(#other-methods)</a></h3>
 <p>Rather than watching the logs and setting trust rules over time, you could use
 tools like <code>nslookup</code> and <code>dig</code> to resolve said domain and reveal IP ranges
 used.</p>
@@ -531,7 +531,8 @@ networks for redundancy and performance.</p>
 <p>You can then run <code>whois</code> on one of those IPs (e.g., <code>whois 151.101.129.140</code>) to
 identify the subnet ranges owned by Reddit's CDN provider (Fastly in this case),
 which helps when setting up subnet range allow rules in Rethink.</p>
-<p>✔️ Click to Expand `whois` Example Output</p>
+<details>
+<summary> ✔️ Click to Expand `whois` Example Output </summary>
 <pre><code class="language-bash">whois 151.101.129.140
 
 #
@@ -611,8 +612,9 @@ range:</p>
 which includes all related IPs Reddit uses via Fastly’s CDN.</li>
 <li>The owning organization: <code>Fastly, Inc.</code> &amp; More...</li>
 </ul>
+</details>
 <hr />
-<h3 id="firefox-encrypted-dns-through-rethink"><a class="header" href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></h3>
+<h3 id="firefox-encrypted-dns-through-rethinkfirefox-encrypted-dns-through-rethink"><a class="header" href="#firefox-encrypted-dns-through-rethinkfirefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink(#firefox-encrypted-dns-through-rethink)</a></h3>
 <p>First, make sure you can visit a few sites in Firefox. If you can, then your
 browser traffic should be routed through the Rethink tunnel, we will check here.
 If you can't, go to <code>Home -&gt; Apps</code> and search for Firefox, is networking
