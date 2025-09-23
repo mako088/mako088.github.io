@@ -359,26 +359,19 @@ slower and more complex than WireGuard. Good VPNs often give you the choice
 between protocols.</p>
 </li>
 <li>
-<p><code>Bypass DNS and Firewall</code>: When you choose this setting, it does exactly that.
-The app that is allowed to bypass will not have its traffic routed through the
-Rethink encrypted tunnel and will fall back to your systems Private DNS
-setting. Rethink will still be aware of the app but it won't route its
-traffic.</p>
+<p><code>Bypass DNS and Firewall</code>: Bypass the DNS and Firewall for this app, <strong>this
+only works with Rethink's DNS</strong>.</p>
 </li>
 <li>
-<p><code>Bypass Universal</code>: Similar to <code>Bypass DNS and Firewall</code> with the added bypass
-of any filters or blocklists. So your extreme privacy blocklist won't block
-this app. Rethink will still be aware of said app.</p>
+<p><code>Bypass Universal</code>: Bypass the Universal firewall for this app.</p>
 </li>
 <li>
-<p><code>Exclude</code>: Rethink will not be aware of this app and it will not be routed
-through RethinkDNS.</p>
+<p><code>Exclude</code>: The app is excluded from the dns and firewall, Rethink is unaware
+of this app.</p>
 </li>
 <li>
-<p><code>Isolate</code>: This is unclear but I believe this functions as an app lockdown
-mode where when you isolate an app, it restricts the app's network access to
-only the IP addresses or domains you explicitly allow. Giving you more control
-over apps that don't work without a <code>Bypass</code>.</p>
+<p><code>Isolate</code>: When an app is isolated, only trusted IPs are allowed. (i.e., IPs
+or domains you explicitly set trust rules for).</p>
 </li>
 <li>
 <p>🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.</p>
