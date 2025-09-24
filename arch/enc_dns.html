@@ -533,10 +533,11 @@ options edns0
 <pre><code class="language-bash">sudo systemctl stop systemd-resolved
 sudo systemctl disable systemd-resolved
 </code></pre>
-<p><code>libvirtd</code> is another problem application for this because it uses dnsmasq by
-default.</p>
+<p><code>libvirtd</code> is another service that utilizes <code>dnsmasq</code> which uses port 53 and
+conflicts with this setup. Since dnscrypt-proxy uses port 53 by default, it
+makes using it with <code>libvirtd</code> difficult.</p>
 <h2 id="dnsmasq-as-a-local-dns-server"><a class="header" href="#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></h2>
-<p>Edit the <code>listen_addresses</code> in <code>dnscrypt-proxy.toml</code>:</p>
+<p>Edit the <code>listen_addresses</code> in <code>/etc/dnscrypt-proxy/dnscrypt-proxy.toml</code>:</p>
 <pre><code class="language-toml">listen_addresses = ['127.0.0.1:5353', '[::1]:5353']
 </code></pre>
 <p>Edit <code>/etc/dnsmasq.conf</code>:</p>
@@ -587,6 +588,9 @@ listed. If not, something is wrong and you have a DNS leak.</p>
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="../arch/hardening_firefox.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -598,6 +602,9 @@ listed. If not, something is wrong and you have a DNS leak.</p>
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="../arch/hardening_firefox.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>

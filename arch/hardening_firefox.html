@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Hardening Firefox on Arch - privacy-book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">privacy-book</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="hardening-firefox-on-arch"><a class="header" href="#hardening-firefox-on-arch">Hardening Firefox on Arch</a></h1>
+<h3 id="fingerprinting"><a class="header" href="#fingerprinting">Fingerprinting</a></h3>
+<p>Browser fingerprinting is a tracking technique, often done by third-party
+companies that specialize in it. They provide code (usually JavaScript) that a
+website owner can embed on their site. When you visit the site, the script runs
+in the background, silently collecting data about your device and browser.</p>
+<p>The most concerning aspect of browser fingerprinting is that it operates
+silently and without user consent. It's not something you can easily see or
+something like cookies that you can opt-out or delete. Browser fingerprinting is
+stateless meaning that it doesn't need to store any data on your computer. It
+can identify you while behind a VPN or in incognito mode as well.</p>
+<p>I will go over some of the settings and what they do. If you plan on using the
+Arkenfox <code>user.js</code> you can jump to that section first as it will set many of
+these settings for you.</p>
+<hr />
+<h4 id="enhanced-tracking-protection-etp"><a class="header" href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></h4>
+<ul>
+<li>
+<p><a href="https://blog.mozilla.org/security/2020/01/07/firefox-72-fingerprinting/">Enhanced Tracking Protection (ETP)</a>
+blocks known "third-party requests" to companies that participate in
+fingerprinting, according to the
+<a href="https://disconnect.me/trackerprotection">Disconnect List</a></p>
+<ul>
+<li>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
+either Strict or Custom enables FPP as well explained further down.</li>
+</ul>
+</li>
+<li>
+<p><a href="https://wiki.mozilla.org/Security/FirstPartyIsolation">First-Party Isolation</a>
+From the Tor Uplift Project.</p>
+</li>
+<li>
+<p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
+</li>
+<li>
+<p>RFP (Resist Fingerprinting) set in <code>about:config</code> with
+<code>privacy.resistFingerprinting</code>. Resist Fingerprinting alters the following:</p>
+<ul>
+<li>
+<p>The timezone is reported as UTC or Icelandic</p>
+</li>
+<li>
+<p>Locale is reported as en-US</p>
+</li>
+<li>
+<p>Several properties of the navigator object are fixed, including the hardware
+concurrency value, application version and build ID. The User Agent version
+is reported to be the major version (for example, 119.0 instead of 119.1)</p>
+<ul>
+<li>And much more...</li>
+</ul>
+</li>
+<li>
+<p>You can set <code>privacy.resistFingerprinting.pbMode</code> (private-browsing) without
+<code>privacy.resistFingerprinting</code> and still get certain Resist Fingerprinting
+behaviors on normal windows, because it's impossible to separate these
+behaviors per-window.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>FPP (Fingerprinting Protection) is enabled in normal browsing when Enhanced
+Tracking Protection is set to Strict. Both Known Fingerprinters and Suspected
+Fingerprinters Protection are enabled in Private Browsing and when ETP is set
+to strict. On the Custom level of ETP you can toggle on/off different
+features.</p>
+</li>
+</ul>
+<hr />
+<h2 id="webrtc"><a class="header" href="#webrtc">WebRTC</a></h2>
+<p>The main reason people disable WebRTC is to prevent an IP address leak. WebRTC
+is designed for real-time communication like video calls and file sharing. If
+you don't use those features, it makes sense to disable it.</p>
+<p>In <code>about:preferences#privacy</code> -&gt; <code>Privacy &amp; Security</code> -&gt; <code>Permissions</code>. Click
+<code>Settings</code>.</p>
+<ul>
+<li>
+<p><input disabled="" type="checkbox" checked=""/>
+Block new requests asking to access your microphone</p>
+</li>
+<li>
+<p><input disabled="" type="checkbox" checked=""/>
+Block new requests asking to access your camera</p>
+</li>
+<li>
+<p>You may also want to block Location, but that isn't involving WebRTC.</p>
+</li>
+</ul>
+<p>You can also use the master switch by going to <code>about:config</code> and setting
+<code>media.peerconnection.enabled</code> to <code>false</code></p>
+<hr />
+<h2 id="canvas-fingerprinting"><a class="header" href="#canvas-fingerprinting">Canvas Fingerprinting</a></h2>
+<p>Canvas Fingerprinting uses the HTML5 <code>&lt;canvas&gt;</code> element to generate a
+fingerprint. It gets your device to render an image or text on a canvas and then
+reads the pixel data. Since devices render things differently, those differences
+are identifiable.</p>
+<p>When you set <code>privacy.resistFingerprinting</code> it modifies both Canvas and WebGL
+behavior to make their outputs non-unique.</p>
+<h2 id="webgl"><a class="header" href="#webgl">WebGL</a></h2>
+<p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
+and 3D graphics. The way your system renders these graphics provides information
+about your GPU and graphics drivers, which contributes to your unique
+fingerprint.</p>
+<blockquote>
+<p>❗️ NOTE: It's unnecessary to disable webgl if you're already using RFP and
+will likely make you stand out more because most people don't disable it.</p>
+</blockquote>
+<p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
+<h2 id="install-firefoxlibrewolf--arkenfox"><a class="header" href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></h2>
+<details>
+<summary> ✔️ Click to Expand Arkenfox How To </summary>
+<p>The process is the same for both Firefox &amp; LibreWolf. I like LibreWolf for it's
+strong defaults but may lag behind Firefox getting security patches.</p>
+<pre><code class="language-bash">paru -S librewolf-bin
+sudo pacman -S firefox
+</code></pre>
+<p>Read the <a href="https://github.com/arkenfox/user.js/wiki">ArkenFox Wiki</a></p>
+<h2 id="apply"><a class="header" href="#apply">Apply</a></h2>
+<p>Open <code>about:support</code> and look for <code>Profile Folder</code> under <code>Application Basics</code> It
+will bring you to somewhere like <code>~/.librewolf/pefoo8xx.default-default/</code> and
+that is where you place the <code>user.js</code>.</p>
+<p>Place the following files in your <code>Profile Folder</code>:</p>
+<ul>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/user.js">Arkenfox user.js</a>
+Read through the <code>user.js</code>, not all settings are applied by default such as
+RFP Fingerprinting protection.</p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/updater.sh">updater.sh</a></p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/prefsCleaner.sh">prefsCleaner.sh</a></p>
+</li>
+<li>
+<p>Also create your own <code>user-overrides.js</code> with any changes you want to make to
+the default <code>user.js</code>. These changes are amended to the <code>user.js</code> and applied
+last enabling them to override the default settings. It's best to make changes
+here so that updating the Arkenfox <code>user.js</code> doesn't make you lose all of your
+customizations.</p>
+</li>
+</ul>
+<p>Example <code>user-overrides.js</code> spoofing the user agent:</p>
+<blockquote>
+<p>❗️ This is just an example, always check for common useragent strings
+yourself.</p>
+</blockquote>
+<pre><code class="language-js">user_pref(
+  "general.useragent.override",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+);
+// Disable Activity Stream on new windows and tab pages
+user_pref("browser.newtab.preload", false);
+// Enhanced Tracking Protection (ETP)
+user_pref("privacy.bounceTrackingProtection.mode", 1); // [FF131+] [ETP FF133+]
+user_pref("privacy.trackingprotection.enabled", true);
+// Resist Fingerprinting (RFP)
+user_pref("privacy.resistFingerprinting", false); // [FF41+]
+user_pref("privacy.resistFingerprinting.pbmode", false); // [FF114+]
+// WebRTC
+user_pref("media.peerconnection.enabled", false);
+user_pref("media.peerconnection.ice.default_address_only", true);
+// WebGL
+user_pref("webgl.disabled", false);
+// Geolocation
+user_pref("geo.enabled", false);
+user_pref("full-screen-api.enabled", false);
+user_pref(
+  "geo.provider.network.url",
+  "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%",
+);
+// Disable studies
+user_pref("app.sheild.optoutstudies.enabled", false);
+// Master Switches, Be Careful
+user_pref("browser.safebrowsing.malware.enabled", false);
+user_pref("browser.safebrowsing.phishing.enabled", false);
+user_pref("browser.safebrowsing.provider.google4.gethashURL", "");
+user_pref("browser.safebrowsing.provider.google4.updateURL", "");
+user_pref("browser.safebrowsing.provider.google.gethashURL", "");
+user_pref("browser.safebrowsing.provider.google.updateURL", "");
+user_pref("browser.safebrowsing.provider.google4.dataSharingURL", "");
+user_pref("signon.rememberSignons", false);
+user_pref("browser.xul.error_pages.expert_bad_cert", true);
+//* [NOTE] Will cause breakage: older modems/routers and some sites e.g banks, vimeo, icloud, instagram ***/
+user_pref("network.http.referer.XOriginPolicy", 2);
+user_pref("network.http.sendRefererHeader", 1);
+// 0 is most strict:
+user_pref("network.http.referer.trimmingPolicy", 0);
+user_pref("network.http.referer.XOriginTrimmingPolicy", 2);
+</code></pre>
+<p>To apply your prefs you have to run the <code>updater.sh</code> script.</p>
+<pre><code class="language-bash">~/.mozilla/firefox/v5kwl3c0.default-release&gt; ./updater.sh
+
+                ############################################################################
+                ####                                                                    ####
+                ####                          arkenfox user.js                          ####
+                ####       Hardening the Privacy and Security Settings of Firefox       ####
+                ####           Maintained by @Thorin-Oakenpants and @earthlng           ####
+                ####            Updater for macOS and Linux by @overdodactyl            ####
+                ####                                                                    ####
+                ############################################################################
+
+
+Documentation for this script is available here: https://github.com/arkenfox/user.js/wiki/5.1-Updater-[Options]#-maclinux
+
+Please observe the following information:
+    Firefox profile:  /home/jr/.mozilla/firefox/v5kwl3c0.default-release
+    Available online: * version: 140
+    Currently using:  * version: 140
+
+
+This script will update to the latest user.js file and append any custom configurations from user-overrides.js. Continue Y/N?
+y
+
+Status: user.js has been backed up and replaced with the latest version!
+Status: Override file appended: user-overrides.js
+</code></pre>
+<h2 id="check"><a class="header" href="#check">Check</a></h2>
+<p>Launch LibreWolf or Firefox and press <code>Ctrl-Shift-J</code> to launch Browser Console
+Mode, and look for any errors.</p>
+<p>Go to <code>about:config</code> -&gt; [x] <code>Show only modified preferences</code>. You should see
+<code>SUCCESS: No no he's not dead, he's, he's restin'!</code></p>
+</details>
+<h3 id="user-agent-spoofing"><a class="header" href="#user-agent-spoofing">User Agent Spoofing</a></h3>
+<p>Research what the most common user agent is. You'll need to disable
+<code>privacy.resistFingerprinting</code> for this to work.</p>
+<p>Place the user agent string in <code>general.useragent.override</code> something like:
+<code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code></p>
+<p><a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
+<p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
+<ul>
+<li><a href="https://www.browsercat.com/post/browser-fingerprint-spoofing-explained">BrowserCat Fingerprint Spoofing</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../arch/enc_dns.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../arch/enc_dns.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
