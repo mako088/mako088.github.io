@@ -393,6 +393,7 @@ blocking these protocols effectively restricts most network traffic from and to
 apps, preventing them from connecting without permission.</p>
 <p>I will share how I use RethinkDNS, obviously feel free to make changes based on
 your threat model and needs.</p>
+<hr />
 <h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
 <h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
 <blockquote>
@@ -512,6 +513,7 @@ for domains or IPs over a period of time which can take a while. You can go to
 the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</p>
 </li>
 </ul>
+<hr />
 <h3 id="other-methods"><a class="header" href="#other-methods">Other Methods</a></h3>
 <p>Rather than watching the logs and setting trust rules over time, you could use
 tools like <code>nslookup</code> and <code>dig</code> to resolve said domain and reveal IP ranges
@@ -647,6 +649,7 @@ both with no leaks detected.</li>
 </ul>
 <p>Double check that in Rethink's <code>Configure -&gt; DNS -&gt; Prevent DNS leaks</code> is ON, as
 well as the Universal Firewalls <code>Block when DNS is bypassed</code> ON.</p>
+<hr />
 <p><strong>Firefox Settings</strong></p>
 <blockquote>
 <p>In Firefox, plug <code>about:config</code> into the URL bar and scroll down to
@@ -664,6 +667,7 @@ from working correctly.
 <p>In Firefox <code>Settings -&gt; Privacy &amp; Security</code>, set <code>DNS over HTTPS</code> to
 <code>Default Protection</code>, this enables Firefox to use RethinkDNS's DNSCrypt resolver
 or whatever you chose.</p>
+<hr />
 <p><strong>Checking for DNS Leaks</strong></p>
 <p>Go to:</p>
 <pre><code class="language-text">https://dnsleaktest.com
@@ -783,6 +787,7 @@ using Tor when he needs to access Google Maps to protect his privacy</p>
 routine tasks. Every user adds valuable noise to the network, helping protect
 privacy and freedom for all.</p>
 </details>
+<hr />
 <h3 id="setting-up-orbot-with-a-tcp-only-proxy"><a class="header" href="#setting-up-orbot-with-a-tcp-only-proxy"><a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></a></h3>
 <p><img src="../images/orbot.png" alt="Orbot Logo" /></p>
 <p>TCP-Only Proxies forward all TCP-level connections from selected apps to Orbot.</p>
@@ -845,6 +850,7 @@ topics. It has been proven that people that feel like they are being watched
 are less creative and curious.</li>
 <li>When it really matters consider using Tor Browser through Tails OS or Whonix.</li>
 </ul>
+<hr />
 <h2 id="setting-up-a-socks5-proxy"><a class="header" href="#setting-up-a-socks5-proxy"><a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></a></h2>
 <p>If you have Orbot set up through auto mode, you'll have to disable it.</p>
 <p>Open <code>Orbot -&gt; More</code>: Near the bottom of the screen you'll see <code>HTTP: 8118</code>, and
@@ -887,6 +893,7 @@ either, it simply directs certain app traffic through a proxy server without
 creating a full encrypted tunnel from your device like a VPN does.</p>
 </li>
 </ul>
+<hr />
 <h3 id="logs"><a class="header" href="#logs"><a href="#logs">Logs</a></a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
 From there, you can set the log level and choose a notification action.</p>
