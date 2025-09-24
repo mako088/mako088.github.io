@@ -177,6 +177,70 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>We live in a digital world where big tech companies dominate almost every part
+of our online lives. They control huge amounts of data, critical services, and
+even the infrastructure we use every day. Their reach is so extensive that some
+people have compared their ecosystems to a kind of “botnet” a word usually
+reserved for networks of hijacked devices used for shady purposes. In this
+intro, I’ll break down why that comparison makes sense and why protecting
+ourselves from their control has become a privacy necessity.</p>
+<p>Some researchers say that "Google has become the main interface for our whole
+reality". To be precise: with the Google interface, the user gets the impression
+that the search results imply a kind of totality. In fact, one only sees a small
+part of what one could see if one also integrates other research
+tools".--<a href="https://en.wikipedia.org/wiki/Criticism_of_Google#cite_note-54">Wikipedia Criticism_of_Google</a></p>
+<h2 id="the-privacy-imperative"><a class="header" href="#the-privacy-imperative">The Privacy Imperative</a></h2>
+<p>The term "botnet" fits because big tech companies control vast networks of
+devices and services, all connected and managed from the top down. Just like a
+botnet hijacks many computers to work together, often without users knowing.
+These companies coordinate enormous amounts of data and user activity across
+their ecosystems. This massive, centralized control quietly shapes what users
+see and do online, making the comparison to a botnet a powerful way to highlight
+their reach and influence.</p>
+<p>Getting out of these monopolized ecosystems matters. Here’s why:</p>
+<ol>
+<li>
+<p>Google’s entire model revolves around ads, which means tracking practically
+everything you do online. Apple may market itself as privacy-friendly, but
+keep in mind its walled garden also benefits from collecting user data to
+refine its services. In both cases, you become the product. Stepping away
+from these systems is the first step toward truly owning and controlling your
+own data.</p>
+</li>
+<li>
+<p>For most people, privacy policies are unreadable walls of text. That’s by
+design. Both companies collect and share data in ways that remain
+intentionally murky to the average user. Like a traditional botnet running
+quietly in the background, this surveillance often happens without you
+realizing it. Switching to transparent, privacy-focused services makes a big
+difference here.</p>
+</li>
+<li>
+<p>When a few companies dominate the market, smaller players pushing for
+privacy-first solutions simply can’t compete. Big tech’s grip on users
+starves the competition of oxygen, keeping better alternatives from reaching
+mainstream adoption. Supporting decentralized or independent alternatives not
+only protects your privacy but also encourages innovation.</p>
+</li>
+<li>
+<p>Centralized power is always vulnerable. Whether it’s hackers, inside abuse,
+or government pressure, the massive troves of data held by Google and Apple
+are high-value targets. A botnet is dangerous precisely because of its size
+and coordination. Similarly, one breach in these systems can expose millions.
+Distributing and decentralizing your digital life reduces this risk
+dramatically.</p>
+</li>
+</ol>
+<p>Saying "I have nothing to hide" ignores the fact that privacy is not just for
+oneself, but protects everyone, including those who may be vulnerable or
+targeted. Privacy guarantees freedom of thought, expression, and association,
+which are essential for a just society. When these rights are undermined,
+history shows that entire populations can be harmed</p>
+<p>Throughout <em>privacy-book</em> I will share my research into this deep rabbit hole
+and will attempt to keep the information up-to-date. For now it's not meant to
+be read cover to cover, just pick the link/chapter you're interested in and go
+from there.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="browser_fingerprinting"><a class="header" href="#browser_fingerprinting">Browser_Fingerprinting</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rethinkdns"><a class="header" href="#rethinkdns">RethinkDNS</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
@@ -1459,6 +1523,409 @@ installed.</li>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq"><a class="header" href="#encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq">Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</a></h1>
+<pre><code class="language-bash">sudo pacman -S dnscrypt-proxy
+</code></pre>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Dnscrypt-proxy">Arch Wiki dnscrypt-proxy</a></li>
+</ul>
+<p>Edit <code>/etc/dnscrypt-proxy/dnscrypt-proxy.toml</code> to add your chosen resolvers etc.</p>
+<p>For example, to use Quad9's resolvers:</p>
+<details>
+<summary>
+✔️ Click to Expand example `dnscrypt-proxy.toml` that is set up with dnsmasq
+as the local resolver.
+</summary>
+<pre><code class="language-toml">server_names = ['quad9-dnscrypt-ip6-filter-pri', 'quad9-dnscrypt-ip4-filter-pri', 'mullvad-adblock-doh' ]
+
+listen_addresses = ['127.0.0.1:53', '[::1]:53']
+
+max_clients = 250
+
+# Use servers reachable over IPv4
+ipv4_servers = true
+
+# Use servers reachable over IPv6 -- Do not enable if you don't have IPv6 connectivity
+ipv6_servers = true
+
+# Use servers implementing the DNSCrypt protocol
+dnscrypt_servers = true
+
+# Use servers implementing the DNS-over-HTTPS protocol
+doh_servers = false
+
+# Use servers implementing the Oblivious DoH protocol
+odoh_servers = false
+
+## Require servers defined by remote sources to satisfy specific properties
+
+# Server must support DNS security extensions (DNSSEC)
+require_dnssec = true
+
+# Server must not log user queries (declarative)
+require_nolog = true
+
+# Server must not enforce its own blocklist (for parental control, ads blocking...)
+require_nofilter = false
+
+# Server names to avoid even if they match all criteria
+disabled_server_names = []
+
+force_tcp = false
+
+http3 = false
+
+http3_probe = false
+
+timeout = 5000
+
+keepalive = 30
+
+log_file = '/var/log/dnscrypt-proxy/dnscrypt-proxy.log'
+
+use_syslog = true
+
+# Maximum log files size in MB - Set to 0 for unlimited.
+log_files_max_size = 10
+
+# How long to keep backup files, in days
+log_files_max_age = 7
+
+# Maximum log files backups to keep (or 0 to keep all backups)
+log_files_max_backups = 1
+
+cert_refresh_delay = 240
+
+## TL;DR: put valid standard resolver addresses here. Your actual queries will
+## not be sent there. If you're using DNSCrypt or Anonymized DNS and your
+## lists are up to date, these resolvers will not even be used.
+
+bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']
+
+fallback_resolvers = ['1.0.0.1:53', '9.9.9.9:53']
+
+ignore_system_dns = true
+
+netprobe_timeout = 60
+
+netprobe_address = '9.9.9.9:53'
+
+block_ipv6 = false
+
+## Immediately respond to A and AAAA queries for host names without a domain name
+## This also prevents "dotless domain names" from being resolved upstream.
+
+block_unqualified = true
+
+## Immediately respond to queries for local zones instead of leaking them to
+## upstream resolvers (always causing errors or timeouts).
+
+block_undelegated = true
+
+## TTL for synthetic responses sent when a request has been blocked (due to
+## IPv6 or blocklists).
+
+reject_ttl = 10
+
+## Enable a DNS cache to reduce latency and outgoing traffic
+
+cache = true
+
+## Cache size
+
+cache_size = 4096
+
+## Minimum TTL for cached entries
+
+cache_min_ttl = 2400
+
+## Maximum TTL for cached entries
+
+cache_max_ttl = 86400
+
+## Minimum TTL for negatively cached entries
+
+cache_neg_min_ttl = 60
+
+## Maximum TTL for negatively cached entries
+
+cache_neg_max_ttl = 600
+
+
+[query_log]
+
+## Path to the query log file (absolute, or relative to the same directory as the config file)
+## Can be set to /dev/stdout in order to log to the standard output.
+
+# file = '/var/log/dnscrypt-proxy/query.log'
+
+
+## Query log format (currently supported: tsv and ltsv)
+
+format = 'tsv'
+
+
+## Do not log these query types, to reduce verbosity. Keep empty to log everything.
+
+# ignored_qtypes = ['DNSKEY', 'NS']
+
+
+###############################################################################
+#                        Suspicious queries logging                            #
+###############################################################################
+
+[nx_log]
+
+## Log queries for nonexistent zones
+## These queries can reveal the presence of malware, broken/obsolete applications,
+## and devices signaling their presence to 3rd parties.
+
+## Path to the query log file (absolute, or relative to the same directory as the config file)
+
+# file = '/var/log/dnscrypt-proxy/nx.log'
+
+
+## Query log format (currently supported: tsv and ltsv)
+
+format = 'tsv'
+
+[sources]
+
+### An example of a remote source from https://github.com/DNSCrypt/dnscrypt-resolvers
+
+[sources.public-resolvers]
+urls = [
+  'https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md',
+  'https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md',
+]
+cache_file = '/var/cache/dnscrypt-proxy/public-resolvers.md'
+minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+refresh_delay = 73
+prefix = ''
+
+### Anonymized DNS relays
+
+[sources.relays]
+urls = [
+  'https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/relays.md',
+  'https://download.dnscrypt.info/resolvers-list/v3/relays.md',
+]
+cache_file = '/var/cache/dnscrypt-proxy/relays.md'
+minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+refresh_delay = 73
+prefix = ''
+
+### Quad9
+
+[sources.quad9-resolvers]
+  urls = ['https://quad9.net/dnscrypt/quad9-resolvers.md', 'https://raw.githubusercontent.com/Quad9DNS/dnscrypt-settings/main/dnscrypt/quad9-resolvers.md']
+  minisign_key = 'RWTp2E4t64BrL651lEiDLNon+DqzPG4jhZ97pfdNkcq1VDdocLKvl5FW'
+  cache_file = '/var/cache/dnscrypt-proxy/quad9-resolvers.md'
+  prefix = 'quad9-'
+
+[broken_implementations]
+
+fragments_blocked = [
+  'cisco',
+  'cisco-ipv6',
+  'cisco-familyshield',
+  'cisco-familyshield-ipv6',
+  'cisco-sandbox',
+  'cleanbrowsing-adult',
+  'cleanbrowsing-adult-ipv6',
+  'cleanbrowsing-family',
+  'cleanbrowsing-family-ipv6',
+  'cleanbrowsing-security',
+  'cleanbrowsing-security-ipv6',
+]
+
+
+###############################################################################
+#                Certificate-based client authentication for DoH               #
+###############################################################################
+
+[doh_client_x509_auth]
+
+## Use an X509 certificate to authenticate yourself when connecting to DoH servers.
+## This is only useful if you are operating your own, private DoH server(s).
+## 'creds' maps servers to certificates, and supports multiple entries.
+## If you are not using the standard root CA, an optional "root_ca"
+## property set to the path to a root CRT file can be added to a server entry.
+
+# creds = [
+#    { server_name='*', client_cert='client.crt', client_key='client.key' }
+# ]
+
+
+###############################################################################
+#                          Anonymized DNS                                      #
+###############################################################################
+
+[anonymized_dns]
+
+skip_incompatible = false
+
+
+## If public server certificates for a non-conformant server cannot be
+## retrieved via a relay, try getting them directly. Actual queries
+## will then always go through relays.
+
+# direct_cert_fallback = false
+
+
+###############################################################################
+#                                 DNS64                                        #
+###############################################################################
+
+
+[ip_encryption]
+
+## Encrypt client IP addresses in plugin logs using IPCrypt
+## This provides privacy for client IP addresses while maintaining
+## the ability to distinguish between different clients in logs
+
+## Encryption algorithm (default: "none")
+## - "none": No encryption (default)
+## - "ipcrypt-deterministic": Deterministic encryption (same IP always encrypts to same value) - requires 16-byte key
+## - "ipcrypt-nd": Non-deterministic encryption with 8-byte tweak - requires 16-byte key
+## - "ipcrypt-ndx": Non-deterministic encryption with 16-byte tweak (extended) - requires 32-byte key
+
+algorithm = "none"
+
+## Encryption key in hexadecimal format (required if algorithm is not "none")
+## Key size depends on algorithm:
+## - ipcrypt-deterministic: 32 hex chars (16 bytes) - Generate with: openssl rand -hex 16
+## - ipcrypt-nd: 32 hex chars (16 bytes) - Generate with: openssl rand -hex 16
+## - ipcrypt-ndx: 64 hex chars (32 bytes) - Generate with: openssl rand -hex 32
+## Example for deterministic/nd: key = "1234567890abcdef1234567890abcdef"
+## Example for ndx: key = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+## IMPORTANT: Keep this key secret
+
+key = ""
+
+
+###############################################################################
+#                            Monitoring UI                                     #
+###############################################################################
+
+[monitoring_ui]
+
+## Enable the monitoring UI
+enabled = false
+
+## Listen address for the monitoring UI
+listen_address = "127.0.0.1:8080"
+
+## Optional username and password for basic authentication
+## To disable authentication, set username to an empty string: username = ""
+## If both username and password are empty, no authentication is required
+username = "admin"
+password = "changeme"
+
+## Optional TLS certificate and key for HTTPS
+## If both are empty, HTTP will be used
+tls_certificate = ""
+tls_key = ""
+
+## Enable query logging in the monitoring UI
+## This will show recent queries in the UI
+enable_query_log = true
+
+## Privacy level for the monitoring UI
+## 0: show all details including client IPs
+## 1: anonymize client IPs (default)
+## 2: aggregate data only (no individual queries or domains shown)
+privacy_level = 1
+
+## Maximum number of recent query log entries to keep in memory
+## Helps control memory usage on high-traffic servers
+## Default: 100
+# max_query_log_entries = 100
+
+## Maximum memory usage in MB for recent query logs
+## Automatic cleanup when limit is exceeded
+## Default: 1
+# max_memory_mb = 1
+
+## Enable Prometheus metrics endpoint
+## Default: false
+# prometheus_enabled = false
+
+## Path for Prometheus metrics endpoint
+## Default: /metrics
+# prometheus_path = "/metrics"
+
+
+###############################################################################
+#                            Static entries                                    #
+###############################################################################
+
+[static]
+
+## Optional, local, static list of additional servers
+## Mostly useful for testing your own servers.
+
+# [static.myserver]
+#   stamp = 'sdns://AQcAAAAAAAAAAAAQMi5kbnNjcnlwdC1jZXJ0Lg'
+</code></pre>
+</details>
+<p>Modify <code>resolv.conf</code>:</p>
+<pre><code class="language-conf">#/etc/resolv.conf
+nameserver ::1
+nameserver 127.0.0.1
+options edns0
+</code></pre>
+<p>Disable any services bound to port 53</p>
+<pre><code class="language-bash">ss -lp 'sport = :domain'
+</code></pre>
+<pre><code class="language-bash">sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+</code></pre>
+<p><code>libvirtd</code> is another problem application for this because it uses dnsmasq by
+default.</p>
+<h2 id="dnsmasq-as-a-local-dns-server"><a class="header" href="#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></h2>
+<p>Edit the <code>listen_addresses</code> in <code>dnscrypt-proxy.toml</code>:</p>
+<pre><code class="language-toml">listen_addresses = ['127.0.0.1:5353', '[::1]:5353']
+</code></pre>
+<p>Edit <code>/etc/dnsmasq.conf</code>:</p>
+<pre><code class="language-conf">listen-address=127.0.0.1,::1
+server=127.0.0.1#5353
+server=::1#5353
+</code></pre>
+<pre><code class="language-bash">sudo systemctl restart dnsmasq
+sudo systemctl restart dnscrypt-proxy
+</code></pre>
+<p><strong>How it Works</strong></p>
+<p>We've created a two-step process for your DNS queries. Instead of your computer
+directly asking a DNS server for a website's IP address, it now sends the
+request to dnsmasq first.</p>
+<ol>
+<li>
+<p>We configured dnsmasq to listen on 127.0.0.1 (our local machine). This means
+that all DNS queries from our system are sent to dnsmasq.</p>
+</li>
+<li>
+<p>We told dnsmasq to use dnscrypt-proxy as its upstream DNS server with
+<code>server=127.0.0.1#5353</code>. So, dnsmasq gets the DNS request and immediately
+forwards it to dnscrypt-proxy, which is listening on port 5353.</p>
+</li>
+<li>
+<p>dnscrypt-proxy then takes the forwarded request, encrypts it, and sends it to
+a secure DNS resolver on the internet. It receives the IP address back,
+decrypts it, and sends it back to dnsmasq.</p>
+</li>
+<li>
+<p>Finally, dnsmasq receives the IP address from dnscrypt-proxy and sends it
+back to the program that made the original request (e.g., the browser).</p>
+</li>
+</ol>
+<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<p>I tested in Firefox by ensuring that in <code>Settings -&gt; Privacy &amp; Security</code> the DNS
+over HTTPS was set to <code>Status: Off</code>, Enable DNS over HTTPS using:
+<code>Default Protection</code>.</p>
+<p>Then go to <code>https://dnsleaktest.com</code> and perform an Extended Test. If you used
+the above configuration with Quad9's resolvers, you should see all WoodyNet ISPs
+listed. If not, something is wrong and you have a DNS leak.</p>
 
                     </main>
 
