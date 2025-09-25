@@ -175,7 +175,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="encrypted-arch-install"><a class="header" href="#encrypted-arch-install">Encrypted Arch Install</a></h1>
+                        <h1 id="encrypted-arch-install-for-uefi-systems"><a class="header" href="#encrypted-arch-install-for-uefi-systems">Encrypted Arch Install for UEFI Systems</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <ul>
@@ -309,8 +309,15 @@ reflector --list-countries
 # Example if you live in the US
 reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
 </code></pre>
+<p>NOTE: This can take a bit and you can expect some failures..</p>
 <hr />
-<p>3 <strong>Set system clock</strong>:</p>
+<p>3 <strong>Set keyboard layout, font, and system clock</strong>:</p>
+<p>Default keymap is US, if you need something different:</p>
+<pre><code class="language-bash">localectl list-keymaps
+loadkeys &lt;chosen-map&gt;
+# Encrease font size
+setfont ter-132b
+</code></pre>
 <pre><code class="language-bash">timedatectl set-ntp true
 timedatectl list-timezones
 # Example
@@ -320,35 +327,63 @@ sudo timedatectl set-timezone America/New_York
 <ol start="4">
 <li><strong>Partition your Disk</strong>:</li>
 </ol>
+<p>The only required partitions are one for the root directory <code>/</code> (typically <code>1G</code>)
+and one for booting in UEFI mode, an EFI system partition (typically the rest of
+the space left).</p>
 <p>In this section, I'll assume that you're starting with a clean slate. If you're
-not, you can use your existing partitions or delete them.</p>
+not, you can use your existing partitions if they meet the above requirements or
+delete them.</p>
 <p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
 filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
 until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
 to save your changes.</p>
 <p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
-<pre><code class="language-bash">lsblk
+<pre><code class="language-bash">fdisk -l
 </code></pre>
 <pre><code class="language-bash">cfdisk /dev/nvme0n1
 </code></pre>
+<ul>
+<li>
 <p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
 <p>Select -&gt; <code>[ New ]</code></p>
+</li>
+<li>
 <p>Partition size: <code>1G</code></p>
+</li>
+<li>
 <p>Type -&gt; <code>EFI System</code></p>
+</li>
+</ul>
+</li>
+<li>
 <p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
 <p>Partition size: The rest of the space</p>
+</li>
+<li>
 <p>Type -&gt; <code>Linux filesystem</code></p>
+</li>
+<li>
 <p>Select -&gt; <code>[ Write ]</code></p>
+</li>
+<li>
 <p>Select -&gt; <code>[ Quit ]</code></p>
+</li>
+</ul>
+</li>
+</ul>
 <hr />
-<ol start="6">
+<ol start="5">
 <li><strong>Format the EFI partition as FAT32</strong>:</li>
 </ol>
 <pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
 </code></pre>
 <p>Leave the root partition unformatted for the next step.</p>
 <hr />
-<ol start="7">
+<ol start="6">
 <li><strong>Encrypt the Root partition and Open it</strong>:</li>
 </ol>
 <pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
@@ -366,7 +401,7 @@ in <code>fstab</code></p>
 <pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr
 </code></pre>
 <hr />
-<ol start="9">
+<ol start="7">
 <li><strong>Generate the Filesystem Table</strong>:</li>
 </ol>
 <p>The EFI and root partitions need to be mounted before you generate the
@@ -380,7 +415,7 @@ vim /mnt/etc/fstab
 <p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn't you'll
 need to regenerate your fstab again with <code>genfstab</code>.</p>
 <hr />
-<ol start="10">
+<ol start="8">
 <li>Add compression, <strong>Only for the Root Partition</strong>:</li>
 </ol>
 <pre><code class="language-bash"># fstab
@@ -391,7 +426,7 @@ need to regenerate your fstab again with <code>genfstab</code>.</p>
 <pre><code class="language-bash">mount -o remount,compress=zstd /mnt
 </code></pre>
 <hr />
-<ol start="11">
+<ol start="9">
 <li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
 </ol>
 <pre><code class="language-bash">arch-chroot /mnt
@@ -408,7 +443,7 @@ passwd yourusername
 <pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
 </code></pre>
 <hr />
-<ol start="12">
+<ol start="10">
 <li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>encrypt</code> hook
 before the <code>filesystems</code> attribute.</li>
 </ol>
@@ -431,7 +466,7 @@ HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont blo
 <pre><code class="language-bash">mkinitcpio -P
 </code></pre>
 <hr />
-<ol start="14">
+<ol start="11">
 <li><strong>Install Grub and EFI boot manager</strong>, (while still in chroot environment):</li>
 </ol>
 <pre><code class="language-bash"># These should be installed in the chroot environment already
@@ -459,7 +494,7 @@ done
 <pre><code class="language-bash">mkinitcpio -P
 </code></pre>
 <hr />
-<ol start="15">
+<ol start="12">
 <li><strong>Enable LightDM and NetworkManager</strong></li>
 </ol>
 <pre><code class="language-bash">systemctl enable lightdm
@@ -484,7 +519,7 @@ umount /mnt
 cryptsetup close cryptroot
 </code></pre>
 <hr />
-<p>16 <strong>Reboot</strong></p>
+<p>13 <strong>Reboot</strong></p>
 <hr />
 <h3 id="arch-chroot"><a class="header" href="#arch-chroot">arch-chroot</a></h3>
 <details>
