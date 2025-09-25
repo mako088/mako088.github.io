@@ -326,11 +326,12 @@ sudo pacman -S firefox
 </code></pre>
 <p>Read the <a href="https://github.com/arkenfox/user.js/wiki">ArkenFox Wiki</a></p>
 <h2 id="apply"><a class="header" href="#apply">Apply</a></h2>
-<p>Open <code>about:support</code> and look for <code>Profile Folder</code> under <code>Application Basics</code> It
-will bring you to somewhere like <code>~/.librewolf/pefoo8xx.default-default/</code> and
-that is where you place the <code>user.js</code>.</p>
-<p>Place the following files in your <code>Profile Folder</code>:</p>
-<ul>
+<p>Open <code>about:support</code> and look for <code>Profile Directory</code> under <code>Application Basics</code>
+Select <code>Open Directory</code>, it will bring you to somewhere like
+<code>~/.librewolf/pefoo8xx.default-default/</code> and that is where you place the
+<code>user.js</code>.</p>
+<p>Place the following files in your <code>Profile Directory</code>:</p>
+<ol>
 <li>
 <p><a href="https://github.com/arkenfox/user.js/blob/master/user.js">Arkenfox user.js</a>
 Read through the <code>user.js</code>, not all settings are applied by default such as
@@ -345,11 +346,11 @@ RFP Fingerprinting protection.</p>
 <li>
 <p>Also create your own <code>user-overrides.js</code> with any changes you want to make to
 the default <code>user.js</code>. These changes are amended to the <code>user.js</code> and applied
-last enabling them to override the default settings. It's best to make changes
-here so that updating the Arkenfox <code>user.js</code> doesn't make you lose all of your
-customizations.</p>
+last enabling them to override the default settings. It's best to make
+changes here so that updating the Arkenfox <code>user.js</code> doesn't make you lose
+all of your customizations.</p>
 </li>
-</ul>
+</ol>
 <p>Example <code>user-overrides.js</code> spoofing the user agent:</p>
 <blockquote>
 <p>❗️ This is just an example, always check for common useragent strings
