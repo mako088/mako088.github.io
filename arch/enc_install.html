@@ -175,11 +175,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="encrypted-arch-install-w-encrypted-swap"><a class="header" href="#encrypted-arch-install-w-encrypted-swap">Encrypted Arch Install w/ Encrypted Swap</a></h1>
+                        <h1 id="encrypted-arch-install"><a class="header" href="#encrypted-arch-install">Encrypted Arch Install</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <ul>
-<li><a href="#automating-encrypted-swap-unlock">Automating Encrypted Swap Unlock</a></li>
 <li><a href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a>
 <ul>
 <li><a href="#arch-chroot">arch-chroot</a></li>
@@ -200,11 +199,9 @@ directory is just the same directory where your Arch Linux ISO file is stored.</
 </ul>
 <blockquote>
 <p>Always review the Wiki and never just plug random things suggested by me or
-anyone else without first doing your own research. If you have a ton of RAM
-and don't want hibernation capabilities, you can safely skip the swap section.
-There is no security benefit to using an encrypted swap over zram that I know
-of since zram is stored in RAM it's wiped on power loss.</p>
+anyone else without first doing your own research.</p>
 </blockquote>
+<p>Edited: 09-25-25 Removed encrypted swap section. Big usability downside IMO.</p>
 <details>
 <summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
 <blockquote>
@@ -253,46 +250,6 @@ is linked below and on the Arch website.</p>
 <li>Verify it against the
 <a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
 </ul>
-<p>✔️ Verifying Arch Linux ISO on Other Distributions</p>
-<pre><code>❗ NOTE: If you only want to verify the ISO once, you can temporarily import the public key, verify the signature, and then you don’t need to keep the key permanently in your keyring or sign it locally. This example is from the last release, but the process is the same.
-</code></pre>
-<p>For example, if you have a folder named archISO where you keep the ISO file
-archlinux-2025-09.01-x86_64.iso, you should also download the PGP signature file
-archlinux-2025.09.01-x86_64.iso.sig to the same folder.</p>
-<p>With sequoia(a separate app), you can get the Arch release signing key with:</p>
-<p>sq network wkd search pierre@archlinux.org --output release-key.pgp</p>
-<p>Export the chosen key to a .pgp file:</p>
-<p>sq cert export --keyring=release-key.pgp
---cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp</p>
-<p>Import into your keychain:</p>
-<pre><code class="language-bash"> gpg --import pierre-archlinux.pgp
-gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
-gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
-gpg: Total number processed: 1
-gpg:               imported: 1
-gpg: marginals needed: 3  completes needed: 1  trust model: pgp
-gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
-gpg: next trustdb check due at 2026-08-23
-</code></pre>
-<ul>
-<li>Now, you should see <a href="mailto:pierre@archlinux.org">pierre@archlinux.org</a> and his keys when you run gpg
---list-keys</li>
-</ul>
-<p>Finally, verify the signature:</p>
-<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
-Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
-1 authenticated signature.
-</code></pre>
-<blockquote>
-<p>❗ To ensure the key is authentic and not spoofed, verify that the key
-fingerprint matches the official Arch Linux signing key fingerprint, which can
-is linked below and on the Arch website.</p>
-</blockquote>
-<p>This shows that the signature was made by the key with the ID
-<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C</code> (Pierre Schmitz).</p>
-<p>You can check the keys fingerprint with:</p>
-<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
-</code></pre>
 <p>Verify it against the Arch Linux master-keys</p>
 <p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
 that the key used to sign is trusted in our keyring.</p>
@@ -363,40 +320,25 @@ sudo timedatectl set-timezone America/New_York
 <ol start="4">
 <li><strong>Partition your Disk</strong>:</li>
 </ol>
-<p>Identify your target disk (e.g., <code>/dev/mmcblk0</code>):</p>
+<p>In this section, I'll assume that you're starting with a clean slate. If you're
+not, you can use your existing partitions or delete them. It's simple with
+<code>cfdisk</code>, you launch it on the target filesystem, select the partition you want
+to delete and Select -&gt; <code>[ Delete ]</code> until all you see is <code>Free space</code> and a
+clean slate.</p>
+<p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
 <pre><code class="language-bash">lsblk
 </code></pre>
-<blockquote>
-<p>❗ If you already have an EFI partition you do not have to create another one
-and doing so can cause issues. First check with fdisk -l, before creating a
-new one.</p>
-</blockquote>
-<pre><code class="language-bash">fdisk -l | less
-Device            Size           Type
-/dev/mmcblk0p1     1G            EFI System
-/dev/mmcblk0p2     57.2G         Linux root (x86-64)
+<pre><code class="language-bash">cfdisk /dev/nvme0n1
 </code></pre>
-<p>Since I already have a 1G EFI and another root partition with the rest of the
-space, I'll only need cfdisk to resize <code>mmcblk0p2</code> in order to make a swap
-partition.</p>
-<pre><code class="language-bash">mkdir -p /mnt/boot
-mount /dev/mmcblk0p1 /mnt/boot
-</code></pre>
-<hr />
-<ol start="5">
-<li>If you have a disk with no partitions on it, you'll have to use a
-partitioning tool to create them. I'll use cfdisk as an example:</li>
-</ol>
-<pre><code class="language-bash">cfdisk /dev/mmcblk0
-</code></pre>
-<p><code>Select label type -&gt; gpt</code></p>
-<p><code>Free space -&gt; 1G</code> (1G boot partition)</p>
-<p><code>type -&gt; EFI System</code></p>
-<p>Stay in cfdisk and go to <code>type -&gt; Linux swap</code></p>
-<p><code>Free space -&gt; RAM+2G</code> (RAM+2G Swap)</p>
-<p>Stay in cfdisk <code>type -&gt; Linux filesystem</code></p>
-<p><code>Free space -&gt; The Rest</code> (The Rest Root partition)</p>
-<p><code>Write -&gt; Quit</code></p>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<p>Select -&gt; <code>[ New ]</code></p>
+<p>Partition size: <code>1G</code></p>
+<p>Type -&gt; <code>EFI System</code></p>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<p>Partition size: The rest of the space</p>
+<p>Type -&gt; <code>Linux filesystem</code></p>
+<p>Select -&gt; <code>[ Write ]</code></p>
+<p>Select -&gt; <code>[ Quit ]</code></p>
 <hr />
 <ol start="6">
 <li><strong>Format the EFI partition as FAT32</strong>:</li>
@@ -418,95 +360,23 @@ mount /dev/mapper/cryptroot /mnt
 <p>Later, we will enable compression by mounting with options like <code>compress=zstd</code>
 in <code>fstab</code></p>
 <hr />
-<ol start="8">
-<li><strong>Encrypted Swap</strong></li>
-</ol>
-<blockquote>
-<p>❗ NOTE: If you have a ton of RAM a swap is probably unnecessary unless you
-want hibernation, which requires it. Anything over 16G of RAM and it is
-questionable if you need swap at all and should probably just use zram.</p>
-</blockquote>
-<p>Verify your swap partition created earlier, in this section we assume the swap
-partition is <code>/dev/mmcblk0p3</code>:</p>
-<pre><code class="language-bash">lsblk -f
-</code></pre>
-<p>Encrypt the swap partiton with LUKS:</p>
-<pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p3
-# Open the encrypted swap
-cryptsetup open /dev/mmcblk0p3 cryptswap
-</code></pre>
-<p>Format the decrypted swap partition:</p>
-<pre><code class="language-bash">mkswap /dev/mapper/cryptswap
-</code></pre>
-<p>Enable the swap:</p>
-<pre><code class="language-bash">swapon /dev/mapper/cryptswap
-</code></pre>
-<p>Add the swap to <code>/mnt/etc/fstab</code> (this will be updated later in the <code>genfstab</code>
-step, but you can manually ensure it):</p>
-<pre><code class="language-bash">echo '/dev/mapper/cryptswap none swap defaults 0 0' &gt;&gt; /mnt/etc/fstab
-</code></pre>
-<p>Add the swap partition to the LUKS configuration for automatic unlocking on
-boot:</p>
-<pre><code class="language-bash">echo 'cryptswap /dev/mmcblk0p3 none luks' &gt;&gt; /mnt/etc/crypttab
-</code></pre>
-<blockquote>
-<p>❗ Later, after arch-chroot, ensure the mkinitcpio.conf HOOKS include resume
-(after encrypt) if you plan on using hibernation. This will be covered in the
-<code>initramfs</code> step.</p>
-</blockquote>
-<hr />
-<h3 id="automating-encrypted-swap-unlock"><a class="header" href="#automating-encrypted-swap-unlock">Automating Encrypted Swap Unlock</a></h3>
-<p>To avoid entering a separate password for the swap on every boot, you can create
-a keyfile that will automatically unlock the swap once the root partition is
-decrypted. This is a recommended practice.</p>
-<ol>
-<li>Create a keyfile: Generate a random keyfile and save it to a secure location,
-like /etc/.</li>
-</ol>
-<pre><code class="language-bash">dd if=/dev/urandom of=/etc/swap.key bs=4096 count=1
-chmod 600 /etc/swap.key
-</code></pre>
-<p>Add the keyfile to the LUKS header: Add the keyfile as a new key to the
-encrypted swap partition.</p>
-<pre><code class="language-bash">cryptsetup luksAddKey /dev/mmcblk0p3 /etc/swap.key
-</code></pre>
-<p>Update <code>crypttab</code>: Modify the <code>/etc/crypttab</code> file to use the keyfile for
-unlocking the swap partition instead of a password.</p>
-<pre><code class="language-bash"># Open /etc/crypttab in a text editor like nano or vim
-# and change the line to:
-cryptswap UUID=&lt;your_swap_UUID&gt; /etc/swap.key luks
-</code></pre>
-<p>Update <code>mkinitcpio</code>:</p>
-<pre><code class="language-bash">sudo mkinitcpio -P
-</code></pre>
-<p>Update <code>grub</code>:</p>
-<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
-</code></pre>
-<p>Now, when you boot and enter the password for your root partition, the system
-will gain access to the keyfile, which will automatically unlock the encrypted
-swap without requiring a second password.</p>
 <h2 id="install-the-base-system-on-mnt-with-pacstrap"><a class="header" href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a></h2>
 <p>If you prefer Nvim or a hardened kernel, change it here.</p>
-<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel
+<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr
 </code></pre>
-<pre><code class="language-bash"># Check if EFI is mounted
-mount | grep /mnt/boot
-# List all mounts under /mnt
-findmnt /mnt
-</code></pre>
-<p>The EFI and root partitions need to be mounted before you generate the
-filesystem table in the next step.</p>
 <hr />
 <ol start="9">
 <li><strong>Generate the Filesystem Table</strong>:</li>
 </ol>
+<p>The EFI and root partitions need to be mounted before you generate the
+filesystem table in the next step.</p>
 <pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
 #
 cat /mnt/etc/fstab
 # Add compression
 vim /mnt/etc/fstab
 </code></pre>
-<p><strong>Important</strong>: The <code>fstab</code> should list all 3 partitions, if it doesn't you'll
+<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn't you'll
 need to regenerate your fstab again with <code>genfstab</code>.</p>
 <hr />
 <ol start="10">
@@ -529,11 +399,11 @@ need to regenerate your fstab again with <code>genfstab</code>.</p>
 <pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
 passwd yourusername
 </code></pre>
-<p>Enable sudo for wheel group:</p>
-<pre><code>EDITOR=vim visudo
+<p>Create an admin password:</p>
+<pre><code class="language-bash">passwd
 </code></pre>
-<p>If that doesn't work, use <code>vim /etc/sudoers</code> and edit the file accordingly.</p>
-<p>Uncomment the line:</p>
+<p>Enable sudo for wheel group:</p>
+<p>In <code>/etc/sudoers</code> uncomment the line:</p>
 <pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
 </code></pre>
 <hr />
@@ -551,20 +421,20 @@ before the <code>filesystems</code> attribute.</li>
 </ul>
 <pre><code class="language-bash">vim /etc/mkinitcpio.conf
 </code></pre>
-<blockquote>
-<p>❗ NOTE how I also added the <code>resume</code> after <code>encrypt</code>, that's required for the
-encrypted swap setup.</p>
-</blockquote>
 <pre><code class="language-bash"># mkinitcpio.conf
 # ... snip ...
-HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt resume filesystems fsck)
+HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt filesystems fsck)
 # ... snip ...
+</code></pre>
+<p>Generate the initial RAM Filesystem (initramfs) image.</p>
+<pre><code class="language-bash">mkinitcpio -P
 </code></pre>
 <hr />
 <ol start="14">
 <li><strong>Install Grub and EFI boot manager</strong>, (while still in chroot environment):</li>
 </ol>
-<pre><code class="language-bash">pacman -S grub efibootmgr
+<pre><code class="language-bash"># These should be installed in the chroot environment already
+pacman -Q grub efibootmgr
 </code></pre>
 <p>Install GRUB for UEFI Systems:</p>
 <pre><code class="language-bash">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
@@ -584,6 +454,9 @@ GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptr
 Adding boot menu entry for UEFI Firmware Settings ...
 done
 </code></pre>
+<p>To be safe re-generate the <code>initramfs</code>:</p>
+<pre><code class="language-bash">mkinitcpio -P
+</code></pre>
 <hr />
 <ol start="15">
 <li><strong>Enable LightDM and NetworkManager</strong></li>
@@ -592,14 +465,13 @@ done
 systemctl enable NetworkManager
 </code></pre>
 <blockquote>
-<p>NOTE: While following these exact steps on a different machine, the above
-commands refused to run. The solution was to exit the chroot environment and
-run the following:</p>
+<p>❗️ NOTE: If you're ever unable to run the above commands in the chroot
+environment, exit chroot and run:</p>
 <pre><code class="language-bash">systemctl --root=/mnt enable lightdm
 systemctl --root=/mnt enable NetworkManager
 </code></pre>
 </blockquote>
-<p>Configure LightDM greeter, edit <code>/et/lightdm/lightdm.conf</code> to add:</p>
+<p>Configure LightDM greeter, edit <code>/etc/lightdm/lightdm.conf</code> to add:</p>
 <pre><code class="language-conf"># lightdm.conf
 [Seat:*]
 greeter-session=lightdm-gtk-greeter
@@ -643,7 +515,10 @@ installed.</li>
 <pre><code class="language-bash">exit
 </code></pre>
 <p>Unmount and close LUKS:</p>
-<pre><code class="language-bash">umount /mnt/boot umount /mnt cryptsetup close cryptroot reboot
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+reboot
 </code></pre>
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>
