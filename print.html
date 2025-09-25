@@ -1195,10 +1195,11 @@ sudo timedatectl set-timezone America/New_York
 <li><strong>Partition your Disk</strong>:</li>
 </ol>
 <p>In this section, I'll assume that you're starting with a clean slate. If you're
-not, you can use your existing partitions or delete them. It's simple with
-<code>cfdisk</code>, you launch it on the target filesystem, select the partition you want
-to delete and Select -&gt; <code>[ Delete ]</code> until all you see is <code>Free space</code> and a
-clean slate.</p>
+not, you can use your existing partitions or delete them.</p>
+<p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
+filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
+until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
+to save your changes.</p>
 <p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
 <pre><code class="language-bash">lsblk
 </code></pre>
@@ -1217,15 +1218,15 @@ clean slate.</p>
 <ol start="6">
 <li><strong>Format the EFI partition as FAT32</strong>:</li>
 </ol>
-<pre><code class="language-bash">mkfs.fat -F32 /dev/mmcblk0p1
+<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
 </code></pre>
 <p>Leave the root partition unformatted for the next step.</p>
 <hr />
 <ol start="7">
 <li><strong>Encrypt the Root partition and Open it</strong>:</li>
 </ol>
-<pre><code class="language-bash">cryptsetup luksFormat /dev/mmcblk0p2
-cryptsetup open /dev/mmcblk0p2 cryptroot
+<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup open /dev/nvme0n1p2 cryptroot
 </code></pre>
 <p>Create a filesystem:</p>
 <pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
@@ -1319,7 +1320,7 @@ Installation finished. No error reported.
 <p>Edit <code>/etc/default/grub</code> and modify line starting with <code>GRUB_CMDLINE_LINUX</code> to
 add:</p>
 <pre><code class="language-bash"># ...snip...
-GRUB_CMDLINE_LINUX="cryptdevice=/dev/mmcblk0p2:cryptroot root=/dev/mapper/cryptroot"
+GRUB_CMDLINE_LINUX="cryptdevice=/dev/nvme0n1p2:cryptroot root=/dev/mapper/cryptroot"
 # ...snip...
 </code></pre>
 <p>Generate GRUB configuration:</p>
@@ -1367,13 +1368,13 @@ and go to TTY into your system and are hit with a AHHH I can't log in WTF!</p>
 <p>It's as easy as repeating some of the steps above. Reboot into the Live
 environment, remount your partitions and <code>arch-chroot</code> back in:</p>
 <p>Open the encrypted root partition:</p>
-<pre><code class="language-bash">cryptsetup open /dev/mmcblk0p2 cryptroot
+<pre><code class="language-bash">cryptsetup open /dev/nvme0n1p2 cryptroot
 </code></pre>
 <p>Mount the decrypted root:</p>
 <pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
 </code></pre>
 <p>Mount the EFI partition:</p>
-<pre><code class="language-bash">mount /dev/mmcblk0p1 /mnt/boot
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot
 </code></pre>
 <p>Chroot into your installed system:</p>
 <pre><code class="language-bash">arch-chroot /mnt
