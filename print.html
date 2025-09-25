@@ -1853,6 +1853,26 @@ can identify you while behind a VPN or in incognito mode as well.</p>
 Arkenfox <code>user.js</code> you can jump to that section first as it will set many of
 these settings for you.</p>
 <hr />
+<h2 id="search-engines"><a class="header" href="#search-engines">Search Engines</a></h2>
+<h3 id="searxng"><a class="header" href="#searxng">SearXNG</a></h3>
+<p><strong>SearXNG</strong> an open-source, privacy-respecting metasearch engine that aggregates
+results from various search services, such as Google, DuckDuckGo, etc without
+tracking you or profiling your searches. You can add SearXNG to firefox by going
+to <code>about:preferences#search</code> and at the bottom click <code>Add</code>, URL will be
+<code>https://searx.be/search?q=%s</code>.</p>
+<blockquote>
+<p>❗️ NOTE: The above searx is the default and doesn't give many relevant
+results. To get relevant results find a
+<a href="https://searx.space/">public instance</a> with a good rating from your area and
+add the <code>search?q=%s</code> to the end of it. For example, I'm using
+<code>https://priv.au/search?q=%s</code>. This gives much better results than DDG in my
+opinion.</p>
+</blockquote>
+<p>Searx is a bit different, you can choose which search engine you want for your
+current search with <code>!ddg search term</code> to use duckduckgo for example.</p>
+<hr />
+<p><strong>Startpage</strong> is another metasearch engine that I've heard good things about.</p>
+<hr />
 <h4 id="enhanced-tracking-protection-etp"><a class="header" href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></h4>
 <ul>
 <li>
@@ -1946,7 +1966,11 @@ fingerprint.</p>
 will likely make you stand out more because most people don't disable it.</p>
 </blockquote>
 <p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
+<hr />
 <h2 id="install-firefoxlibrewolf--arkenfox"><a class="header" href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></h2>
+<p><strong>LibreWolf</strong> is an open-source fork of Firefox with a strong focus on privacy,
+security, and user freedom. LibreWolf enables always HTTPS, includes
+uBlockOrigin, and more providing strong defaults.</p>
 <details>
 <summary> ✔️ Click to Expand Arkenfox How To </summary>
 <p>The process is the same for both Firefox &amp; LibreWolf. I like LibreWolf for it's
@@ -1983,7 +2007,7 @@ customizations.</p>
 <p>Example <code>user-overrides.js</code> spoofing the user agent:</p>
 <blockquote>
 <p>❗️ This is just an example, always check for common useragent strings
-yourself.</p>
+yourself. Read the Arkenfox Wiki!</p>
 </blockquote>
 <pre><code class="language-js">user_pref(
   "general.useragent.override",
@@ -2062,15 +2086,91 @@ Mode, and look for any errors.</p>
 <code>SUCCESS: No no he's not dead, he's, he's restin'!</code></p>
 </details>
 <h3 id="user-agent-spoofing"><a class="header" href="#user-agent-spoofing">User Agent Spoofing</a></h3>
+<blockquote>
+<p>❗️ NOTE: Spoofing your useragent alone likely isn't worth the protections you
+lose from disabling <code>resistFingerprinting</code>. <code>resistFingerprinting</code> spoofs many
+different fingerprinting aspects.</p>
+</blockquote>
 <p>Research what the most common user agent is. You'll need to disable
 <code>privacy.resistFingerprinting</code> for this to work.</p>
 <p>Place the user agent string in <code>general.useragent.override</code> something like:
 <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code></p>
 <p><a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
 <p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
+<hr />
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
 <ul>
-<li><a href="https://www.browsercat.com/post/browser-fingerprint-spoofing-explained">BrowserCat Fingerprint Spoofing</a></li>
+<li>
+<p><a href="https://docs.searxng.org/">Welcome to SearXNG</a></p>
+</li>
+<li>
+<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">Firefox Hardening Guide</a></p>
+</li>
+<li>
+<p><a href="https://www.ghacks.net/2015/08/18/a-comprehensive-list-of-firefox-privacy-and-security-settings/">Firefox ghacks</a></p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js">Arkenfox</a></p>
+</li>
+<li>
+<p><a href="https://www.privacytools.io/private-browser">PrivacyTools.io</a></p>
+</li>
+<li>
+<p><a href="https://github.com/simeononsecurity/FireFox-Privacy-Script">simeononsecurity Firefox-Privacy-Script</a></p>
+</li>
+<li>
+<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">brianfucksec firefox-hardening-Guide 2023</a></p>
+</li>
+<li>
+<p><a href="https://simeononsecurity.com/guides/enhance-firefox-security-configuring-guide/">STIG Firefox Hardening</a></p>
+</li>
 </ul>
+<blockquote>
+<p>If you should trust the U.S. Governments recommendations is another story but
+it can be good to compare and contrast with other trusted resources. You'll
+have to think whether the CISA recommending that everyone uses Signal is solid
+advice or guiding you towards a honeypot, I can't say for sure.</p>
+</blockquote>
+<ul>
+<li>
+<p><a href="https://stigviewer.com/stigs/mozilla_firefox">Mozilla Firefox Security Technical Implementation Guide</a>
+The STIG for Mozilla Firefox (Security Technical Implementation Guide) is a
+set of security configuration standards developed by the U.S. Department of
+Defense. They are created by the Defense Information Systems Agency (DISA) to
+secure and harden DoD information systems and software.</p>
+</li>
+<li>
+<p><a href="https://thenewoil.org/en/guides/prologue/why/">Privacy, The New Oil (Why Privacy &amp; Security Matter)</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/en/">PrivacyGuides</a></p>
+</li>
+<li>
+<p><a href="https://relay.firefox.com/accounts/profile/">Firefox Relay</a> can be used to
+create email aliases that forward to your real email address. The paid plan
+also lets you create phone number aliases that forward to your phone number.</p>
+</li>
+<li>
+<p><a href="https://zebracrossing.narwhalacademy.org/">Zebra Crossing digital safety checklist</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/essentials#step-1">DataDetoxKit</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/degooglise/">DataDetox Degooglise</a></p>
+</li>
+<li>
+<p><a href="https://tb-manual.torproject.org/">Tor Browser User Manual</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.torproject.org/tpo/team/-/wikis/home">Tor Wiki</a></p>
+</li>
+<li>
+<p><a href="https://www.browsercat.com/post/browser-fingerprint-spoofing-explained">BrowserCat Fingerprint Spoofing</a></p>
+</li>
+</ul>
+</details>
 
                     </main>
 
