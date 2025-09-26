@@ -2489,6 +2489,7 @@ adding extra rounds can make it harder to brute-force.</p>
 <p><code>-f</code> is for filename</p>
 </li>
 </ul>
+<hr />
 <h2 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h2>
 <p><code>gpg --full-generate-key</code> can be used to generate a basic keypair.</p>
 <p><code>gpg --expert --full-generate-key</code> can be used for keys that require more
@@ -2530,6 +2531,7 @@ chmod 600 ~/.gnupg/*
 ls -l ~/.gnupg
 # Files should show: -rw-------
 </code></pre>
+<hr />
 <h3 id="generate-a-revocation-certificate"><a class="header" href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></h3>
 <p><code>mykey</code> must be a key specifier, either the keyID of the primary keypair or any
 part of the user ID that identifies the keypair:</p>
@@ -2557,8 +2559,6 @@ could publish the revoke cert and render the corresponding public key useless.</
 gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEYID
 </code></pre>
 <hr />
-<p>After fixing, run <code>gpg --list-keys --with-fingerprint</code>, which lists your public
-keys:</p>
 <pre><code class="language-bash"># Take note of your public key
 gpg --list-keys --with-fingerprint
 /home/jr/.gnupg/pubring.kbx
@@ -2571,7 +2571,6 @@ uid                   [ultimate] Jr (08-23-25) &lt;sayls8@proton.me&gt;
 <li>Copy the KeyID, in this example it would be <code>0x095722B2A123CF15</code>. We will use
 it for the command below.</li>
 </ul>
-<p>The warning should be gone.</p>
 <p>Now we will generate 2 subkeys, 1 for encryption and 1 for authentication.</p>
 <pre><code class="language-bash">gpg --expert --edit-key 0x095722B2A123CF15
 </code></pre>
@@ -2721,6 +2720,59 @@ ssh-ed25519 AABBC3NzaC1lZDI1NTE5AAAAIGXwhVokJ6cKgodYT+0+0ZrU0sBqMPPRDPJqFxqRtM+I
 <ul>
 <li>It shows <code>(none)</code> because the comment field is blank on subkeys.</li>
 </ul>
+<h3 id="backing-up-your-keys"><a class="header" href="#backing-up-your-keys">Backing up Your Keys</a></h3>
+<pre><code class="language-bash">gpg --export-secret-keys --armor --output my-private-key-backup.gpg
+</code></pre>
+<p>Your private keys will be encrypted with a passphrase into a .gpg file. Store
+this backup in a secure location line an encrypted USB drive. This can prevent
+you from losing access to your keys in the case of disk failure or accidents.</p>
+<p>You can export your public keys and publish them publicly if you choose:</p>
+<pre><code class="language-bash">gpg --export --armor --output my-public-keys.gpg
+</code></pre>
+<p>Now if your keys ever get lost or corrupted, you can import these backups.</p>
+<p>--</p>
+<h3 id="remove-and-store-your-primary-key-offline"><a class="header" href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></h3>
+<blockquote>
+<p>❗ NOTE: After you remove your primary key, you will no longer be able to
+derive subkeys from it or sign keys unless you re-import it.</p>
+</blockquote>
+<pre><code class="language-bash"># extract the primary key
+gpg -a --export-secret-key sayls8@proton.me &gt; secret_key
+# extract the subkeys, which we will reimport later
+gpg -a --export-secret-subkeys sayls8@proton.me &gt; secret_subkeys.gpg
+# delete the secret keys from the keyring, so only subkeys are left
+gpg --delete-secret-keys sayls8@proton.me
+Delete this key from the keyring? (y/N) y
+This is a secret key! - really delete? (y/N) y
+# reimport the subkeys
+gpg --import secret_subkeys.gpg
+# verify everything is in order
+gpg --list-secret-keys
+# remove the subkeys from disk
+rm secret_subkeys.gpg
+</code></pre>
+<p>I recommend also keeping a <code>.gpg</code> version to make it easy to re-import your
+primary key: <code>gpg --export-secret-keys --armor --output private-key-bak.gpg</code></p>
+<p>Then store <code>secret_key</code> on an encrypted USB drive or somewhere offline. If you
+want to protect it for now, you can just use the encryption subkey that we
+created to encrypt <code>secret_key</code> with a passphrase:</p>
+<pre><code class="language-bash">gpg --list-keys --keyid-format LONG
+</code></pre>
+<p>Copy the KeyID of the subkey with encrypt capabilities for the following
+command:</p>
+<pre><code class="language-bash"># Encrypting your secret key for yourself
+gpg --encrypt --recipient Ox37ACA569C5C44787 secret_key
+</code></pre>
+<p>You can check that the secret key material is missing with
+<code>gpg --list-secret-keys</code>, you should see <code>sec#</code> instead of <code>sec</code>.</p>
+<pre><code class="language-bash">gpg --list-secret-keys
+# Output:
+sec#  ed25519/0x
+# ...snip...
+</code></pre>
+<p>The above set of commands are from the
+<a href="https://riseup.net/ru/security/message-security/openpgp/gpg-best-practices#keep-your-primary-key-entirely-offline">RiseUp Keep your primary key offline</a></p>
+<hr />
 <h2 id="hardening-openssh"><a class="header" href="#hardening-openssh">Hardening OpenSSH</a></h2>
 <p>Install and configure fail2ban:</p>
 <pre><code class="language-bash">sudo pacman -S fail2ban
@@ -2784,6 +2836,7 @@ ssh jr@archlinux
 # Specify the port
 ssh -p 22 user@hostname
 </code></pre>
+<hr />
 <h4 id="tip-change-the-default-port"><a class="header" href="#tip-change-the-default-port">Tip Change the Default Port</a></h4>
 <blockquote>
 <p>⚠️ Critical Warning: Do not close your existing SSH session until you
@@ -2826,6 +2879,18 @@ table inet filter {
 <p>Finally, text a connection:</p>
 <pre><code class="language-bash">ssh -p 2222 user@hostname
 </code></pre>
+<hr />
+<h3 id="firejail"><a class="header" href="#firejail">Firejail</a></h3>
+<pre><code class="language-bash">sudo pacman -S firejail
+</code></pre>
+<p>Usage:</p>
+<pre><code class="language-bash">firejail librewolf
+</code></pre>
+<p>Using by default:</p>
+<pre><code class="language-bash">sudo firecfg
+</code></pre>
+<p>This creates symbolic links in <code>/usr/local/bin/</code> pointing to <code>/usr/bin/firejail</code>
+for programs for which Firejail has default or self-created profiles.</p>
 
                     </main>
 
