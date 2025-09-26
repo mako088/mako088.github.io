@@ -455,6 +455,365 @@ and HTTP/HTTPS.</p>
 <pre><code class="language-bash">sudo nft list ruleset
 </code></pre>
 <hr />
+<h2 id="ssh-keygen"><a class="header" href="#ssh-keygen">ssh-keygen</a></h2>
+<p>The <code>ed25519</code> algorithm is significantly faster and more secure when compared to
+<code>RSA</code>. You can also specify the key derivation function (KDF) rounds to
+strengthen protection even more.</p>
+<p>For example, to generate a strong key for MdBook:</p>
+<pre><code class="language-bash">ssh-keygen -t ed25519 -a 32
+</code></pre>
+<p>Or more specifically:</p>
+<pre><code class="language-bash">ssh-keygen -t ed25519 -a 32 -f ~/.ssh/id_ed25519_github_$(date +%Y-%m-%d) -C "SSH Key for GitHub"
+</code></pre>
+<ul>
+<li>
+<p><code>-t</code> is for type</p>
+</li>
+<li>
+<p><code>-a 32</code> sets the number of KDF rounds. The standard is usually good enough,
+adding extra rounds can make it harder to brute-force.</p>
+</li>
+<li>
+<p><code>-f</code> is for filename</p>
+</li>
+</ul>
+<h2 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h2>
+<p><code>gpg --full-generate-key</code> can be used to generate a basic keypair.</p>
+<p><code>gpg --expert --full-generate-key</code> can be used for keys that require more
+capabilities.</p>
+<blockquote>
+<p>❗ NOTE: We will first generate our GPG primary key that is required to
+atleast have sign capabilities, we will then derive subkeys from said primary
+key and use them for signing and encrypting. It is recommended to generate a
+revoke certificate right after creating your primary key.</p>
+</blockquote>
+<p>To generate your gpg primary key you can do the following:</p>
+<pre><code class="language-bash">gpg --full-generate-key
+</code></pre>
+<ul>
+<li>
+<p>Choose <code>(10) (sign only)</code></p>
+</li>
+<li>
+<p>Give it a name and description</p>
+</li>
+<li>
+<p>Give it an expiration date, 1y is common</p>
+</li>
+<li>
+<p>Use a strong passphrase or password</p>
+</li>
+<li>
+<p>Give it a comment, I typically add the date</p>
+</li>
+</ul>
+<p>If you see a warning about incorrect permissions, you can run the following:</p>
+<pre><code class="language-bash">chmod 700 ~/.gnupg
+chmod 600 ~/.gnupg/*
+</code></pre>
+<p>Verify:</p>
+<pre><code class="language-bash">ls -ld ~/.gnupg
+# Should show: drwx------
+
+ls -l ~/.gnupg
+# Files should show: -rw-------
+</code></pre>
+<h3 id="generate-a-revocation-certificate"><a class="header" href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></h3>
+<p><code>mykey</code> must be a key specifier, either the keyID of the primary keypair or any
+part of the user ID that identifies the keypair:</p>
+<p>Replace <code>mykeyID</code> with the keyID of your primary key and store the cert in a
+safe place:</p>
+<pre><code class="language-bash">gpg --output revoke.asc --gen-revoke mykeyID
+Create a revocation certificate for this key? (y/N)
+Please select the reason for the revocation:
+  0 = No reason specified
+  1 = Key has been compromised
+  2 = Key is superseded
+  3 = Key is no longer used
+  Q = Cancel
+(Probably you want to select 1 here)
+Your decision?
+</code></pre>
+<p>The certificate will be output to a file <code>revoke.asc</code>. If the <code>--output</code> is
+ommitted, the result will be placed on stdout.</p>
+<p>Since it's a short certificate, you can print a hardcopy and store it somewhere
+safe. The cert shouldn't be somewhere that others can access it since anyone
+could publish the revoke cert and render the corresponding public key useless.</p>
+<p>To apply the revoke cert, import it:</p>
+<pre><code class="language-bash">gpg --import revoke.asc
+# And optionally push the revoked key to public keyservers to notify others:
+gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEYID
+</code></pre>
+<hr />
+<p>After fixing, run <code>gpg --list-keys --with-fingerprint</code>, which lists your public
+keys:</p>
+<pre><code class="language-bash"># Take note of your public key
+gpg --list-keys --with-fingerprint
+/home/jr/.gnupg/pubring.kbx
+---------------------------
+pub   ed25519/0x095782A1B124AF15 2025-08-23 [SCA] [expires: 2026-08-23]
+Key fingerprint = 5908 9C5B FEC8 0D75 FCB0  E206 0958 82C1 A124 CF15
+uid                   [ultimate] Jr (08-23-25) &lt;sayls8@proton.me&gt;
+</code></pre>
+<ul>
+<li>Copy the KeyID, in this example it would be <code>0x095722B2A123CF15</code>. We will use
+it for the command below.</li>
+</ul>
+<p>The warning should be gone.</p>
+<p>Now we will generate 2 subkeys, 1 for encryption and 1 for authentication.</p>
+<pre><code class="language-bash">gpg --expert --edit-key 0x095722B2A123CF15
+</code></pre>
+<p>Choose 11 (set your own capabilities) and add A (Authenticate) and type Q.
+Create another key while still in the menu with only encrypt capabilities.</p>
+<blockquote>
+<p>❗ <code>gpg --edit-key</code> has many more capabilities, after launching type <code>help</code>.</p>
+</blockquote>
+<p><strong>Add Keygrip of Authenticate Subkey to <code>sshcontrol</code> for gpg-agent</strong></p>
+<pre><code class="language-bash">gpg --list-secret-keys --with-keygrip --keyid-format LONG
+</code></pre>
+<p>Copy the keygrip of the subkey with Authenticate capabilities</p>
+<pre><code class="language-bash">echo "6BD11826F3845BC222127FE3D22C92C91BB3FB32" &gt; ~/.gnupg/sshcontrol
+</code></pre>
+<pre><code class="language-bash">ssh-add -L
+# you should see something like:
+ssh-ed25519 AABCC3NzaC1lZDI1NTE5ABBAIHyujgyCjjBTqIuFM3EMUSo6RGklmOXQW3uWRhWdJ1Mm (none)
+</code></pre>
+<ul>
+<li>By itself, a keygrip cannot be used to reconstruct your private key. It's
+derived from the public key material, not from the secret key itself so it's
+safe to version control. Don't put your keygrip in a public repo if you don't
+want people to know you use that key for signing/authentication. It's not a
+security risk, but it leaks a tiny bit of metadata.</li>
+</ul>
+<p>The following article mentions the keygrip being computed from public elements
+of the key:</p>
+<ul>
+<li><a href="https://gnupg-users.gnupg.narkive.com/q5JtahdV/gpg-agent-what-is-a-keygrip">gnupg-users what-is-a-keygrip</a></li>
+</ul>
+<p>Create a <code>~/.gnupg/gpg.conf</code>:</p>
+<p>Copy the KeyID of the key with Authenticate capabilities and use it as your
+default-key in <code>gpg.conf</code>:</p>
+<ul>
+<li><a href="https://riseup.net/ru/security/message-security/openpgp/gpg-best-practices">RiseUp GPG Best Practices</a></li>
+</ul>
+<pre><code class="language-bash">#
+# This is an implementation of the Riseup OpenPGP Best Practices
+# https://help.riseup.net/en/security/message-security/openpgp/best-practices
+#
+
+
+#-----------------------------
+# default key
+#-----------------------------
+
+# The default key to sign with. If this option is not used, the default key is
+# the first key found in the secret keyring
+
+#default-key 0xD8692123C4065DEA5E0F3AB5249B39D24F25E3B6
+
+
+#-----------------------------
+# behavior
+#-----------------------------
+
+# Disable inclusion of the version string in ASCII armored output
+no-emit-version
+
+# Disable comment string in clear text signatures and ASCII armored messages
+no-comments
+
+# Display long key IDs
+keyid-format 0xlong
+
+# List all keys (or the specified ones) along with their fingerprints
+with-fingerprint
+
+# Display the calculated validity of user IDs during key listings
+list-options show-uid-validity
+verify-options show-uid-validity
+
+# Try to use the GnuPG-Agent. With this option, GnuPG first tries to connect to
+# the agent before it asks for a passphrase.
+use-agent
+
+
+#-----------------------------
+# keyserver
+#-----------------------------
+
+# This is the server that --recv-keys, --send-keys, and --search-keys will
+# communicate with to receive keys from, send keys to, and search for keys on
+keyserver hkps://keys.openpgp.org/
+
+# Set the proxy to use for HTTP and HKP keyservers - default to the standard
+# local Tor socks proxy
+# It is encouraged to use Tor for improved anonymity. Preferrably use either a
+# dedicated SOCKSPort for GnuPG and/or enable IsolateDestPort and
+# IsolateDestAddr
+#keyserver-options http-proxy=socks5-hostname://127.0.0.1:9050
+
+# Don't leak DNS, see https://trac.torproject.org/projects/tor/ticket/2846
+keyserver-options no-try-dns-srv
+
+# When using --refresh-keys, if the key in question has a preferred keyserver
+# URL, then disable use of that preferred keyserver to refresh the key from
+keyserver-options no-honor-keyserver-url
+
+# When searching for a key with --search-keys, include keys that are marked on
+# the keyserver as revoked
+keyserver-options include-revoked
+
+
+#-----------------------------
+# algorithm and ciphers
+#-----------------------------
+
+# list of personal digest preferences. When multiple digests are supported by
+# all recipients, choose the strongest one
+personal-cipher-preferences AES256 AES192 AES CAST5
+
+# list of personal digest preferences. When multiple ciphers are supported by
+# all recipients, choose the strongest one
+personal-digest-preferences SHA512 SHA384 SHA256 SHA224
+
+# message digest algorithm used when signing a key
+cert-digest-algo SHA512
+
+# This preference list is used for new keys and becomes the default for
+# "setpref" in the edit menu
+default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
+</code></pre>
+<p>Add the following to your shell config, either <code>.bashrc</code> or <code>.zshrc</code>:</p>
+<pre><code class="language-zsh">GPG_TTY=$(tty)
+export GPG_TTY
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+gpgconf --launch gpg-agent
+</code></pre>
+<p>Rebuild and then restart <code>gpg-agent</code> if necessary:</p>
+<pre><code class="language-bash">gpgconf --kill gpg-agent
+gpgconf --launch gpg-agent
+</code></pre>
+<p>Test, these should match:</p>
+<pre><code class="language-bash">echo "$SSH_AUTH_SOCK"
+# output
+/run/user/1000/gnupg/d.wft5hcsny4qqq3g31c76534j/S.gpg-agent.ssh
+
+gpgconf --list-dirs agent-ssh-socket
+# output
+/run/user/1000/gnupg/d.wft5hcsny4qqq3g31c76834j/S.gpg-agent.ssh
+</code></pre>
+<pre><code class="language-bash">ssh-add -L
+# Copy the entire following line:
+ssh-ed25519 AABBC3NzaC1lZDI1NTE5AAAAIGXwhVokJ6cKgodYT+0+0ZrU0sBqMPPRDPJqFxqRtM+I (none)
+</code></pre>
+<ul>
+<li>It shows <code>(none)</code> because the comment field is blank on subkeys.</li>
+</ul>
+<h2 id="hardening-openssh"><a class="header" href="#hardening-openssh">Hardening OpenSSH</a></h2>
+<p>Install and configure fail2ban:</p>
+<pre><code class="language-bash">sudo pacman -S fail2ban
+</code></pre>
+<p>Create a <code>/etc/fail2ban/jail.local</code> file:</p>
+<pre><code class="language-bash">[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 3600  # 1 hour in seconds
+findtime = 600
+ignoreip = 127.0.0.1/8 ::1
+banaction = iptables-multiport
+</code></pre>
+<p>Start and enable the service:</p>
+<pre><code class="language-bash">sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+</code></pre>
+<p>Harden OpenSSH settings in <code>/etc/ssh/sshd_config</code>:</p>
+<pre><code class="language-bash">PasswordAuthentication no
+PermitEmptyPasswords no
+PubkeyAuthentication yes
+AuthorizedKeysFile     %h/.ssh/authorized_keys
+UsePAM yes
+PermitTunnel no
+UseDNS no
+KbdInteractiveAuthentication no
+X11Forwarding no  # or yes if you have X server enabled
+MaxAuthTries 3
+MaxSessions 2
+ClientAliveInterval 300
+ClientAliveCountMax 0
+AllowUsers your-user
+TCPKeepAlive no
+AllowTcpForwarding no
+AllowAgentForwarding no
+LogLevel VERBOSE
+PermitRootLogin no
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+</code></pre>
+<p>Enable and start sshd:</p>
+<pre><code class="language-bash">sudo systemctl enable sshd
+sudo systemctl start sshd
+</code></pre>
+<p>Ensure all of the permissions are correct:</p>
+<pre><code class="language-bash">chmod 755 $HOME
+chmod 700 $HOME/.ssh
+chmod 600 $HOME/.ssh/authorized_keys
+</code></pre>
+<p>Add the output of <code>ssh-add -L</code> to <code>~/.ssh/authorized_keys</code></p>
+<pre><code class="language-bash">echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXwhVokJ6cKgodYT+0+0ZrU0sBqMPPRDPJqFxqRtM+I (none)" &gt; ~/.ssh/authorized_keys
+</code></pre>
+<p>Finally, test an ssh connection:</p>
+<pre><code class="language-bash">ssh user@hostname
+# Example
+ssh jr@archlinux
+# Specify the port
+ssh -p 22 user@hostname
+</code></pre>
+<h4 id="tip-change-the-default-port"><a class="header" href="#tip-change-the-default-port">Tip Change the Default Port</a></h4>
+<blockquote>
+<p>⚠️ Critical Warning: Do not close your existing SSH session until you
+successfully connect using the new port. If you make a mistake and get locked
+out, you'll need console access to your server to fix it</p>
+</blockquote>
+<p>Edit <code>/etc/ssh/sshd_config</code> to add the line:</p>
+<pre><code class="language-config">Port 2222
+</code></pre>
+<p>Update the Firewall Rules in <code>/etc/nftables.conf</code>:</p>
+<pre><code class="language-conf"># ...snip...
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Allow loopback
+        iif "lo" accept
+
+        # Accept established and related connections
+        ct state established,related accept
+
+        # Allow ICMPv6
+        ip protocol icmp accept
+        ip6 nexthdr icmpv6 accept
+
+        # Allow SSH (port 2222)
+        tcp dport 2222 ct state new accept
+
+        # Allow HTTP and HTTPS (ports 80 and 443)
+        tcp dport {80,443} ct state new accept
+    }
+# ...snip...
+</code></pre>
+<p>Reload the Firewall:</p>
+<pre><code class="language-bash">sudo nft -f /etc/nftables.conf
+</code></pre>
+<p>Restart sshd:</p>
+<pre><code class="language-bash">sudo systemctl restart sshd
+</code></pre>
+<p>Finally, text a connection:</p>
+<pre><code class="language-bash">ssh -p 2222 user@hostname
+</code></pre>
 
                     </main>
 
