@@ -2900,6 +2900,11 @@ download anything. A fix for this is to run:</p>
 <p>Download your file, close firefox and run again in the firejail sandbox.</p>
 <hr />
 <h2 id="apparmor"><a class="header" href="#apparmor">AppArmor</a></h2>
+<p><a href="https://apparmor.net/">AppArmor</a> is a
+<a href="https://wiki.archlinux.org/title/Mandatory_Access_Control">Mandatory Access Control</a>
+(MAC) system, implemented upon the
+<a href="https://en.wikipedia.org/wiki/Linux_Security_Modules">Linux Security Modules</a>(LSM)
+-- Arch Wiki</p>
 <p>Install <code>apparmor</code> with <code>sudo pacman -S apparmor</code>.</p>
 <p>Add the following to <code>/etc/default/grub</code> in <code>GRUB_CMDLINE_LINUX_DEFAULT</code>:</p>
 <pre><code class="language-grub">GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
@@ -2911,14 +2916,74 @@ download anything. A fix for this is to run:</p>
 <pre><code class="language-bash">sudo systemctl start apparmor
 sudo systemctl enable apparmor
 </code></pre>
+<p>Ensure the LSM is loaded with:</p>
+<pre><code class="language-bash">zgrep CONFIG_LSM=/proc/config.gz
+# &amp;
+cat /sys/kernel/security/lsm
+</code></pre>
 <p>Reboot, and run <code>sudo aa-enabled</code>, and <code>sudo aa-status</code>. You should see many
 profiles in enforce mode.</p>
+<p>Further reading:</p>
+<ul>
+<li>
+<p><a href="https://apparmor.net/">AppArmor Quick Intro</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.com/apparmor/apparmor/-/wikis/home">AppArmor Wiki</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/AppArmor">Arch Wiki AppArmor</a></p>
+</li>
+</ul>
+<pre><code class="language-bash">paru -S bazaar
+</code></pre>
+<p>speling eror</p>
 <h2 id="creating-profiles-that-arent-pre-configured"><a class="header" href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a></h2>
+<h3 id="auditd"><a class="header" href="#auditd">Auditd</a></h3>
+<p>Install with:</p>
+<pre><code class="language-bash">sudo pacman -S audit
+</code></pre>
+<p>Enable:</p>
+<pre><code class="language-bash">sudo systemctl enable auditd
+sudo systemctl start auditd --now
+</code></pre>
 <p>To create new profiles, <code>auditd</code> should be running. AppArmor can use kernel
 audit logs from the userspace auditd daemon, allowing you to build new profiles.</p>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Audit_framework">Audit Framework</a></li>
 </ul>
+<p>A basic set of rules could be to create a <code>/etc/audit/rules.d/audit.rules</code> with
+the following contents:</p>
+<pre><code class="language-audit.rules"># Clear existing rules
+-D
+
+# Set buffer size
+-b 8192
+
+# Monitor /etc/passwd for modifications
+-w /etc/passwd -p wa -k passwd_changes
+
+# Monitor sudo command execution
+-w /usr/bin/sudo -p x -k sudo_usage
+
+# Enable auditing
+-e 1
+</code></pre>
+<p>Validate and load the rules, this will populate <code>/etc/audit/audit.rules</code> with
+the rules we just set:</p>
+<pre><code class="language-bash">sudo augenrules --load
+</code></pre>
+<p>Ensure <code>auditd</code> is running:</p>
+<pre><code class="language-bash">sudo systemctl status auditd
+</code></pre>
+<p>Since we set a watch rule for sudo let's run an update and check the auditd
+logs:</p>
+<pre><code class="language-bash">sudo pacman -Syu
+sudo ausearch -k sudo_usage
+</code></pre>
+<p>Verify the rules are loaded:</p>
+<pre><code class="language-bash">sudo auditctl -l
+</code></pre>
 <p>Be careful here, if you enable <code>auditd</code> and don't iron out the kinks I've found
 that it freezes after you enter your cryptroot passphrase. If this happens to
 you, follow the chroot steps but skip the <code>arch-chroot /mnt</code> step and instead
