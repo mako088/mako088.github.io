@@ -880,6 +880,28 @@ table inet filter {
 </code></pre>
 <p>This creates symbolic links in <code>/usr/local/bin/</code> pointing to <code>/usr/bin/firejail</code>
 for programs for which Firejail has default or self-created profiles.</p>
+<hr />
+<h2 id="apparmor"><a class="header" href="#apparmor">AppArmor</a></h2>
+<p>Install <code>apparmor</code> with <code>sudo pacman -S apparmor</code>.</p>
+<p>Add the following to <code>/etc/default/grub</code> in <code>GRUB_CMDLINE_LINUX_DEFAULT</code>:</p>
+<pre><code class="language-grub">GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+</code></pre>
+<p>Rebuild grub:</p>
+<pre><code class="language-bash">sudo grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+<p>Start/Enable AppArmor:</p>
+<pre><code class="language-bash">sudo systemctl start apparmor
+sudo systemctl enable apparmor
+</code></pre>
+<p>Reboot, and run <code>sudo aa-enabled</code>, and <code>sudo aa-status</code>. You should see many
+profiles in enforce mode.</p>
+<h2 id="creating-profiles-that-arent-pre-configured"><a class="header" href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a></h2>
+<p>To create new profiles, <code>auditd</code> should be running. AppArmor can use kernel
+audit logs from the userspace auditd daemon, allowing you to build new profiles.</p>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Audit_framework">Audit Framework</a></li>
+</ul>
+<hr />
 
                     </main>
 
