@@ -2892,6 +2892,12 @@ table inet filter {
 </code></pre>
 <p>This creates symbolic links in <code>/usr/local/bin/</code> pointing to <code>/usr/bin/firejail</code>
 for programs for which Firejail has default or self-created profiles.</p>
+<p>You can inspect <code>/etc/firejail/</code> to see all the pre-baked profiles available.</p>
+<p>With firejail running, I noticed that none of my browsers would allow me to
+download anything. A fix for this is to run:</p>
+<pre><code class="language-bash">sudo firejail --noprofile firefox
+</code></pre>
+<p>Download your file, close firefox and run again in the firejail sandbox.</p>
 <hr />
 <h2 id="apparmor"><a class="header" href="#apparmor">AppArmor</a></h2>
 <p>Install <code>apparmor</code> with <code>sudo pacman -S apparmor</code>.</p>
@@ -2913,6 +2919,13 @@ audit logs from the userspace auditd daemon, allowing you to build new profiles.
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Audit_framework">Audit Framework</a></li>
 </ul>
+<p>Be careful here, if you enable <code>auditd</code> and don't iron out the kinks I've found
+that it freezes after you enter your cryptroot passphrase. If this happens to
+you, follow the chroot steps but skip the <code>arch-chroot /mnt</code> step and instead
+run:</p>
+<pre><code class="language-bash">systemctl --root=/mnt disable auditd
+</code></pre>
+<p>Unmount the partitions, close cryptroot, and Reboot.</p>
 <hr />
 
                     </main>
