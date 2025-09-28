@@ -2188,6 +2188,9 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </ul>
 </details>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
+<p>In this section I will assume you're using GRUB. In the future I plan on adding
+a systemd-boot section as it is more minimalist and therefore has a smaller
+attack surface with fewer lines of code to exploit.</p>
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
 <p>You can use the <code>linux-hardened</code> kernel to have a kernel that prioritizes
 security over anything else:</p>
@@ -2970,7 +2973,23 @@ download anything. A fix for this is to run:</p>
 (MAC) system, implemented upon the
 <a href="https://en.wikipedia.org/wiki/Linux_Security_Modules">Linux Security Modules</a>(LSM)
 -- Arch Wiki</p>
-<p>Install <code>apparmor</code> with <code>sudo pacman -S apparmor</code>.</p>
+<p>MAC systems generally block all access by default, only permitting actions that
+are explicitly defined as allowed in their security policy or access profiles.</p>
+<p>This is why, if you read about creating your own policy that they recommend
+setting AppArmor to complain mode while you use said app using all functionality
+and APIs you can think of before setting to enforce. Within a policy everything
+is default-deny so any action not covered in the above steps will be blocked by
+default.</p>
+<blockquote>
+<p>❗️ The AppArmor policy con only be considered default deny if it is deployed
+as a complete system policy which we don't do here. The apps and parts of the
+system that don't have pre-defined policies aren't covered by AppArmor so are
+therefore default allow. You can get there in time but it's beyond the scope
+of this section.</p>
+</blockquote>
+<p>Install:</p>
+<pre><code class="language-bash">sudo pacman -S apparmor
+</code></pre>
 <p>Add the following to <code>/etc/default/grub</code> in <code>GRUB_CMDLINE_LINUX_DEFAULT</code>:</p>
 <pre><code class="language-grub">GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
 </code></pre>
