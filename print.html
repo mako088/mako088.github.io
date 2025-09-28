@@ -2881,7 +2881,72 @@ table inet filter {
 <pre><code class="language-bash">ssh -p 2222 user@hostname
 </code></pre>
 <hr />
+<h2 id="usb-port-protection"><a class="header" href="#usb-port-protection">USB Port Protection</a></h2>
+<p>It's important to protect your USB ports to prevent BadUSB attacks, data
+exfiltration, unauthorized device access, malware injection, etc.</p>
+<p>To get a list of your connected USB devices you can use <code>lsusb</code> from the
+<code>usbutils</code> package.</p>
+<pre><code class="language-bash">lsusb
+</code></pre>
+<p>Generate a policy based on your currently attached USB devices with:</p>
+<pre><code class="language-bash">sudo usbguard generate-policy | sudo tee /etc/usbguard/rules.conf
+</code></pre>
+<pre><code class="language-bash">sudo chmod 600 /etc/usbguard/rules.d/99-policy.conf
+</code></pre>
+<h3 id="usbguard-daemon"><a class="header" href="#usbguard-daemon">USBGuard Daemon</a></h3>
+<p>Edit <code>/etc/usbguard/usbguard-daemon.conf</code> to set the policy to allow devices
+that are already connected for root and your user:</p>
+<pre><code class="language-conf"># Default policy for devices that were already connected when the daemon started.
+# Supported values: apply-policy, allow, block, reject, keep.
+PresentDevicePolicy=allow
+
+# A list of users and groups that are allowed to interact with the daemon
+# via the IPC interface.
+IPCAllowedUsers=root your-user
+</code></pre>
+<p>From the above file we can see that it expects its configuration file to be
+located at <code>/etc/usbguard/rules.d/</code>:</p>
+<pre><code class="language-bash">sudo mkdir -p /etc/usbguard/rules.d
+</code></pre>
+<p>Create a file <code>/etc/usbguard/rules.d/99-policy.conf</code>:</p>
+<pre><code class="language-conf"># allow `only` devices with mass storage interfaces (USB Mass Storage)
+allow with-interface equals { 08:*:* }
+
+# allow mice and keyboards
+# allow with-interface equals { 03:*:* }
+
+# Reject devices with suspicious combination of interfaces
+reject with-interface all-of { 08:*:* 03:00:* }
+reject with-interface all-of { 08:*:* 03:01:* }
+reject with-interface all-of { 08:*:* e0:*:* }
+reject with-interface all-of { 08:*:* 02:*:* }
+</code></pre>
+<p>The above policy can be found in
+<a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/security_guide/sec-using-usbguard">RedHat UsbGuard</a></p>
+<p>The only allow rule is for devices with only mass storage interfaces (08:<em>:</em>)
+i.e., USB Mass storage devices, devices like keyboards and mice (which use
+interface class <code>03:*:*</code>) implicitly not allowed.(commented out)</p>
+<p>The reject rules reject devices with a suspicious combination of interfaces. A
+USB drive that implements a keyboard or a network interface is very suspicious,
+these reject rules prevent that.</p>
+<p>The <code>presentDevicePolicy = "allow"</code> allows any device that is present at daemon
+start up even if they're not explicitly allowed. However, newly plugged in
+devices must match an allow rule or get denied implicitly.</p>
+<p>Enable/Start <code>usbguard.service</code>:</p>
+<pre><code class="language-bash">sudo systemctl enable usbguard
+sudo systemctl start usbguard --now
+</code></pre>
+<p>Check status:</p>
+<pre><code class="language-bash">sudo systemctl status usbguard
+</code></pre>
+<ul>
+<li>If you plug something new in and it doesn't work, this is why. Remember this!</li>
+</ul>
+<hr />
 <h3 id="firejail"><a class="header" href="#firejail">Firejail</a></h3>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Firejail">Arch Wiki Firejail</a></li>
+</ul>
 <pre><code class="language-bash">sudo pacman -S firejail
 </code></pre>
 <p>Usage:</p>
@@ -2992,6 +3057,26 @@ run:</p>
 </code></pre>
 <p>Unmount the partitions, close cryptroot, and Reboot.</p>
 <hr />
+<h3 id="doas-over-sudo"><a class="header" href="#doas-over-sudo">Doas over sudo</a></h3>
+<p>For a more minimalist version of <code>sudo</code> with a smaller codebase and attack
+surface, consider <code>doas</code>:</p>
+<pre><code class="language-bash">sudo pacman -S opendoas
+</code></pre>
+<p>Create <code>/etc/doas.conf</code> with the following contents:</p>
+<pre><code class="language-conf">permit setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :wheel
+</code></pre>
+<p>You can add a line below that one like <code>permit nopass your-username as root:</code>
+Enabling your user passwordless usage, it's much less secure but an option none
+the less.</p>
+<pre><code class="language-bash">doas pacman -R sudo base-devel
+</code></pre>
+<p>Secure the <code>doas.conf</code>:</p>
+<pre><code class="language-conf">doas chown -c root:root /etc/doas.conf
+doas chmod -c 0400 /etc/doas.conf
+</code></pre>
+<p>Create a symlink replacing sudo with doas:</p>
+<pre><code class="language-bash">ln -s $(which doas) /usr/bin/sudo
+</code></pre>
 
                     </main>
 
