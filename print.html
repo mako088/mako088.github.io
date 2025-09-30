@@ -2488,6 +2488,10 @@ digging. You can harden your current kernel, or even better would be to harden
 the Long-Term Support (LTS) kernel.</p>
 <p><code>sysctl</code> is a tool that allows you to view or modify kernel settings and
 enable/disable different features.</p>
+<p>Check what each setting does <a href="https://sysctl-explorer.net/">sysctl-explorer</a></p>
+<p>Refer to
+<a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html#sysctl-kernel">madadaidans-insecurities#sysctl-kernel</a>
+for the following settings and their explainations.</p>
 <p>Create a file <code>/etc/sysctl.d/99-custom.conf</code>, since files are read in
 lexicographical order this file will be read last, allowing it to override any
 settings from earlier files.</p>
