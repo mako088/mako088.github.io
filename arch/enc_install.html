@@ -299,7 +299,7 @@ everyone.</p>
 <ol start="2">
 <li><strong>Update package databases and mirrorlist</strong>:</li>
 </ol>
-<pre><code class="language-bash">pacman -Sy
+<pre><code class="language-bash">pacman -Syyu
 </code></pre>
 <p>Save a backup of your current mirrorlist so we can safely update it:</p>
 <pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
@@ -532,7 +532,8 @@ options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/ma
 <blockquote>
 <p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
 configured to autodetect the UKI. It doesn't hurt to add it though and can
-prevent issues in the future.</p>
+prevent issues in the future. Ensure <code>rd.luks.name=</code> contains the UUID from
+the encrypted root partition. (e.g., <code>blkid /dev/nvme0n1p2</code>).</p>
 </blockquote>
 <p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
 <pre><code class="language-conf">default arch.conf
@@ -613,24 +614,44 @@ Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
 </code></pre>
 <p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
 your keys when the time runs out.</p>
+<p>After successful key enrollment, reboot into UEFI again, enable Secure Boot and
+reboot.</p>
+<p>When the desktop launches, check the output of <code>bootctl status</code> to ensure
+<code>Secure Boot: enabled (user)</code></p>
 <p>If your system doesn't accept them, you may have to do some conversions. You can
 also add the keys manually which is what I did.</p>
 <details>
 <summary> ✔️ Click to Expand conversion Examples </summary>
-<pre><code class="language-bash">mkdir -p ~/secureboot/keys ~/secureboot/output
-</code></pre>
-<pre><code class="language-bash">CERT_PEM="/mnt/etc/kernel/secure-boot-certificate.pem"
+<pre><code class="language-bash"># Create workspace for certs and outputs
+mkdir -p ~/secureboot/output
 
-# Convert the PEM cert to DER (.cer) format
-sudo openssl x509 -in $CERT_PEM -out /mnt/boot/db.cer -outform DER
+# Define certificate location
+CERT_PEM="/etc/kernel/secure-boot-certificate.pem"
+
+# Convert PEM cert to DER format for UEFI enrollment
+sudo openssl x509 -in $CERT_PEM -out ~/secureboot/output/db.cer -outform DER
+
+# Convert PEM cert to EFI Signature List
+cert-to-efi-sig-list $CERT_PEM ~/secureboot/output/db.esl
+
+# Sign the Signature List (run from wherever your private key is; do not copy it)
+sudo sign-efi-sig-list -k /etc/kernel/secure-boot-private-key.pem -c $CERT_PEM db \
+    ~/secureboot/output/db.esl ~/secureboot/output/db.auth
 </code></pre>
-<pre><code class="language-bash">cp /etc/kernel/secure-boot-certificate.pem ~/secureboot/keys/db.pem
-sudo cp /etc/kernel/secure-boot-private-key.pem ~/secureboot/keys/db.key
-</code></pre>
-<pre><code class="language-bash">cert-to-efi-sig-list ~/secureboot/keys/db.pem ~/secureboot/output/db.esl
-</code></pre>
-<pre><code class="language-bash">sudo sign-efi-sig-list -k ~/secureboot/keys/db.key -c ~/secureboot/keys/db.pem db ~/secureboot/output/db.esl ~/secureboot/output/db.auth
-</code></pre>
+<p>Manual Key Enrollment:</p>
+<ul>
+<li>
+<p><code>db.cer</code> -&gt; enroll in db (Trusted Signatures), Choose the desired drive, find
+the file and add it. Save as an <code>Authorized Signature</code> instead of <code>Public Key</code></p>
+</li>
+<li>
+<p><code>PK.cer</code> -&gt; enroll in <code>Platform Key</code>(PK)</p>
+</li>
+<li>
+<p>Keep your <code>secure-boot-private-key.pem</code> <strong>private</strong>, with the above commands
+we only use it when signing, and otherwise keep it protected.</p>
+</li>
+</ul>
 </details>
 <hr />
 <ol start="11">
