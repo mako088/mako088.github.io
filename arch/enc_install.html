@@ -311,7 +311,9 @@ reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pac
 </code></pre>
 <p>NOTE: This can take a bit and you can expect some failures..</p>
 <hr />
-<p>3 <strong>Set keyboard layout, font, and system clock</strong>:</p>
+<ol start="3">
+<li><strong>Set keyboard layout, font, and system clock</strong>:</li>
+</ol>
 <p>Default keymap is US, if you need something different:</p>
 <pre><code class="language-bash">localectl list-keymaps
 loadkeys &lt;chosen-map&gt;
@@ -704,9 +706,21 @@ umount /mnt
 cryptsetup close cryptroot
 reboot
 </code></pre>
+<hr />
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>
-<li><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki UKI/SecureBoot</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_kernel_image">Wiki UKI</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Systemd-boot">Wiki systemd-boot</a></p>
+</li>
 </ul>
 
                     </main>
