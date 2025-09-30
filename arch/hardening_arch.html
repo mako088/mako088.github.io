@@ -176,9 +176,57 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
-<p>In this section I will assume you're using GRUB. In the future I plan on adding
-a systemd-boot section as it is more minimalist and therefore has a smaller
-attack surface with fewer lines of code to exploit.</p>
+<p>This guide started with using grub, here I include a section on switching to
+systemd-boot as it's more minimal and has a smaller attack surface.</p>
+<h2 id="switching-to-systemd-boot-from-grub"><a class="header" href="#switching-to-systemd-boot-from-grub">Switching to systemd-boot from GRUB</a></h2>
+<p>Ensure the EFI partition is mounted at <code>/boot</code> or <code>/efi</code>:</p>
+<pre><code class="language-bash">mount | grep efi
+</code></pre>
+<pre><code class="language-bash">sudo pacman -Rs grub
+</code></pre>
+<p>Remove leftover GRUB files:</p>
+<pre><code class="language-bash">sudo rm -r /boot/EFI/grub
+</code></pre>
+<h3 id="install-systemd-boot"><a class="header" href="#install-systemd-boot">Install systemd-boot</a></h3>
+<pre><code class="language-bash">sudo bootctl install
+</code></pre>
+<p>Configure systemd-boot in <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">default arch.conf
+timeout 4
+editor no
+console-mode max
+</code></pre>
+<p>Create the boot entry:</p>
+<pre><code class="language-bash">sudo blkid /dev/nvme0n1p2
+</code></pre>
+<p>For the following step, ensure that you use the correct <code>vmlinuz</code> and
+<code>initramfs</code> for your kernel.</p>
+<p>Take note of these names for use in <code>arch.conf</code>:</p>
+<pre><code class="language-bash">ls /boot/vmlinuz-*
+ls /boot/initramfs-*
+</code></pre>
+<p>If you're on an Intel machine, replace <code>amd-ucode</code> with <code>intel-ucode</code></p>
+<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
+<pre><code class="language-conf">title   Arch Linux
+linux   /vmlinuz-linux-zen
+initrd  /amd-ucode.img
+initrd  /initramfs-linux-zen.img
+options cryptdevice=UUID=bdeed105-a1be-40b9-895c-5f7e9f6a19c3:cryptroot root=/dev/mapper/cryptroot rw quiet loglevel=3
+</code></pre>
+<p>Ensure the <code>/etc/mkinitcpio.conf</code> has <code>encrypt</code> before the <code>filesystems</code> hook:</p>
+<pre><code class="language-conf">HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt filesystems fsck)
+</code></pre>
+<p>Regenerate initramfs:</p>
+<pre><code class="language-bash">sudo mkinitcpio -P
+</code></pre>
+<p>Update <code>systemd-boot</code> if needed:</p>
+<pre><code class="language-bash">sudo bootctl update
+</code></pre>
+<p>Ensure your images are listed:</p>
+<pre><code class="language-bash">sudo bootctl list
+</code></pre>
+<p>Reboot</p>
+<hr />
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
 <p>You can use the <code>linux-hardened</code> kernel to have a kernel that prioritizes
 security over anything else:</p>
@@ -1084,6 +1132,15 @@ doas chmod -c 0400 /etc/doas.conf
 <p>Create a symlink replacing sudo with doas:</p>
 <pre><code class="language-bash">ln -s $(which doas) /usr/bin/sudo
 </code></pre>
+<h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki Secure Boot</a></p>
+</li>
+<li>
+<p><a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html">rodsbooks Secure Boot</a></p>
+</li>
+</ul>
 
                     </main>
 

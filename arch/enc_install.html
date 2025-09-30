@@ -210,7 +210,7 @@ the public key, verify the signature, and then you don’t need to keep the key
 permanently in your keyring or sign it locally. This example is from the last
 release, but the process is the same.</p>
 </blockquote>
-<p>With <code>sequoia</code>, you can get the Arch release signing key with:</p>
+<p>With <code>sequoia-sq</code>, you can get the Arch release signing key with:</p>
 <pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
 </code></pre>
 <p>Export the chosen key to a <code>.pgp</code> file:</p>
@@ -391,14 +391,16 @@ cryptsetup open /dev/nvme0n1p2 cryptroot
 </code></pre>
 <p>Create a filesystem:</p>
 <pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
-mount /dev/mapper/cryptroot /mnt
 </code></pre>
-<p>Later, we will enable compression by mounting with options like <code>compress=zstd</code>
-in <code>fstab</code></p>
+<p>If you mount the filesystem with compression before running <code>genfstab</code>, it will
+automatically add the chosen compression to the <code>fstab</code>.</p>
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot  # Mount EFI partition at /mnt/boot
+mount -o compress=zstd /dev/mapper/cryptroot /mnt
+</code></pre>
 <hr />
 <h2 id="install-the-base-system-on-mnt-with-pacstrap"><a class="header" href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a></h2>
 <p>If you prefer Nvim or a hardened kernel, change it here.</p>
-<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix grub lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr
+<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr systemd-ukify
 </code></pre>
 <hr />
 <ol start="7">
@@ -409,24 +411,13 @@ filesystem table in the next step.</p>
 <pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
 #
 cat /mnt/etc/fstab
-# Add compression
-vim /mnt/etc/fstab
 </code></pre>
 <p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn't you'll
-need to regenerate your fstab again with <code>genfstab</code>.</p>
+need to ensure both partitions are mounted and regenerate your fstab again with
+<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
+<hr />
 <hr />
 <ol start="8">
-<li>Add compression, <strong>Only for the Root Partition</strong>:</li>
-</ol>
-<pre><code class="language-bash"># fstab
-/dev/mapper/cryptroot    /    btrfs    rw,relatime,compress=zstd,ssd, #...snip
-#...snip...
-</code></pre>
-<p>Remount root with compression:</p>
-<pre><code class="language-bash">mount -o remount,compress=zstd /mnt
-</code></pre>
-<hr />
-<ol start="9">
 <li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
 </ol>
 <pre><code class="language-bash">arch-chroot /mnt
@@ -443,8 +434,8 @@ passwd yourusername
 <pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
 </code></pre>
 <hr />
-<ol start="10">
-<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>encrypt</code> hook
+<ol start="9">
+<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>sd-encrypt</code> hook
 before the <code>filesystems</code> attribute.</li>
 </ol>
 <ul>
@@ -457,44 +448,190 @@ before the <code>filesystems</code> attribute.</li>
 </ul>
 <pre><code class="language-bash">vim /etc/mkinitcpio.conf
 </code></pre>
+<p>To use <code>sd-encrypt</code>, it is necessary to replace <code>udev</code> with <code>systemd</code> and if you
+require a different keyboard layout from US <code>sd-vconsole</code> is needed.</p>
 <pre><code class="language-bash"># mkinitcpio.conf
+# *IF* you use an nvme drive
+MODULES=(nvme)
+FILES=(/etc/crypttab.initramfs /etc/vconsole.conf)
 # ... snip ...
-HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolfont block encrypt filesystems fsck)
+HOOKS=(base systemd autodetect microcode modconf kms keyboard keymap consolefont sd-vconsole block sd-encrypt filesystems fsck systemd-ukify)
 # ... snip ...
+</code></pre>
+<p>Create <code>/etc/crypttab.initramfs</code>:</p>
+<pre><code class="language-initramfs">cryptroot UUID=your-uuid none luks,discard
+</code></pre>
+<hr />
+<p>Create <code>/etc/vconsole.conf</code>:</p>
+<p>For example <code>KEYMAP=fr</code> is french</p>
+<pre><code class="language-conf">KEYMAP=us
+FONT=lat9w-16
+</code></pre>
+<hr />
+<p>Edit <code>/etc/mkinitcpio.d/linux-zen.preset</code>, this enables <code>mkinitcpio -P</code> to
+generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
+<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-zen' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-zen"
+
+# PRESETS=('default' 'fallback')
+PRESETS=('default')
+
+# default_config="/etc/mkinitcpio.conf"
+# default_image="/boot/initramfs-linux-zen.img"
+default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
+default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+#fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-linux-zen-fallback.img"
+#fallback_uki="/efi/EFI/Linux/arch-linux-zen-fallback.efi"
+fallback_options="-S autodetect"
 </code></pre>
 <p>Generate the initial RAM Filesystem (initramfs) image.</p>
 <pre><code class="language-bash">mkinitcpio -P
 </code></pre>
+<blockquote>
+<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the
+boot * root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try
+again. Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> exists for your kernel
+of choice.</p>
+</blockquote>
+<hr />
+<ol start="10">
+<li><strong>Install systemd-boot and setup Unified Kernel Image</strong>, (while still in
+chroot environment):</li>
+</ol>
+<p>Ensure your UEFI variables are accessible:</p>
+<pre><code class="language-bash">efivar --list
+</code></pre>
+<p>This command won't work if both partitions aren't mounted, ensure they are both
+mounted and if it still doesn't work you can use <code>--esp-path=/boot</code> or
+<code>--esp-path=/mnt/boot</code>.</p>
+<pre><code class="language-bash">bootctl install
+</code></pre>
+<p>Edit <code>/etc/kernel/cmdline</code> and add the output of <code>blkid</code> on your root partition.
+For example:</p>
+<pre><code class="language-bash">blkid /dev/nvme0n1p2 &gt; /tmp/uuid.txt
+</code></pre>
+<p>When you open <code>/etc/kernel/cmdline</code> in vim or helix, run <code>:r /tmp/uuid.txt</code> to
+read the UUID of your root partition into the file. You only need the numbers
+like so:</p>
+<pre><code class="language-cmdline">rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw
+</code></pre>
+<p>In the above example, <code>7b78e942-f4f7-4dde-a015-3a816305483f</code> is the UUID
+extracted from the <code>blkid</code> command.</p>
+<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
+<pre><code class="language-conf">title Arch Linux
+linux /vmlinuz-linux-zen
+initrd /initramfs-linux-zen.img
+options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw quiet
+</code></pre>
+<blockquote>
+<p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
+configured to autodetect the UKI. It doesn't hurt to add it though and can
+prevent issues in the future.</p>
+</blockquote>
+<p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">default arch.conf
+# default @saved  # return to last choice
+timeout 4
+console-mode auto
+auto-entries 1
+</code></pre>
+<pre><code class="language-bash">bootctl status
+</code></pre>
+<hr />
+<p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
+<p>We already added <code>systemd-ukify</code> in the pacstrap command, let's add a few more
+tools for this process:</p>
+<pre><code class="language-bash">sudo pacman -S sbsigntools efitools
+</code></pre>
+<p>Copy the existing template to <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-bash">cp /usr/lib/kernel/uki.conf /etc/kernel/uki.conf
+</code></pre>
+<p>Edit <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-conf">[UKI]
+#Initrd=
+#Microcode=
+#Splash=
+#PCRPKey=
+#PCRBanks=
+#SecureBootSigningTool=
+SecureBootPrivateKey=/etc/kernel/secure-boot-private-key.pem
+SecureBootCertificate=/etc/kernel/secure-boot-certificate.pem
+#SecureBootCertificateDir=
+#SecureBootCertificateName=
+#SecureBootCertificateValidity=
+#SigningEngine=
+SignKernel=yes
+</code></pre>
+<p>Generate your signing keys:</p>
+<pre><code class="language-bash">ukify genkey --config /etc/kernel/uki.conf
+</code></pre>
+<p>The above command creates <code>/etc/kernel/secure-boot-certificate.pem</code> and
+<code>/etc/kernel/secure-boot-private-key.pem</code>.</p>
+<p>Building the UKIs:</p>
+<pre><code class="language-bash">mkdir -p /boot/EFI/Linux
+mkinitcpio -P
+# Output
+Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
+==&gt; Unified kernel image generation successful
+</code></pre>
+<p>Sign the boot loader with the new keys:</p>
+<pre><code class="language-bash">/usr/lib/systemd/systemd-sbsign sign \
+--private-key /etc/kernel/secure-boot-private-key.pem \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--output /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed \
+/usr/lib/systemd/boot/efi/systemd-bootx64.efi
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Wrote signed PE binary to /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
+</code></pre>
+<pre><code class="language-bash">sudo bootctl install --secure-boot-auto-enroll yes \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--private-key /etc/kernel/secure-boot-private-key.pem
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/systemd/systemd-bootx64.efi".
+    3 Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/BOOT/BOOTX64.EFI".
+    4 ⚠️  Mount point '/boot' which backs the random seed file is world accessible, which is a security hole!  ⚠️
+    5 ⚠️ Random seed file '/boot/loader/random-seed' is world accessible, which is a security hole! ⚠️
+    6 Random seed file /boot/loader/random-seed successfully refreshed (32 bytes).
+    7 Secure boot auto-enrollment file /boot/loader/keys/auto/PK.auth successfully written.
+    8 Secure boot auto-enrollment file /boot/loader/keys/auto/KEK.auth successfully written.
+    9 Secure boot auto-enrollment file /boot/loader/keys/auto/db.auth successfully written.
+   10 Created EFI boot entry "Linux Boot Manager".
+</code></pre>
+<p>Fix the security hole:</p>
+<pre><code class="language-bash">chmod 700 /boot
+</code></pre>
+<p>Add the following to your <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">secure-boot-enroll force
+</code></pre>
+<p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
+your keys when the time runs out.</p>
+<p>If your system doesn't accept them, you may have to do some conversions. You can
+also add the keys manually which is what I did.</p>
+<details>
+<summary> ✔️ Click to Expand conversion Examples </summary>
+<pre><code class="language-bash">mkdir -p ~/secureboot/keys ~/secureboot/output
+</code></pre>
+<pre><code class="language-bash">CERT_PEM="/mnt/etc/kernel/secure-boot-certificate.pem"
+
+# Convert the PEM cert to DER (.cer) format
+sudo openssl x509 -in $CERT_PEM -out /mnt/boot/db.cer -outform DER
+</code></pre>
+<pre><code class="language-bash">cp /etc/kernel/secure-boot-certificate.pem ~/secureboot/keys/db.pem
+sudo cp /etc/kernel/secure-boot-private-key.pem ~/secureboot/keys/db.key
+</code></pre>
+<pre><code class="language-bash">cert-to-efi-sig-list ~/secureboot/keys/db.pem ~/secureboot/output/db.esl
+</code></pre>
+<pre><code class="language-bash">sudo sign-efi-sig-list -k ~/secureboot/keys/db.key -c ~/secureboot/keys/db.pem db ~/secureboot/output/db.esl ~/secureboot/output/db.auth
+</code></pre>
+</details>
 <hr />
 <ol start="11">
-<li><strong>Install Grub and EFI boot manager</strong>, (while still in chroot environment):</li>
-</ol>
-<pre><code class="language-bash"># These should be installed in the chroot environment already
-pacman -Q grub efibootmgr
-</code></pre>
-<p>Install GRUB for UEFI Systems:</p>
-<pre><code class="language-bash">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-# Should output
-Installation finished. No error reported.
-</code></pre>
-<p>Configure GRUB to unlock LUKS root partition</p>
-<p>Edit <code>/etc/default/grub</code> and modify line starting with <code>GRUB_CMDLINE_LINUX</code> to
-add:</p>
-<pre><code class="language-bash"># ...snip...
-GRUB_CMDLINE_LINUX="cryptdevice=/dev/nvme0n1p2:cryptroot root=/dev/mapper/cryptroot"
-# ...snip...
-</code></pre>
-<p>Generate GRUB configuration:</p>
-<pre><code class="language-bash">grub-mkconfig -o /boot/grub/grub.cfg
-# Should output
-Adding boot menu entry for UEFI Firmware Settings ...
-done
-</code></pre>
-<p>To be safe re-generate the <code>initramfs</code>:</p>
-<pre><code class="language-bash">mkinitcpio -P
-</code></pre>
-<hr />
-<ol start="12">
 <li><strong>Enable LightDM and NetworkManager</strong></li>
 </ol>
 <pre><code class="language-bash">systemctl enable lightdm
@@ -519,7 +656,18 @@ umount /mnt
 cryptsetup close cryptroot
 </code></pre>
 <hr />
-<p>13 <strong>Reboot</strong></p>
+<ol start="12">
+<li><strong>Reboot</strong></li>
+</ol>
+<pre><code class="language-bash">bootctl status
+System:
+      Firmware: UEFI 2.70 (American Megatrends)
+ Firmware Arch: x64
+   Secure Boot: enabled (user)
+  TPM2 Support: yes
+  Measured UKI: yes
+  Boot into FW: supported
+</code></pre>
 <hr />
 <h3 id="arch-chroot"><a class="header" href="#arch-chroot">arch-chroot</a></h3>
 <details>
