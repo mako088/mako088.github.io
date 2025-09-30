@@ -1191,7 +1191,7 @@ reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pac
 <p>Default keymap is US, if you need something different:</p>
 <pre><code class="language-bash">localectl list-keymaps
 loadkeys &lt;chosen-map&gt;
-# Encrease font size
+# Increase font size
 setfont ter-132b
 </code></pre>
 <pre><code class="language-bash">timedatectl set-ntp true
@@ -2371,83 +2371,123 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </ul>
 </details>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
-<p>This guide started with using grub, here I include a section on switching to
-systemd-boot as it's more minimal and has a smaller attack surface.</p>
-<h2 id="switching-to-systemd-boot-from-grub"><a class="header" href="#switching-to-systemd-boot-from-grub">Switching to systemd-boot from GRUB</a></h2>
-<p>Ensure the EFI partition is mounted at <code>/boot</code> or <code>/efi</code>:</p>
-<pre><code class="language-bash">mount | grep efi
-</code></pre>
-<pre><code class="language-bash">sudo pacman -Rs grub
-</code></pre>
-<p>Remove leftover GRUB files:</p>
-<pre><code class="language-bash">sudo rm -r /boot/EFI/grub
-</code></pre>
-<h3 id="install-systemd-boot"><a class="header" href="#install-systemd-boot">Install systemd-boot</a></h3>
-<pre><code class="language-bash">sudo bootctl install
-</code></pre>
-<p>Configure systemd-boot in <code>/boot/loader/loader.conf</code>:</p>
-<pre><code class="language-conf">default arch.conf
-timeout 4
-editor no
-console-mode max
-</code></pre>
-<p>Create the boot entry:</p>
-<pre><code class="language-bash">sudo blkid /dev/nvme0n1p2
-</code></pre>
-<p>For the following step, ensure that you use the correct <code>vmlinuz</code> and
-<code>initramfs</code> for your kernel.</p>
-<p>Take note of these names for use in <code>arch.conf</code>:</p>
-<pre><code class="language-bash">ls /boot/vmlinuz-*
-ls /boot/initramfs-*
-</code></pre>
-<p>If you're on an Intel machine, replace <code>amd-ucode</code> with <code>intel-ucode</code></p>
-<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
-<pre><code class="language-conf">title   Arch Linux
-linux   /vmlinuz-linux-zen
-initrd  /amd-ucode.img
-initrd  /initramfs-linux-zen.img
-options cryptdevice=UUID=bdeed105-a1be-40b9-895c-5f7e9f6a19c3:cryptroot root=/dev/mapper/cryptroot rw quiet loglevel=3
-</code></pre>
-<p>Ensure the <code>/etc/mkinitcpio.conf</code> has <code>encrypt</code> before the <code>filesystems</code> hook:</p>
-<pre><code class="language-conf">HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt filesystems fsck)
-</code></pre>
-<p>Regenerate initramfs:</p>
-<pre><code class="language-bash">sudo mkinitcpio -P
-</code></pre>
-<p>Update <code>systemd-boot</code> if needed:</p>
-<pre><code class="language-bash">sudo bootctl update
-</code></pre>
-<p>Ensure your images are listed:</p>
-<pre><code class="language-bash">sudo bootctl list
-</code></pre>
-<p>Reboot</p>
+<blockquote>
+<p>⚠️ Warning: I am not a security expert. This guide presents various options
+for hardening Arch Linux, but it is your responsibility to evaluate whether
+each adjustment suits your specific needs and environment. Security hardening
+and process isolation can introduce stability challenges, compatibility
+issues, or unexpected behavior. Additionally, these protections often come
+with performance tradeoffs. Always conduct thorough research, there are no
+plug and play one size fits all security solutions.</p>
+</blockquote>
+<h2 id="getting-started-1"><a class="header" href="#getting-started-1">Getting Started</a></h2>
+<p>Encryption is the process of using an algorithm to scramble plaintext data into
+ciphertext, making it unreadable except to a person who has the key to decrypt
+it.</p>
+<p><strong>Data at rest</strong> is data in storage, such as a computer's or a servers hard
+disk.</p>
+<p><strong>Data at rest encryption</strong> (typically hard disk encryption), secures the
+documents, directories, and files behind an encryption key. Encrypting your data
+at rest prevents data leakage, physical theft, unauthorized access, and more as
+long as the key management scheme isn't compromised.</p>
+<p>Enable a UEFI password or Administrator password where it requires
+authentication in order to access the UEFI/BIOS.</p>
+<p>Secure Boot helps ensure only signed, trusted kernels and bootloaders are
+executed at startup.</p>
+<p><code>systemd-boot</code> has a smaller attack surface and is often recommended over GRUB
+for hardened systems.</p>
+<ul>
+<li><a href="https://mako088.github.io/arch/enc_install.html">Encrypted Install Guide w/ systemd-boot and UKI Secure Boot Guide</a></li>
+</ul>
+<p>Useful Resources:</p>
+<details>
+<summary> ✔️ Click to Expand Secure Boot Resources </summary>
+<ul>
+<li><a href="https://0pointer.net/blog/authenticated-boot-and-disk-encryption-on-linux.html">The Strange State of Authenticated Boot and Encryption</a></li>
+</ul>
+</details>
+<h3 id="best-practices-and-standards"><a class="header" href="#best-practices-and-standards">Best Practices and Standards</a></h3>
+<p>It's crucial to <strong>document every change</strong> you make. By creating smaller,
+feature-complete commits, each with a descriptive message, you're building a
+clear history. This approach makes it far simpler to revert a breaking change
+and quickly identify what went wrong. Over time, this discipline allows you to
+create security-focused checklists and ensure all angles are covered, building a
+more robust and secure system.</p>
+<ul>
+<li>
+<p>The
+<a href="https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/3498776/post-quantum-cryptography-cisa-nist-and-nsa-recommend-how-to-prepare-now/">NSA, CISA, and NIST warn</a>
+that nation-state actors are likely stockpiling encrypted data now, preparing
+for a future when quantum computers could break today’s most widely used
+encryption algorithms. Sensitive data with long-term secrecy needs is
+especially at risk.</p>
+</li>
+<li>
+<p>This is a wake-up call to use the strongest encryption available today and to
+plan early for post-quantum security.</p>
+</li>
+<li>
+<p><a href="https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards">NIST First 3 Post-Quantum Encryption Standards</a>
+Organizations and individuals should prepare to migrate cryptographic systems
+to these new standards as soon as practical.</p>
+</li>
+<li>
+<p>They chose
+<a href="https://www.nist.gov/news-events/news/2022/07/nist-announces-first-four-quantum-resistant-cryptographic-algorithms">Four Quantum-Resistant Cryptographic Algorithms</a>
+warning that public-key cryptography is especially vulnerable and widely used
+to protect digital information.</p>
+</li>
+</ul>
 <hr />
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
+<p>Given the kernel's central role, it's a frequent target for malicious actors,
+making robust hardening essential.</p>
 <p>You can use the <code>linux-hardened</code> kernel to have a kernel that prioritizes
 security over anything else:</p>
 <pre><code class="language-bash">sudo pacman -S linux-hardened linux-hardened-headers
 </code></pre>
-<p>Edit your <code>/etc/default/grub</code>:</p>
-<pre><code class="language-bash">GRUB_DEFAULT=saved
-GRUB_SAVEDEFAULT=true
-GRUB_DISABLE_SUBMENU=y
-</code></pre>
-<ul>
-<li>This enables you to choose from the available kernels at boot and stays on the
-kernel you chose last.</li>
-</ul>
-<p>Make grub aware of the new kernel:</p>
-<pre><code class="language-bash">sudo grub-mkconfig -o /boot/grub/grub.cfg
-</code></pre>
-<p>Generate the initramfs:</p>
+<p>Generate the initramfs for the hardened kernel:</p>
 <pre><code class="language-bash">sudo mkinitcpio -p linux-hardened
 </code></pre>
-<p>Reboot and choose <code>linux-hardened</code>.</p>
+<p>Configure systemd-boot to boot the hardened kernel, the entries are configured
+under <code>/boot/loader/entries/</code>. Create or edit an entry file, for example
+<code>/boot/loader/entries/arch-linux-hardened.conf</code>:</p>
+<pre><code class="language-text">title   Arch Linux Hardened
+linux   /vmlinuz-linux-hardened
+initrd  /initramfs-linux-hardened.img
+options rd.luks.name=YOUR_UUID=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
+</code></pre>
+<p>Replace <code>YOUR_UUID</code> with the UUID of the encrypted root partition (from <code>blkid</code>)</p>
+<p>To set this as the default boot entry and enable booting the last selected
+kernel automatically, edit <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-text">default arch-linux-hardened.conf
+timeout 4
+console-mode auto
+</code></pre>
+<p>Reboot and <code>linux-hardened</code> should be chosen by default. You can also choose
+additional kernels if needed.</p>
 <hr />
 <h2 id="hardening-your-current-kernel"><a class="header" href="#hardening-your-current-kernel">Hardening your current Kernel</a></h2>
+<p>The Linux kernel is typically released under two forms: stable and long-term
+support (LTS). Choosing either has consequences, do your research.
+<a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html#stable-vs-lts">Stable vs. LTS kernels</a></p>
+<ul>
+<li><a href="https://www.kernel.org/category/releases.html">The Linux Kernel Archives Active kernel releases</a></li>
+</ul>
+<p>See which kernel you're currently using with:</p>
+<pre><code class="language-bash"># show the kernel release
+uname -r
+# show kernel version, hostname, and architecture
+uname -a
+</code></pre>
+<p>Show the configuration of your current kernel:</p>
+<pre><code class="language-bash">zcat /proc/config.gz
+</code></pre>
 <p>Sometimes <code>linux-hardened</code> just won't work on your system without some serious
 digging. You can harden your current kernel, or even better would be to harden
 the Long-Term Support (LTS) kernel.</p>
+<p><code>sysctl</code> is a tool that allows you to view or modify kernel settings and
+enable/disable different features.</p>
 <p>Create a file <code>/etc/sysctl.d/99-custom.conf</code>, since files are read in
 lexicographical order this file will be read last, allowing it to override any
 settings from earlier files.</p>
@@ -2475,6 +2515,17 @@ fs.protected_symlinks = 1
 </code></pre>
 <p>Apply the changes immediately:</p>
 <pre><code class="language-bash">sudo sysctl --system
+</code></pre>
+<p>Check Active Linux Security Modules:</p>
+<pre><code class="language-bash">cat /sys/kernel/security/lsm
+# Output:
+File: /sys/kernel/security/lsm
+capability,landlock,yama,bpf,apparmor
+</code></pre>
+<p>Check Kernel Configuration Options:</p>
+<pre><code class="language-bash">zcat /proc/config.gz | grep CONFIG_SECURITY_SELINUX
+zcat /proc/config.gz | grep CONFIG_HARDENED_USERCOPY
+zcat /proc/config.gz | grep CONFIG_STACKPROTECTOR
 </code></pre>
 <pre><code class="language-bash">sudo pacman -S kernel-hardening-checker
 </code></pre>
@@ -2630,12 +2681,14 @@ net.ipv4.tcp_congestion_control = bbr
 net.core.default_qdisc = cake
 </code></pre>
 </details>
+<h2 id="hardening-bootloader-kernel-parameters"><a class="header" href="#hardening-bootloader-kernel-parameters">Hardening Bootloader Kernel Parameters</a></h2>
+<p>Edit <code>/boot/loader/entries/arch.conf</code>:</p>
 <h2 id="firewall-1"><a class="header" href="#firewall-1">Firewall</a></h2>
 <p>Flush existing iptables Rules &amp; Disable iptables:</p>
 <blockquote>
-<p>⚠️ Warning: Flushing rules will remove all existing firewall configurations.
-Ensure no critical services are running, or review existing rules with
-<code>iptables -L -v -n</code> and <code>ip6tables -L -v -n</code> before proceeding.</p>
+<p>⚠️ <strong>Warning</strong>: Flushing rules will remove all existing firewall
+configurations. Ensure no critical services are running, or review existing
+rules with <code>iptables -L -v -n</code> and <code>ip6tables -L -v -n</code> before proceeding.</p>
 </blockquote>
 <pre><code class="language-bash">sudo iptables -F
 sudo iptables -X
@@ -3221,12 +3274,17 @@ of this section.</p>
 <p>Install:</p>
 <pre><code class="language-bash">sudo pacman -S apparmor
 </code></pre>
-<p>Add the following to <code>/etc/default/grub</code> in <code>GRUB_CMDLINE_LINUX_DEFAULT</code>:</p>
-<pre><code class="language-grub">GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+<p>Edit <code>/etc/cmdline.d/security.conf</code>:</p>
+<pre><code class="language-conf"># enable apparmor
+lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
 </code></pre>
-<p>Rebuild grub:</p>
-<pre><code class="language-bash">sudo grub-mkconfig -o /boot/grub/grub.cfg
+<p>It's recommended to add the same line to your <code>/boot/loader/entries/arch.conf</code>:</p>
+<pre><code class="language-bash">title   Arch Linux
+linux   /vmlinuz-linux-zen
+initrd  /initramfs-linux-zen.img
+options rd.luks.name=7b78e942-f4f7-4dde-a015-3b826505483f=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
 </code></pre>
+<p>Save &amp; Reboot</p>
 <p>Start/Enable AppArmor:</p>
 <pre><code class="language-bash">sudo systemctl start apparmor
 sudo systemctl enable apparmor
@@ -3252,7 +3310,6 @@ profiles in enforce mode.</p>
 </ul>
 <pre><code class="language-bash">paru -S bazaar
 </code></pre>
-<p>speling eror</p>
 <h2 id="creating-profiles-that-arent-pre-configured"><a class="header" href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a></h2>
 <h3 id="auditd"><a class="header" href="#auditd">Auditd</a></h3>
 <p>Install with:</p>
@@ -3308,6 +3365,11 @@ run:</p>
 <p>Unmount the partitions, close cryptroot, and Reboot.</p>
 <hr />
 <h3 id="doas-over-sudo"><a class="header" href="#doas-over-sudo">Doas over sudo</a></h3>
+<blockquote>
+<p>❗️ Removing sudo may cause compatibility issues with some scripts/tools that
+expect it, I haven't had many issues but you should test before completely
+removing it.</p>
+</blockquote>
 <p>For a more minimalist version of <code>sudo</code> with a smaller codebase and attack
 surface, consider <code>doas</code>:</p>
 <pre><code class="language-bash">sudo pacman -S opendoas
