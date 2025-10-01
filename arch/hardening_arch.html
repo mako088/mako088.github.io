@@ -560,6 +560,9 @@ table inet filter {
         # Allow HTTP and HTTPS (ports 80 and 443)
         tcp dport { 80, 443 } ct state new accept
 
+         # Allow Git (and general SSH client) outgoing connections
+        tcp dport 22 ct state new accept
+
         # Log packets that reach the end of the chain before they are dropped by the policy (optional)
         log prefix "nft-input-drop: "
     }
@@ -605,13 +608,21 @@ table inet filter {
     }
 }
 </code></pre>
+<blockquote>
+<p>❗️ Most desktop firewalls default to <strong>allow all outgoing traffic</strong>
+(<code>policy accept</code> on the output chain). This is done for convenience, as it
+prevents applications from breaking. However, for a system practicing zero
+trust, the best practice is to enforce a <strong>default deny</strong>(<code>policy drop</code>) on
+the output chain and <strong>only explicitly allow</strong> the services the system needs.</p>
+</blockquote>
 <pre><code class="language-bash">sudo systemctl enable nftables.service
 sudo systemctl start nftables.service
-
-Load and test the rules if in a different location than the default:
-
-```bash
-sudo nft -f /path/to/your/nftables.conf
+</code></pre>
+<p>Load and test the rules if in a different location than the default:</p>
+<pre><code class="language-bash">sudo nft -f /path/to/your/nftables.conf
+</code></pre>
+<p>or in default location:</p>
+<pre><code class="language-bash">sudo nft -f /etc/nftables.conf
 </code></pre>
 <blockquote>
 <p>❗️ If you don't use SSH or host a web server or any service, don't allow SSH
