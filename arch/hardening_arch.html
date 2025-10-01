@@ -260,7 +260,7 @@ under <code>/boot/loader/entries/</code>. Create or edit an entry file, for exam
 <pre><code class="language-text">title   Arch Linux Hardened
 linux   /vmlinuz-linux-hardened
 initrd  /initramfs-linux-hardened.img
-options rd.luks.name=YOUR_UUID=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
+options rd.luks.name=YOUR_UUID=cryptroot root=/dev/mapper/cryptroot rw quiet
 </code></pre>
 <p>Replace <code>YOUR_UUID</code> with the UUID of the encrypted root partition (from <code>blkid</code>)</p>
 <p>To set this as the default boot entry and enable booting the last selected
@@ -1086,12 +1086,6 @@ of this section.</p>
 <p>Edit <code>/etc/cmdline.d/security.conf</code>:</p>
 <pre><code class="language-conf"># enable apparmor
 lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
-</code></pre>
-<p>It's recommended to add the same line to your <code>/boot/loader/entries/arch.conf</code>:</p>
-<pre><code class="language-bash">title   Arch Linux
-linux   /vmlinuz-linux-zen
-initrd  /initramfs-linux-zen.img
-options rd.luks.name=7b78e942-f4f7-4dde-a015-3b826505483f=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
 </code></pre>
 <p>Save &amp; Reboot</p>
 <p>Start/Enable AppArmor:</p>

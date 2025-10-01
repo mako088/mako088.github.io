@@ -1351,8 +1351,8 @@ generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-linux-zen"
 
-# PRESETS=('default' 'fallback')
-PRESETS=('default')
+PRESETS=('default' 'fallback')
+# PRESETS=('default')
 
 # default_config="/etc/mkinitcpio.conf"
 # default_image="/boot/initramfs-linux-zen.img"
@@ -1360,18 +1360,18 @@ default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 #fallback_config="/etc/mkinitcpio.conf"
-fallback_image="/boot/initramfs-linux-zen-fallback.img"
-#fallback_uki="/efi/EFI/Linux/arch-linux-zen-fallback.efi"
+#fallback_image="/boot/initramfs-linux-zen-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
 fallback_options="-S autodetect"
 </code></pre>
 <p>Generate the initial RAM Filesystem (initramfs) image.</p>
 <pre><code class="language-bash">mkinitcpio -P
 </code></pre>
 <blockquote>
-<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the
-boot * root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try
-again. Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> exists for your kernel
-of choice.</p>
+<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
+&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
+Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
+<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
 </blockquote>
 <hr />
 <ol start="10">
@@ -2561,7 +2561,7 @@ under <code>/boot/loader/entries/</code>. Create or edit an entry file, for exam
 <pre><code class="language-text">title   Arch Linux Hardened
 linux   /vmlinuz-linux-hardened
 initrd  /initramfs-linux-hardened.img
-options rd.luks.name=YOUR_UUID=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
+options rd.luks.name=YOUR_UUID=cryptroot root=/dev/mapper/cryptroot rw quiet
 </code></pre>
 <p>Replace <code>YOUR_UUID</code> with the UUID of the encrypted root partition (from <code>blkid</code>)</p>
 <p>To set this as the default boot entry and enable booting the last selected
@@ -3387,12 +3387,6 @@ of this section.</p>
 <p>Edit <code>/etc/cmdline.d/security.conf</code>:</p>
 <pre><code class="language-conf"># enable apparmor
 lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
-</code></pre>
-<p>It's recommended to add the same line to your <code>/boot/loader/entries/arch.conf</code>:</p>
-<pre><code class="language-bash">title   Arch Linux
-linux   /vmlinuz-linux-zen
-initrd  /initramfs-linux-zen.img
-options rd.luks.name=7b78e942-f4f7-4dde-a015-3b826505483f=cryptroot root=/dev/mapper/cryptroot rw quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
 </code></pre>
 <p>Save &amp; Reboot</p>
 <p>Start/Enable AppArmor:</p>

@@ -477,8 +477,8 @@ generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-linux-zen"
 
-# PRESETS=('default' 'fallback')
-PRESETS=('default')
+PRESETS=('default' 'fallback')
+# PRESETS=('default')
 
 # default_config="/etc/mkinitcpio.conf"
 # default_image="/boot/initramfs-linux-zen.img"
@@ -486,18 +486,18 @@ default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
 default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
 
 #fallback_config="/etc/mkinitcpio.conf"
-fallback_image="/boot/initramfs-linux-zen-fallback.img"
-#fallback_uki="/efi/EFI/Linux/arch-linux-zen-fallback.efi"
+#fallback_image="/boot/initramfs-linux-zen-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
 fallback_options="-S autodetect"
 </code></pre>
 <p>Generate the initial RAM Filesystem (initramfs) image.</p>
 <pre><code class="language-bash">mkinitcpio -P
 </code></pre>
 <blockquote>
-<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the
-boot * root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try
-again. Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> exists for your kernel
-of choice.</p>
+<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
+&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
+Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
+<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
 </blockquote>
 <hr />
 <ol start="10">
