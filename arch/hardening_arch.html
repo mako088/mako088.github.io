@@ -176,48 +176,6 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
-<details>
-<summary> ✔️ Click to Expand Table of Contents</summary>
-<ul>
-<li><a href="#getting-started">Getting Started</a>
-<ul>
-<li><a href="#best-practices-and-standards">Best Practices and Standards</a></li>
-</ul>
-</li>
-<li><a href="#hardening-the-kernel">Hardening the Kernel</a></li>
-<li><a href="#hardening-your-current-kernel">Hardening your current Kernel</a></li>
-<li><a href="#hardening-bootloader-kernel-parameters">Hardening Bootloader Kernel Parameters</a></li>
-<li><a href="#firewall">Firewall</a></li>
-<li><a href="#ssh-keygen">ssh-keygen</a></li>
-<li><a href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a>
-<ul>
-<li><a href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></li>
-<li><a href="#generate-gpg-subkeys">Generate Gpg Subkeys</a></li>
-<li><a href="#backing-up-your-keys">Backing up Your Keys</a></li>
-<li><a href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></li>
-</ul>
-</li>
-<li><a href="#hardening-openssh">Hardening OpenSSH</a>
-<ul>
-<li><a href="#tip-change-the-default-port">Tip Change the Default Port</a></li>
-</ul>
-</li>
-<li><a href="#usb-port-protection">USB Port Protection</a>
-<ul>
-<li><a href="#usbguard-daemon">USBGuard Daemon</a></li>
-<li><a href="#firejail">Firejail</a></li>
-</ul>
-</li>
-<li><a href="#apparmor">AppArmor</a></li>
-<li><a href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a>
-<ul>
-<li><a href="#auditd">Auditd</a></li>
-<li><a href="#doas-over-sudo">Doas over sudo</a></li>
-<li><a href="#resources">Resources</a></li>
-</ul>
-</li>
-</ul>
-</details>
 <blockquote>
 <p>⚠️ Warning: I am not a security expert. This guide presents various options
 for hardening Arch Linux, but it is your responsibility to evaluate whether
@@ -535,7 +493,21 @@ net.core.default_qdisc = cake
 <h2 id="hardening-bootloader-kernel-parameters"><a class="header" href="#hardening-bootloader-kernel-parameters">Hardening Bootloader Kernel Parameters</a></h2>
 <p>Edit <code>/boot/loader/entries/arch.conf</code>:</p>
 <h2 id="firewall"><a class="header" href="#firewall">Firewall</a></h2>
-<p>Flush existing iptables Rules &amp; Disable iptables:</p>
+<p><strong>nftables</strong> is designed to replace <strong>iptables</strong> by providing a modern,
+simplified, and unified packet filtering and classification framework in the
+Linux kernel. It reuses the underlying Netfilter infrastructure but introduces a
+new kernel API and completely different user-space tool (<code>nft</code>).</p>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Nftables">Arch Wiki nftables</a></li>
+</ul>
+<p><strong>Installation</strong>:</p>
+<pre><code class="language-bash">sudo pacman -S nftables
+</code></pre>
+<p>There is an example firewall ruleset located at <code>/etc/nftables.conf</code> and more
+examples located in <code>/usr/share/nftables/</code> and
+<code>/usr/share/doc/nftables/examples/</code></p>
+<p>Flush existing iptables Rules &amp; Disable iptables(only necessary if switching to
+nftables from iptables):</p>
 <blockquote>
 <p>⚠️ <strong>Warning</strong>: Flushing rules will remove all existing firewall
 configurations. Ensure no critical services are running, or review existing
@@ -553,55 +525,98 @@ sudo systemctl disable ip6tables.service
 sudo systemctl stop iptables.service
 sudo systemctl stop ip6tables.service
 </code></pre>
-<p><strong>Install and enable nftables</strong>:</p>
-<pre><code class="language-bash">sudo pacman -S nftables
-sudo systemctl enable nftables.service
-sudo systemctl start nftables.service
-</code></pre>
-<p>Create nftables ruleset:</p>
-<pre><code class="language-bash">#!/usr/sbin/nft -f
+<p><strong>Create nftables ruleset</strong>:</p>
+<pre><code class="language-bash">#!/usr/bin/nft -f
+# vim:set ts=2 sw=2 et:
 
+# More examples in /usr/share/nftables/ and /usr/share/doc/nftables/examples/.
+flush ruleset
 table inet filter {
+    # -------------------------------------------------------------------------
+    # INPUT CHAIN (Incoming Traffic destined for this host)
+    # Default is to DROP all incoming traffic
+    # -------------------------------------------------------------------------
     chain input {
-        type filter hook input priority 0; policy drop;
+        type filter hook input priority filter; policy drop;
 
-        # Allow loopback
+        # Drop invalid packets (e.g., malformed or out-of-state)
+        ct state invalid drop
+
+        # Allow loopback traffic (localhost to localhost)
         iif "lo" accept
 
-        # Accept established and related connections
+        # Allow established and related connections (replies to outgoing, FTP helper)
         ct state established,related accept
 
-        ip protocol icmp accept
-        # Allow ICMPv6
-        ip6 nexthdr icmpv6 accept
+        # Allow specific ICMP types for IPv4
+        ip protocol icmp icmp type { echo-request, echo-reply, destination-unreachable, time-exceeded } accept
 
-        # Allow SSH (port 22)
-        tcp dport 22 ct state new accept
+        # Allow critical ICMPv6 types for IPv6 (essential for network function)
+        ip6 nexthdr icmpv6 icmpv6 type { echo-request, echo-reply, destination-unreachable, packet-too-big, time-exceeded, parameter-problem, nd-router-advert, nd-router-solicit, nd-neighbor-solicit, nd-neighbor-advert } accept
+
+        # Allow SSH (port 2222) with rate-limiting to prevent brute-force attacks
+        tcp dport 2222 ct state new limit rate 15/minute accept
 
         # Allow HTTP and HTTPS (ports 80 and 443)
-        tcp dport {80,443} ct state new accept
+        tcp dport { 80, 443 } ct state new accept
+
+        # Log packets that reach the end of the chain before they are dropped by the policy (optional)
+        log prefix "nft-input-drop: "
     }
 
+    # -------------------------------------------------------------------------
+    # FORWARD CHAIN (Routed Traffic passing through this host)
+    # Default is to DROP all routed traffic (host-based firewall)
+    # -------------------------------------------------------------------------
     chain forward {
-        type filter hook forward priority 0; policy drop;
+        type filter hook forward priority filter; policy drop;
+
+        # Drop invalid packets
+        ct state invalid drop
+
+        # Allow established and related connections
+        ct state established,related accept
+
+        # Add specific FORWARD rules here if the machine is acting as a router/gateway
     }
 
+    # -------------------------------------------------------------------------
+    # OUTPUT CHAIN (Outgoing Traffic originating from this host)
+    # Default is to DROP all outgoing traffic for maximum security
+    # -------------------------------------------------------------------------
     chain output {
-        type filter hook output priority 0; policy accept;
+        type filter hook output priority filter; policy drop; # &lt;-- Changed to 'drop' for security
 
-        # Allow DNS queries
+        # Allow replies for established and related connections (critical)
+        ct state established,related accept
+
+        # Allow DNS queries (UDP and TCP)
         udp dport 53 accept
         tcp dport 53 accept
+
+        # Allow general outbound web access (e.g., for updates, API calls)
+        tcp dport { 80, 443 } accept
+
+        # Allow NTP (Network Time Protocol) for time synchronization
+        udp dport 123 accept
+
+        # Log packets that reach the end of the chain before they are dropped by the policy (optional)
+        log prefix "nft-output-drop: "
     }
 }
+</code></pre>
+<pre><code class="language-bash">sudo systemctl enable nftables.service
+sudo systemctl start nftables.service
+
+Load and test the rules if in a different location than the default:
+
+```bash
+sudo nft -f /path/to/your/nftables.conf
 </code></pre>
 <blockquote>
 <p>❗️ If you don't use SSH or host a web server or any service, don't allow SSH
 and HTTP/HTTPS.</p>
 </blockquote>
-<p>Load and test the rules:</p>
-<pre><code class="language-bash">sudo nft -f /etc/nftables.conf
-</code></pre>
 <pre><code class="language-bash">sudo nft list ruleset
 </code></pre>
 <hr />
@@ -963,10 +978,12 @@ sudo systemctl start sshd
 <p>Ensure all of the permissions are correct:</p>
 <pre><code class="language-bash">chmod 755 $HOME
 chmod 700 $HOME/.ssh
-chmod 600 $HOME/.ssh/authorized_keys
 </code></pre>
 <p>Add the output of <code>ssh-add -L</code> to <code>~/.ssh/authorized_keys</code></p>
 <pre><code class="language-bash">echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXwhVokJ6cKgodYT+0+0ZrU0sBqMPPRDPJqFxqRtM+I (none)" &gt; ~/.ssh/authorized_keys
+</code></pre>
+<p>After adding the authorized_key, adjust the permission:</p>
+<pre><code class="language-bash">chmod 600 $HOME/.ssh/authorized_keys
 </code></pre>
 <p>Finally, test an ssh connection:</p>
 <pre><code class="language-bash">ssh user@hostname
@@ -986,29 +1003,14 @@ out, you'll need console access to your server to fix it</p>
 <pre><code class="language-config">Port 2222
 </code></pre>
 <p>Update the Firewall Rules in <code>/etc/nftables.conf</code>:</p>
-<pre><code class="language-conf"># ...snip...
-table inet filter {
-    chain input {
-        type filter hook input priority 0; policy drop;
-
-        # Allow loopback
-        iif "lo" accept
-
-        # Accept established and related connections
-        ct state established,related accept
-
-        # Allow ICMPv6
-        ip protocol icmp accept
-        ip6 nexthdr icmpv6 accept
-
-        # Allow SSH (port 2222)
-        tcp dport 2222 ct state new accept
-
-        # Allow HTTP and HTTPS (ports 80 and 443)
-        tcp dport {80,443} ct state new accept
-    }
-# ...snip...
+<p>Replace this line:</p>
+<pre><code class="language-conf">tcp dport ssh accept comment "allow sshd"
 </code></pre>
+<p>with:</p>
+<pre><code class="language-conf">tcp dport 2222 accept comment "allow sshd on port 2222"
+</code></pre>
+<p>This change explicitly allows new incomming TCP connections on port 2222 for
+SSH, ensuring remote access will work through the firewall.</p>
 <p>Reload the Firewall:</p>
 <pre><code class="language-bash">sudo nft -f /etc/nftables.conf
 </code></pre>
@@ -1025,6 +1027,9 @@ exfiltration, unauthorized device access, malware injection, etc.</p>
 <p>To get a list of your connected USB devices you can use <code>lsusb</code> from the
 <code>usbutils</code> package.</p>
 <pre><code class="language-bash">lsusb
+</code></pre>
+<p>Install usbguard:</p>
+<pre><code class="language-bash">sudo pacman -S usbguard
 </code></pre>
 <p>Generate a policy based on your currently attached USB devices with:</p>
 <pre><code class="language-bash">sudo usbguard generate-policy | sudo tee /etc/usbguard/rules.conf
