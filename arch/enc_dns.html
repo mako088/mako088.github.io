@@ -200,7 +200,7 @@ your browsing activity.</p>
 </li>
 </ul>
 <p>Edit <code>/etc/dnscrypt-proxy/dnscrypt-proxy.toml</code> to add your chosen resolvers etc.</p>
-<p>For example, to use Quad9's resolvers:</p>
+<p>For example, to use Quad9's resolvers with oDoH:</p>
 <details>
 <summary>
 ✔️ Click to Expand example `dnscrypt-proxy.toml` that is set up with dnsmasq
@@ -225,7 +225,7 @@ dnscrypt_servers = true
 doh_servers = false
 
 # Use servers implementing the Oblivious DoH protocol
-odoh_servers = false
+odoh_servers = true
 
 ## Require servers defined by remote sources to satisfy specific properties
 
@@ -237,6 +237,12 @@ require_nolog = true
 
 # Server must not enforce its own blocklist (for parental control, ads blocking...)
 require_nofilter = false
+
+bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']
+
+fallback_resolvers = ['1.0.0.1:53', '9.9.9.9:53']
+
+ignore_system_dns = true
 
 
 [sources]
@@ -265,6 +271,21 @@ minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
 refresh_delay = 73
 prefix = ''
 
+### ODoH (Oblivious DoH) servers and relays
+
+[sources.odoh-servers]
+  urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-servers.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-servers.md']
+  cache_file = '/var/cache/dnscrypt-proxy/odoh-servers.md'
+  minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+  refresh_delay = 73
+  prefix = ''
+[sources.odoh-relays]
+  urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/odoh-relays.md', 'https://download.dnscrypt.info/resolvers-list/v3/odoh-relays.md']
+  cache_file = '/var/cache/dnscrypt-proxy/odoh-relays.md'
+  minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+  refresh_delay = 73
+  prefix = ''
+
 ### Quad9
 
 [sources.quad9-resolvers]
@@ -273,7 +294,20 @@ prefix = ''
   cache_file = '/var/cache/dnscrypt-proxy/quad9-resolvers.md'
   prefix = 'quad9-'
 
+[anonymized_dns]
+
+routes = [
+  { server_name='quad9-dnscrypt-ip6-filter-pri', via=['anon-cs-berlin', 'anon-cs-dus6'] },
+  { server_name='quad9-dnscrypt-ip4-filter-pri', via=['sdns://gREzNy4xMjAuMjE3Ljc1OjQ0Mw'] },
+  { server_name='mullvad-adblock-doh', via=['anon-cs-de', 'anon-cs-norway6'] }
+]
+
+## Skip resolvers incompatible with anonymization instead of using them directly
+skip_incompatible = true
 </code></pre>
+<p>Check the
+<a href="https://github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/relays.md">relays.md</a>
+for different anon relays.</p>
 </details>
 <p>Modify <code>/etc/resolv.conf</code>:</p>
 <pre><code class="language-conf">nameserver ::1
@@ -336,11 +370,13 @@ back to the program that made the original request (e.g., the browser).</p>
 </ol>
 <h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
 <p>I tested in Firefox by ensuring that in <code>Settings -&gt; Privacy &amp; Security</code> the DNS
-over HTTPS was set to <code>Status: Off</code>, Enable DNS over HTTPS using:
-<code>Default Protection</code>.</p>
+over HTTPS was set to <code>Status: Off</code>, Enable DNS over HTTPS using: <code>Off</code> Use your
+default DNS resolver.</p>
 <p>Then go to <code>https://dnsleaktest.com</code> and perform an Extended Test. If you used
 the above configuration with Quad9's resolvers, you should see all WoodyNet ISPs
-listed. If not, something is wrong and you have a DNS leak.</p>
+listed in Germany. If not, something is wrong and you have a DNS leak.</p>
+<p>I have noticed dnsleaktest having issues lately, <code>https://ipleak.net</code> works for
+this as well.</p>
 
                     </main>
 
