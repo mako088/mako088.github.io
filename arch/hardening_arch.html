@@ -185,7 +185,19 @@ issues, or unexpected behavior. Additionally, these protections often come
 with performance tradeoffs. Always conduct thorough research, there are no
 plug and play one size fits all security solutions.</p>
 </blockquote>
-<h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
+<blockquote>
+<p>Much of this guide draws inspiration or recommendations from the well-known
+<a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">Linux Hardening Guide</a>
+by Madaidan's Insecurities and the Arch Wiki. Arch is great but when anonymity
+truly matters, use Whonix or Tails. The Whonix Docs have a specific section or
+Arch with KVM that is an excellent resource.</p>
+</blockquote>
+<ul>
+<li><a href="https://www.whonix.org/wiki/KVM#Arch_Linux">Whonix KVM#Arch_Linux</a>, if you
+plan on using this think twice before enabling dnscrypt-proxy and you might
+want to consider ufw firewall rather than the nftables I share in this guide.</li>
+</ul>
+<h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
 <p>Encryption is the process of using an algorithm to scramble plaintext data into
 ciphertext, making it unreadable except to a person who has the key to decrypt
 it.</p>
@@ -197,8 +209,29 @@ at rest prevents data leakage, physical theft, unauthorized access, and more as
 long as the key management scheme isn't compromised.</p>
 <p>Enable a UEFI password or Administrator password where it requires
 authentication in order to access the UEFI/BIOS.</p>
-<p>Secure Boot helps ensure only signed, trusted kernels and bootloaders are
-executed at startup.</p>
+<p>Use Secure Boot, with a Unified Kernel Image (UKI). TPM can, in some ways
+increase security; I may add a section in the future.</p>
+<p>When Secure Boot is used with a Unified Kernel Image, it provides enhanced
+protection compared to traditional boot methods because when Secure Boot
+verifies the UKI's signature, it ensures the integrity and authenticity of:</p>
+<ul>
+<li>
+<p>The kernel itself,</p>
+</li>
+<li>
+<p>The initramfs,</p>
+</li>
+<li>
+<p>The kernel command line parameters,</p>
+</li>
+<li>
+<p>And indirectly, the bootloader that loads the UKI (since the bootloader
+verifies the UKI signature before execution).</p>
+</li>
+</ul>
+<p>This means that any tampering with these components, such as injecting malware
+into the initramfs, altering boot parameters, or swapping the kernel would break
+the signature verification and prevent the system from booting.</p>
 <p><code>systemd-boot</code> has a smaller attack surface and is often recommended over GRUB
 for hardened systems.</p>
 <ul>
@@ -208,7 +241,13 @@ for hardened systems.</p>
 <details>
 <summary> ✔️ Click to Expand Secure Boot Resources </summary>
 <ul>
-<li><a href="https://0pointer.net/blog/authenticated-boot-and-disk-encryption-on-linux.html">The Strange State of Authenticated Boot and Encryption</a></li>
+<li>
+<p><a href="https://0pointer.net/blog/authenticated-boot-and-disk-encryption-on-linux.html">The Strange State of Authenticated Boot and Encryption</a></p>
+</li>
+<li>
+<p>When using a UKI with Secure Boot, the initrd is authenticated because it's a
+sealed component of the single signed image.</p>
+</li>
 </ul>
 </details>
 <h3 id="best-practices-and-standards"><a class="header" href="#best-practices-and-standards">Best Practices and Standards</a></h3>
@@ -220,10 +259,13 @@ create security-focused checklists and ensure all angles are covered, building a
 more robust and secure system.</p>
 <ul>
 <li>
-<p>Use strong passwords and a password manager.</p>
+<p>Use strong passwords and a password manager. The Arch Wiki
+<a href="https://wiki.archlinux.org/title/Security">Security</a> section goes in depth
+about this so I won't cover it here.</p>
 </li>
 <li>
-<p>Update frequently</p>
+<p>Update frequently, updates often contain security patches and are important to
+stay on top of.</p>
 </li>
 <li>
 <p>Prefer software/hardware that has privacy respecting defaults and a secure
@@ -238,7 +280,9 @@ posture.</p>
 <li>
 <p>Encrypted DNS protects your DNS queries from being seen and a VPN protects
 your IP address from being exposed. There is a lot to this, just know that a
-VPN isn't made to nor does it protect your anonymity.</p>
+VPN isn't made to nor does it protect your anonymity and there are so many
+fingerprinting techniques that encrypted DNS's effectiveness is questionable
+without a VPN.</p>
 </li>
 </ul>
 </li>
@@ -296,6 +340,9 @@ console-mode auto
 additional kernels if needed.</p>
 <hr />
 <h2 id="hardening-your-current-kernel"><a class="header" href="#hardening-your-current-kernel">Hardening your current Kernel</a></h2>
+<p>Sometimes <code>linux-hardened</code> just won't work on your system without some serious
+digging. You can harden your current kernel, or even better would be to harden
+the Long-Term Support (LTS) kernel.</p>
 <p>The Linux kernel is typically released under two forms: stable and long-term
 support (LTS). Choosing either has consequences, do your research.
 <a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html#stable-vs-lts">Stable vs. LTS kernels</a></p>
@@ -311,9 +358,6 @@ uname -a
 <p>Show the configuration of your current kernel:</p>
 <pre><code class="language-bash">zcat /proc/config.gz
 </code></pre>
-<p>Sometimes <code>linux-hardened</code> just won't work on your system without some serious
-digging. You can harden your current kernel, or even better would be to harden
-the Long-Term Support (LTS) kernel.</p>
 <p><code>sysctl</code> is a tool that allows you to view or modify kernel settings and
 enable/disable different features.</p>
 <p>Check what each setting does <a href="https://sysctl-explorer.net/">sysctl-explorer</a></p>
@@ -535,36 +579,39 @@ though, setting more strict permissions helps.</p>
 <li>
 <p>Lock kernel modules (optional):</p>
 <ul>
-<li>Set <code>module.sig_enforce=1</code> in kernel parameters.</li>
-<li>Blacklist unneeded modules in <code>/etc/modprobe.d/blacklist.conf</code>.</li>
+<li>Set <code>module.sig_enforce=1</code> in kernel parameters.(i.e.,
+<code>/etc/cmdline.d/security.conf</code>)</li>
 </ul>
 </li>
 </ul>
-<pre><code class="language-conf">blacklist dccp
-blacklist sctp
-blacklist rds
-blacklist tipc
-blacklist n_hdlc
-blacklist ax25
-blacklist netrom
-blacklist x25
+<p>Blacklist unneeded modules in <code>/etc/modprobe.d/blacklist.conf</code>:</p>
+<pre><code class="language-conf">blacklist dccp          # Datagram Congestion Control Protocol
+blacklist sctp          # Stream Control Transmission Protocol
+blacklist rds           # Reliable Datagram Sockets
+blacklist tipc          # Transparent Inter-Process Communication
+blacklist n_hdlc        # High-level Data Link Control
+blacklist ax25          # Amateur X.25
+blacklist netrom        # NetRom
+blacklist x25           # X.25
 blacklist rose
 blacklist decnet
 blacklist econet
-blacklist af_802154
-blacklist ipx
+blacklist af_802154     # IEE 802.15.4
+blacklist ipx           # Internetwork Packet Exchange
 blacklist appletalk
-blacklist psnap
-blacklist p8023
-blacklist p8022
-blacklist can
+blacklist psnap         # SubnetworkAccess Protocol
+blacklist p8023         # Novell raw IEE 802.3
+blacklist p8022         # IEE 802.3
+blacklist can           # Controller Area Network
 blacklist atm
+# Various rare filesystems
 blacklist cramfs
 blacklist freevxfs
 blacklist jffs2
 blacklist hfs
 blacklist hfsplus
 blacklist udf
+# Less rare but often recommended
 # Optionally blacklist squashfs, cifs, nfs etc. by uncommenting:
 # blacklist squashfs
 # blacklist cifs
@@ -575,6 +622,7 @@ blacklist udf
 # blacklist gfs2
 # blacklist vivid
 </code></pre>
+<p>There are more suggestions in the madaidans insecurities guide.</p>
 <p>Apply the changes:</p>
 <pre><code class="language-bash">sudo mkinitcpio -P
 </code></pre>
@@ -705,9 +753,11 @@ table inet filter {
     # -------------------------------------------------------------------------
     # OUTPUT CHAIN (Outgoing Traffic originating from this host)
     # Default is to DROP all outgoing traffic for maximum security
+    # # Change 'policy drop' to 'policy accept' below if having outbound
+    # # connection problems
     # -------------------------------------------------------------------------
     chain output {
-        type filter hook output priority filter; policy drop; # &lt;-- Changed to 'drop' for security
+        type filter hook output priority filter; policy drop;
 
         # Allow essential local communication
         oif "lo" accept
