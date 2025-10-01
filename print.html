@@ -2925,6 +2925,9 @@ table inet filter {
     chain output {
         type filter hook output priority filter; policy drop; # &lt;-- Changed to 'drop' for security
 
+        # Allow essential local communication
+        oif "lo" accept
+
         # Allow replies for established and related connections (critical)
         ct state established,related accept
 
