@@ -1618,6 +1618,13 @@ reboot
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq"><a class="header" href="#encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq">Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</a></h1>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<ul>
+<li><a href="arch/enc_dns.html#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></li>
+<li><a href="arch/enc_dns.html#testing">Testing</a></li>
+</ul>
+</details>
 <blockquote>
 <p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
 what domain you looked up via DNS that it's effectiveness is questionable
@@ -2028,7 +2035,34 @@ over HTTPS was set to <code>Status: Off</code>, Enable DNS over HTTPS using:
 the above configuration with Quad9's resolvers, you should see all WoodyNet ISPs
 listed. If not, something is wrong and you have a DNS leak.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-firefox-on-arch"><a class="header" href="#hardening-firefox-on-arch">Hardening Firefox on Arch</a></h1>
-<h3 id="fingerprinting"><a class="header" href="#fingerprinting">Fingerprinting</a></h3>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<ul>
+<li><a href="arch/hardening_firefox.html#fingerprinting-explained">Fingerprinting Explained</a></li>
+<li><a href="arch/hardening_firefox.html#metasearch-engines">Metasearch Engines</a>
+<ul>
+<li><a href="arch/hardening_firefox.html#searxng">SearXNG</a>
+<ul>
+<li><a href="arch/hardening_firefox.html#encrypted-dns">Encrypted DNS</a></li>
+<li><a href="arch/hardening_firefox.html#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_firefox.html#fingerprinting">Fingerprinting</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_firefox.html#webrtc">WebRTC</a></li>
+<li><a href="arch/hardening_firefox.html#canvas-fingerprinting">Canvas Fingerprinting</a></li>
+<li><a href="arch/hardening_firefox.html#webgl">WebGL</a></li>
+<li><a href="arch/hardening_firefox.html#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></li>
+<li><a href="arch/hardening_firefox.html#apply">Apply</a></li>
+<li><a href="arch/hardening_firefox.html#check">Check</a>
+<ul>
+<li><a href="arch/hardening_firefox.html#user-agent-spoofing">User Agent Spoofing</a></li>
+</ul>
+</li>
+</ul>
+</details>
+<h3 id="fingerprinting-explained"><a class="header" href="#fingerprinting-explained">Fingerprinting Explained</a></h3>
 <p>Browser fingerprinting is a tracking technique, often done by third-party
 companies that specialize in it. They provide code (usually JavaScript) that a
 website owner can embed on their site. When you visit the site, the script runs
@@ -2173,7 +2207,7 @@ companies from using them to track your browsing from site to site.</p>
 From the Tor Uplift Project.</p>
 </li>
 </ul>
-<h3 id="fingerprinting-1"><a class="header" href="#fingerprinting-1">Fingerprinting</a></h3>
+<h3 id="fingerprinting"><a class="header" href="#fingerprinting">Fingerprinting</a></h3>
 <ul>
 <li>
 <p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
@@ -2477,6 +2511,48 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </ul>
 </details>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<ul>
+<li><a href="arch/hardening_arch.html#getting-started">Getting Started</a>
+<ul>
+<li><a href="arch/hardening_arch.html#best-practices-and-standards">Best Practices and Standards</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_arch.html#hardening-the-kernel">Hardening the Kernel</a></li>
+<li><a href="arch/hardening_arch.html#hardening-your-current-kernel">Hardening your current Kernel</a></li>
+<li><a href="arch/hardening_arch.html#hardening-bootloader-kernel-parameters">Hardening Bootloader Kernel Parameters</a></li>
+<li><a href="arch/hardening_arch.html#firewall">Firewall</a></li>
+<li><a href="arch/hardening_arch.html#ssh-keygen">ssh-keygen</a></li>
+<li><a href="arch/hardening_arch.html#gnupg-and-gpg-agent">GnuPG and gpg-agent</a>
+<ul>
+<li><a href="arch/hardening_arch.html#generate-a-revocation-certificate">Generate a Revocation Certificate</a></li>
+<li><a href="arch/hardening_arch.html#generate-gpg-subkeys">Generate Gpg Subkeys</a></li>
+<li><a href="arch/hardening_arch.html#backing-up-your-keys">Backing up Your Keys</a></li>
+<li><a href="arch/hardening_arch.html#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_arch.html#hardening-openssh">Hardening OpenSSH</a>
+<ul>
+<li><a href="arch/hardening_arch.html#tip-change-the-default-port">Tip Change the Default Port</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_arch.html#usb-port-protection">USB Port Protection</a>
+<ul>
+<li><a href="arch/hardening_arch.html#usbguard-daemon">USBGuard Daemon</a></li>
+<li><a href="arch/hardening_arch.html#firejail">Firejail</a></li>
+</ul>
+</li>
+<li><a href="arch/hardening_arch.html#apparmor">AppArmor</a></li>
+<li><a href="arch/hardening_arch.html#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a>
+<ul>
+<li><a href="arch/hardening_arch.html#auditd">Auditd</a></li>
+<li><a href="arch/hardening_arch.html#doas-over-sudo">Doas over sudo</a></li>
+<li><a href="arch/hardening_arch.html#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
+</details>
 <blockquote>
 <p>⚠️ Warning: I am not a security expert. This guide presents various options
 for hardening Arch Linux, but it is your responsibility to evaluate whether
