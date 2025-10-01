@@ -190,7 +190,10 @@ can identify you while behind a VPN or in incognito mode as well.</p>
 Arkenfox <code>user.js</code> you can jump to that section first as it will set many of
 these settings for you.</p>
 <hr />
-<h2 id="search-engines"><a class="header" href="#search-engines">Search Engines</a></h2>
+<h2 id="metasearch-engines"><a class="header" href="#metasearch-engines">Metasearch Engines</a></h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Metasearch_engine">Wikipedia Metasearch engine</a></li>
+</ul>
 <h3 id="searxng"><a class="header" href="#searxng">SearXNG</a></h3>
 <p><strong>SearXNG</strong> an open-source, privacy-respecting metasearch engine that aggregates
 results from various search services, such as Google, DuckDuckGo, etc without
@@ -207,10 +210,85 @@ opinion.</p>
 </blockquote>
 <p>Searx is a bit different, you can choose which search engine you want for your
 current search with <code>!ddg search term</code> to use duckduckgo for example.</p>
+<ul>
+<li><a href="https://github.com/searxng/searxng?tab=readme-ov-file">searxng repo</a>
+<ul>
+<li>
+<p><a href="https://docs.searxng.org/admin/installation.html">Install guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.searxng.org/admin/settings/index.html">Configuration guide</a></p>
+</li>
+</ul>
+</li>
+</ul>
 <hr />
 <p><strong>Startpage</strong> is another metasearch engine that I've heard good things about.</p>
+<ul>
+<li>
+<p><a href="https://www.startpage.com/privacy-please/">Startpage Privacy Please!</a></p>
+</li>
+<li>
+<p><a href="https://www.startpage.com/privacy-please/startpage-articles/easy-privacy-control-across-the-internet-introducing-startpage-privacy-protection">Startpage Privacy Protection</a></p>
+</li>
+</ul>
 <hr />
 <h4 id="encrypted-dns"><a class="header" href="#encrypted-dns">Encrypted DNS</a></h4>
+<p>DNS (Domain Name System) resolution is the process of translating a website's
+domain name into its corresponding IP address. By default, this traffic isn't
+encrypted, which means anyone on the network, from your ISP to potential
+hackers, can see the websites you're trying to visit. <strong>Encrypted DNS</strong> uses
+protocols to scramble this information, protecting your queries and responses
+from being intercepted and viewed by others.</p>
+<blockquote>
+<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
+what domain you looked up via DNS that it's effectiveness is questionable
+without also using Tor or a VPN. Encrypted DNS will not help you hide any of
+your browsing activity.</p>
+</blockquote>
+<p>There are 3 main types of DNS protection:</p>
+<ul>
+<li>
+<p><strong>DNS over HTTPS (DoH)</strong>: Uses the HTTPS protocol to encrypt data between the
+client and the resolver.</p>
+</li>
+<li>
+<p><strong>DNS over TLS (DoT)</strong>: Similar to (DoH), differs in the methods used for
+encryption and delivery using a separate port from HTTPS.</p>
+</li>
+<li>
+<p><strong>DNSCrypt</strong>: Uses end-to-end encryption with the added benefit of being able
+to prevent DNS spoofing attacks.</p>
+</li>
+</ul>
+<p>Useful resources:</p>
+<details>
+<summary> ✔️ Click to Expand DNS Resources </summary>
+<ul>
+<li>
+<p><a href="https://wiki.nixos.org/wiki/Encrypted_DNS">NixOS Wiki Encrypted DNS</a></p>
+</li>
+<li>
+<p><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">Domain Name System (DNS)</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/DNS_over_HTTPS">Wikipedia DNS over HTTPS (DoH)</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/DNS_over_TLS">Wikipedia DNS over TLS (DoT)</a></p>
+</li>
+<li>
+<p><a href="https://blog.cloudflare.com/dns-encryption-explained/">Cloudflare Dns Encryption Explained</a></p>
+</li>
+<li>
+<p><a href="https://nordvpn.com/blog/encrypted-dns-traffic/">NordVPN Encrypted Dns Traffic</a></p>
+</li>
+</ul>
+<p><strong>Hot Take</strong>:</p>
+<ul>
+<li><a href="https://madaidans-insecurities.github.io/encrypted-dns.html">Encrypted DNS is ineffective without a VPN or Tor by madaidan</a></li>
+</ul>
+</details>
 <p>I recommend either setting up dnscrypt-proxy:</p>
 <ul>
 <li><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy on Arch</a></li>
@@ -227,14 +305,24 @@ blocks known "third-party requests" to companies that participate in
 fingerprinting, according to the
 <a href="https://disconnect.me/trackerprotection">Disconnect List</a></p>
 <ul>
-<li>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
-either Strict or Custom enables FPP as well explained further down.</li>
+<li>
+<p>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
+either Strict or Custom enables FPP as well explained further down.</p>
+</li>
+<li>
+<p>When you enable ETP strict mode, Total Cookie Protection is enabled by
+default. It confines cookies to the site where they were created, preventing
+companies from using them to track your browsing from site to site.</p>
+</li>
 </ul>
 </li>
 <li>
 <p><a href="https://wiki.mozilla.org/Security/FirstPartyIsolation">First-Party Isolation</a>
 From the Tor Uplift Project.</p>
 </li>
+</ul>
+<h3 id="fingerprinting-1"><a class="header" href="#fingerprinting-1">Fingerprinting</a></h3>
+<ul>
 <li>
 <p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
 </li>
@@ -302,6 +390,7 @@ reads the pixel data. Since devices render things differently, those differences
 are identifiable.</p>
 <p>When you set <code>privacy.resistFingerprinting</code> it modifies both Canvas and WebGL
 behavior to make their outputs non-unique.</p>
+<hr />
 <h2 id="webgl"><a class="header" href="#webgl">WebGL</a></h2>
 <p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
 and 3D graphics. The way your system renders these graphics provides information
@@ -314,6 +403,12 @@ will likely make you stand out more because most people don't disable it.</p>
 <p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
 <hr />
 <h2 id="install-firefoxlibrewolf--arkenfox"><a class="header" href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></h2>
+<p>Download Firefox from the
+<a href="https://ftp.mozilla.org/pub/firefox/releases/">Mozilla FTP site</a> if you are
+worried about the download token, the FTP site lets you download the version you
+want without a token.</p>
+<p>For example, for the latest firefox as of 09-30-25:</p>
+<p><code>https://download.mozilla.org/?product=firefox-latest&amp;os=linux64&amp;lang=en-US</code></p>
 <p><strong>LibreWolf</strong> is an open-source fork of Firefox with a strong focus on privacy,
 security, and user freedom. LibreWolf enables always HTTPS, includes
 uBlockOrigin, and more providing strong defaults.</p>
@@ -322,7 +417,6 @@ uBlockOrigin, and more providing strong defaults.</p>
 <p>The process is the same for both Firefox &amp; LibreWolf. I like LibreWolf for it's
 strong defaults but may lag behind Firefox getting security patches.</p>
 <pre><code class="language-bash">paru -S librewolf-bin
-sudo pacman -S firefox
 </code></pre>
 <p>Read the <a href="https://github.com/arkenfox/user.js/wiki">ArkenFox Wiki</a></p>
 <h2 id="apply"><a class="header" href="#apply">Apply</a></h2>
@@ -356,23 +450,23 @@ all of your customizations.</p>
 <p>❗️ This is just an example, always check for common useragent strings
 yourself. Read the Arkenfox Wiki!</p>
 </blockquote>
-<pre><code class="language-js">user_pref(
-  "general.useragent.override",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-);
+<pre><code class="language-js">&lt;!-- user_pref( --&gt;
+  &lt;!-- "general.useragent.override", --&gt;
+  &lt;!-- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", --&gt;
+&lt;!-- ); --&gt;
 // Disable Activity Stream on new windows and tab pages
 user_pref("browser.newtab.preload", false);
 // Enhanced Tracking Protection (ETP)
 user_pref("privacy.bounceTrackingProtection.mode", 1); // [FF131+] [ETP FF133+]
 user_pref("privacy.trackingprotection.enabled", true);
 // Resist Fingerprinting (RFP)
-user_pref("privacy.resistFingerprinting", false); // [FF41+]
-user_pref("privacy.resistFingerprinting.pbmode", false); // [FF114+]
+user_pref("privacy.resistFingerprinting", true); // [FF41+]
+user_pref("privacy.resistFingerprinting.pbmode", true); // [FF114+]
 // WebRTC
 user_pref("media.peerconnection.enabled", false);
 user_pref("media.peerconnection.ice.default_address_only", true);
 // WebGL
-user_pref("webgl.disabled", false);
+user_pref("webgl.disabled", true);
 // Geolocation
 user_pref("geo.enabled", false);
 user_pref("full-screen-api.enabled", false);
@@ -436,13 +530,14 @@ Mode, and look for any errors.</p>
 <blockquote>
 <p>❗️ NOTE: Spoofing your useragent alone likely isn't worth the protections you
 lose from disabling <code>resistFingerprinting</code>. <code>resistFingerprinting</code> spoofs many
-different fingerprinting aspects.</p>
+different fingerprinting aspects. If you don't get it right, you will get
+captcha requests constantly.</p>
 </blockquote>
 <p>Research what the most common user agent is. You'll need to disable
 <code>privacy.resistFingerprinting</code> for this to work.</p>
 <p>Place the user agent string in <code>general.useragent.override</code> something like:
-<code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code></p>
-<p><a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
+<code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code>
+<a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
 <p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
 <hr />
 <details>
@@ -458,13 +553,24 @@ different fingerprinting aspects.</p>
 <p><a href="https://www.ghacks.net/2015/08/18/a-comprehensive-list-of-firefox-privacy-and-security-settings/">Firefox ghacks</a></p>
 </li>
 <li>
-<p><a href="https://github.com/arkenfox/user.js">Arkenfox</a></p>
+<p><a href="https://github.com/arkenfox/user.js">ArkenFox user.js</a> Just right IMO.</p>
+</li>
+<li>
+<p><a href="https://github.com/yokoffing/Betterfox">BetterFox user.js</a> Easiest to use
+with less breakage.</p>
+</li>
+<li>
+<p><a href="https://codeberg.org/Narsil/user.js/src/branch/main/desktop">Narsil user.js</a>
+Most hardened.</p>
 </li>
 <li>
 <p><a href="https://www.privacytools.io/private-browser">PrivacyTools.io</a></p>
 </li>
 <li>
 <p><a href="https://github.com/simeononsecurity/FireFox-Privacy-Script">simeononsecurity Firefox-Privacy-Script</a></p>
+</li>
+<li>
+<p><a href="https://anhkhoakz.neocities.org/blog/browsers-for-daily-using/#firefox-but-hardened">Browsers for Daily Using</a></p>
 </li>
 <li>
 <p><a href="https://brainfucksec.github.io/firefox-hardening-guide">brianfucksec firefox-hardening-Guide 2023</a></p>
