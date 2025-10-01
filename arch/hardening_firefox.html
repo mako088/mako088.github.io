@@ -213,9 +213,33 @@ silently and without user consent. It's not something you can easily see or
 something like cookies that you can opt-out or delete. Browser fingerprinting is
 stateless meaning that it doesn't need to store any data on your computer. It
 can identify you while behind a VPN or in incognito mode as well.</p>
-<p>I will go over some of the settings and what they do. If you plan on using the
-Arkenfox <code>user.js</code> you can jump to that section first as it will set many of
-these settings for you.</p>
+<p>There are two main approaches to obfuscating your fingerprint:</p>
+<ul>
+<li>
+<p>Standardization: Make browsers standardized and therefore have the same
+fingerprint to blend into a crowd. This is what Tor does.</p>
+</li>
+<li>
+<p>Randomization: Randomize fingerprint metrics so it's not directly tieable to
+you. Brave has this feature.</p>
+</li>
+</ul>
+<p>Test your browsers fingerprint:</p>
+<ul>
+<li>
+<p><a href="https://coveryourtracks.eff.org/">CoverYourTracks</a></p>
+</li>
+<li>
+<p><a href="https://amiunique.org/">AmIUnique</a></p>
+</li>
+</ul>
+<p>Don't put too much weight into the results as people often check their
+fingerprint, change one metric and check it again over and over skewing the
+results. It is helpful for knowing what the values actually are and seeing what
+the tracking companies see.</p>
+<p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
+JavaScript, preventing the scripts from running that do most of the
+fingerprinting. Extensions can make you more unique but it's a give and take.</p>
 <hr />
 <h2 id="metasearch-engines"><a class="header" href="#metasearch-engines">Metasearch Engines</a></h2>
 <ul>

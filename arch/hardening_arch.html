@@ -220,6 +220,29 @@ create security-focused checklists and ensure all angles are covered, building a
 more robust and secure system.</p>
 <ul>
 <li>
+<p>Use strong passwords and a password manager.</p>
+</li>
+<li>
+<p>Update frequently</p>
+</li>
+<li>
+<p>Prefer software/hardware that has privacy respecting defaults and a secure
+posture.</p>
+</li>
+<li>
+<p>Use encrypted DNS and a VPN when possible:</p>
+<ul>
+<li>
+<p><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy w/ dnsmasq guide</a></p>
+</li>
+<li>
+<p>Encrypted DNS protects your DNS queries from being seen and a VPN protects
+your IP address from being exposed. There is a lot to this, just know that a
+VPN isn't made to nor does it protect your anonymity.</p>
+</li>
+</ul>
+</li>
+<li>
 <p>The
 <a href="https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/3498776/post-quantum-cryptography-cisa-nist-and-nsa-recommend-how-to-prepare-now/">NSA, CISA, and NIST warn</a>
 that nation-state actors are likely stockpiling encrypted data now, preparing
@@ -490,8 +513,104 @@ net.ipv4.tcp_congestion_control = bbr
 net.core.default_qdisc = cake
 </code></pre>
 </details>
-<h2 id="hardening-bootloader-kernel-parameters"><a class="header" href="#hardening-bootloader-kernel-parameters">Hardening Bootloader Kernel Parameters</a></h2>
-<p>Edit <code>/boot/loader/entries/arch.conf</code>:</p>
+<h2 id="kernel-and-namespace-hardening-and-blacklisting"><a class="header" href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></h2>
+<ul>
+<li>
+<p>Protect the kernel image:</p>
+<ul>
+<li>
+<p>Enable Secure Boot and use <code>module.sig_enforce=1</code> to restrict unsigned
+module loading. You could add this to <code>/etc/cmdline.d/security.conf</code>.</p>
+</li>
+<li>
+<p>The above setting is fairly strict and will break some things. Do research
+before going so strict.</p>
+</li>
+<li>
+<p>Make <code>/boot</code> read-only if you have a high threat model. It can cause issues
+though, setting more strict permissions helps.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Lock kernel modules (optional):</p>
+<ul>
+<li>Set <code>module.sig_enforce=1</code> in kernel parameters.</li>
+<li>Blacklist unneeded modules in <code>/etc/modprobe.d/blacklist.conf</code>.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-conf">blacklist dccp
+blacklist sctp
+blacklist rds
+blacklist tipc
+blacklist n_hdlc
+blacklist ax25
+blacklist netrom
+blacklist x25
+blacklist rose
+blacklist decnet
+blacklist econet
+blacklist af_802154
+blacklist ipx
+blacklist appletalk
+blacklist psnap
+blacklist p8023
+blacklist p8022
+blacklist can
+blacklist atm
+blacklist cramfs
+blacklist freevxfs
+blacklist jffs2
+blacklist hfs
+blacklist hfsplus
+blacklist udf
+# Optionally blacklist squashfs, cifs, nfs etc. by uncommenting:
+# blacklist squashfs
+# blacklist cifs
+# blacklist nfs
+# blacklist nfsv3
+# blacklist nfsv4
+# blacklist ksmbd
+# blacklist gfs2
+# blacklist vivid
+</code></pre>
+<p>Apply the changes:</p>
+<pre><code class="language-bash">sudo mkinitcpio -P
+</code></pre>
+<p>Check which modules were included in the initramfs (Long Output):</p>
+<pre><code class="language-bash">mkinitcpio -v &gt; /tmp/mk.txt
+</code></pre>
+<p>Then search through the file and ensure they weren't loaded.</p>
+<h1 id="note-this-may-break-some-networking-and-virtualization-tools"><a class="header" href="#note-this-may-break-some-networking-and-virtualization-tools">Note: This may break some networking and virtualization tools.</a></h1>
+<ul>
+<li>
+<p>Force-enable PTI (Page Table Isolation):</p>
+<ul>
+<li>Add <code>pti=on</code> to the kernel command line.</li>
+</ul>
+</li>
+<li>
+<p>User namespaces:</p>
+<ul>
+<li>
+<p>Do <strong>not</strong> set <code>kernel.unprivileged_userns_clone=0</code> if desktop
+sandboxing/containers are used.</p>
+</li>
+<li>
+<p>Set <code>kernel.unprivileged_userns_clone=0</code> in <code>/etc/sysctl.d/</code> to disable if
+containers are not required.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>SMT/Hyperthreading policy:</p>
+<ul>
+<li>For extra isolation, add <code>nosmt</code> to kernel parameters.</li>
+</ul>
+<h1 id="note-disabling-smt-reduces-performance"><a class="header" href="#note-disabling-smt-reduces-performance">Note: Disabling SMT reduces performance.</a></h1>
+</li>
+</ul>
 <h2 id="firewall"><a class="header" href="#firewall">Firewall</a></h2>
 <p><strong>nftables</strong> is designed to replace <strong>iptables</strong> by providing a modern,
 simplified, and unified packet filtering and classification framework in the
