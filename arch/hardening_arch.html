@@ -209,6 +209,8 @@ at rest prevents data leakage, physical theft, unauthorized access, and more as
 long as the key management scheme isn't compromised.</p>
 <p>Enable a UEFI password or Administrator password where it requires
 authentication in order to access the UEFI/BIOS.</p>
+<p>Use a different password/passphrase for encryption and userspace.(i.e., user
+passwd)</p>
 <p>Use Secure Boot, with a Unified Kernel Image (UKI). TPM can, in some ways
 increase security; I may add a section in the future.</p>
 <p>When Secure Boot is used with a Unified Kernel Image, it provides enhanced
@@ -311,6 +313,80 @@ to protect digital information.</p>
 </li>
 </ul>
 <hr />
+<h2 id="hardeningsandboxing-systemd"><a class="header" href="#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></h2>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Systemd/Sandboxing">Arch Wiki systemd/sandboxing</a></li>
+</ul>
+<p><code>systemd</code> is the core "init system" and service manager that controls how
+services, daemons, and basic system processes are started, stopped and
+supervised on modern Linux distributions, including Arch. It provides a suite of
+basic building blocks for a Linux system as well as a system and service manager
+that runs as <code>PID 1</code> and starts the rest of the system.</p>
+<p>Because it launches and supervises almost all system services, hardening systemd
+means raising the baseline security of your entire system.</p>
+<pre><code class="language-bash">sudo systemd-analyze security
+# ...snip
+systemd-hostnamed.service                 1.7 OK        🙂
+systemd-importd.service                   5.0 MEDIUM    😐
+systemd-journald.service                  4.9 OK        🙂
+systemd-logind.service                    2.8 OK        🙂
+systemd-machined.service                  6.2 MEDIUM    😐
+</code></pre>
+<p>Check a specific unit:</p>
+<pre><code class="language-bash">sudo systemd-analyze security NetworkManager
+</code></pre>
+<pre><code class="language-bash">sudo systemctl edit NetworkManager.service
+→ Overall exposure level for NetworkManager.service: 9.6 UNSAFE    😨
+</code></pre>
+<pre><code class="language-conf">[Service]
+NoNewPrivileges = true
+ProtectHome = true
+ProtectKernelModules = true
+ProtectKernelLogs = true
+ProtectControlGroups = true
+ProtectClock = true
+ProtectHostname = true
+ProtectProc = "invisible"
+ProtectKernelTunables=yes
+PrivateTmp = true
+RestrictRealtime = true
+SystemCallFilter=~@mount ~@module ~@swap ~@obsolete ~@cpu-emulation ptrace
+CapabilityBoundingSet=~CAP_KILL ~CAP_SYS_CHROOT ~CAP_AUDIT_* ~CAP_SETUID ~CAP_SETGID ~CAP_SETPCAP ~CAP_SYS_ADMIN ~CAP_NET_BIND_SERVICE ~CAP_NET_BROADCAST ~CAP_NET_RAW ~CAP_DAC_OVERRIDE ~CAP
+_FOWNER ~CAP_IPC_OWNER
+
+# Allow only the essential families (AF_PACKET and exotic ones are blocked by omission)
+#RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+RestrictNamespaces = true
+RestrictSUIDSGID = true
+MemoryDenyWriteExecute = true
+SystemCallArchitectures = "native"
+LockPersonality= true
+UMask=0077
+User=root
+PrivateDevices=yes
+
+### Edits below this comment will be discarded
+</code></pre>
+<pre><code class="language-bash">sudo systemd-analyze security NetworkManager
+→ Overall exposure level for NetworkManager.service: 4.5 OK 🙂
+</code></pre>
+<p>There are also tools like <code>lynis</code> which help with hardening different system
+settings and more.</p>
+<p>Further reading on systemd:</p>
+<details>
+<summary> ✔️ Click to Expand Systemd Resources </summary>
+<ul>
+<li>
+<p><a href="https://systemd.io/">systemd.io</a></p>
+</li>
+<li>
+<p><a href="https://0pointer.de/blog/projects/systemd.html">Rethinking PID 1</a></p>
+</li>
+<li>
+<p><a href="https://0pointer.de/blog/projects/the-biggest-myths.html">Biggest Myths about Systemd</a></p>
+</li>
+</ul>
+</details>
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
 <p>Given the kernel's central role, it's a frequent target for malicious actors,
 making robust hardening essential.</p>
