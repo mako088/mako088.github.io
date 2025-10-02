@@ -198,13 +198,16 @@ your browsing activity.</p>
 <li>
 <p><a href="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/Configuration">dnscrypt-proxy Wiki</a></p>
 </li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Domain_name_resolution#Privacy_and_security">DNS Privacy and Security</a></p>
+</li>
 </ul>
 <p>Edit <code>/etc/dnscrypt-proxy/dnscrypt-proxy.toml</code> to add your chosen resolvers etc.</p>
 <p>For example, to use Quad9's resolvers with oDoH:</p>
 <details>
 <summary>
-✔️ Click to Expand example `dnscrypt-proxy.toml` that is set up with dnsmasq
-as the local resolver.
+<p>✔️ Click to Expand example <code>dnscrypt-proxy.toml</code> that is set up with dnsmasq as
+the local resolver.</p>
 </summary>
 <pre><code class="language-toml">server_names = ['quad9-dnscrypt-ip6-filter-pri', 'quad9-dnscrypt-ip4-filter-pri', 'mullvad-adblock-doh' ]
 

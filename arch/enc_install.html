@@ -182,6 +182,9 @@
 <li><a href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a>
 <ul>
 <li><a href="#arch-chroot">arch-chroot</a></li>
+<li><a href="#creating-a-readonly-snapshot-of-your-root-subvolume">Creating a readonly snapshot of your root subvolume:</a></li>
+<li><a href="#restoring-from-a-backup">Restoring from a Backup</a></li>
+<li><a href="#automated-backup">Automated backup</a></li>
 <li><a href="#resources">Resources</a></li>
 </ul>
 </li>
@@ -734,6 +737,114 @@ umount /mnt
 cryptsetup close cryptroot
 reboot
 </code></pre>
+<h3 id="creating-a-readonly-snapshot-of-your-root-subvolume"><a class="header" href="#creating-a-readonly-snapshot-of-your-root-subvolume">Creating a readonly snapshot of your root subvolume:</a></h3>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/System_backup">Arch Wiki System Backup</a></li>
+</ul>
+<ol>
+<li>Create readonly snapshot of root subvol:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume snapshot -r / /root-snapshot-$(date +%Y%m%d%H%M%S)
+</code></pre>
+<ol start="2">
+<li>Mount your external backup disk:</li>
+</ol>
+<pre><code class="language-bash">sudo mkdir -p /mnt/backup
+sudo mount /dev/sdc1 /mnt/backup
+</code></pre>
+<ol start="3">
+<li>Use rsync to copy the snapshot to the external drive:</li>
+</ol>
+<p>List the available snapshots and get the exact name:</p>
+<pre><code class="language-bash">sudo btrfs subvolume list /
+</code></pre>
+<pre><code class="language-bash">sudo rsync -aAXv --delete --progress /root-snapshot-20251002135000/ /mnt/backup/root-backup/
+</code></pre>
+<ol start="4">
+<li>Unmount the external drive:</li>
+</ol>
+<pre><code class="language-bash">sudo umount /mnt/backup
+</code></pre>
+<ol start="5">
+<li>Optionally, delete older snapshots to save space:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume delete /root-snapshot-OLD_TIMESTAMP
+</code></pre>
+<h3 id="restoring-from-a-backup"><a class="header" href="#restoring-from-a-backup">Restoring from a Backup</a></h3>
+<p>For this, you mount the partitions but don't need to <code>arch-chroot</code> in.</p>
+<ol>
+<li>
+<p>Boot from a live USB</p>
+</li>
+<li>
+<p>Mount your encrypted root partition (unlock if encrypted) and the external
+backup drive.</p>
+</li>
+<li>
+<p>Move or delete the corrupted data on the root partition.</p>
+</li>
+<li>
+<p>Use rsync to copy the backed-up snapshot from the external disk back to the
+root partition, preserving permissions and attributes.</p>
+</li>
+</ol>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-backup/ /
+</code></pre>
+<p>Or, the Wiki's suggestion, (Much more efficient, Direct backup of a running
+system without the need for btrfs snapshots):</p>
+<pre><code class="language-bash">sudo rsync -aAXHv --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/tmp/*' --exclude='/run/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found/' / /path/to/backup
+</code></pre>
+<ul>
+<li>
+<p><code>/mnt/backup/root-backup/</code> is the path where the backup snapshot is mounted on
+the external disk.</p>
+</li>
+<li>
+<p><code>/</code> is the root partition mount point where you want to restore the files.</p>
+</li>
+<li>
+<p>The options:</p>
+<ul>
+<li>
+<p><code>-a</code> archive mode to preserve symbolic links, permissions, timestamps, etc.</p>
+</li>
+<li>
+<p><code>-A</code> preserve ACLs (access control lists).</p>
+</li>
+<li>
+<p><code>-X</code> preserve extended attributes.</p>
+</li>
+<li>
+<p><code>-v</code> verbose output.</p>
+</li>
+<li>
+<p><code>--delete</code> deletes files on the destination that don't exist in the source,
+keeping an exact mirror.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>If you want to restore a specific snapshot directory (e.g.,
+<code>/root-snapshot-20251002135000</code>), replace the source path accordingly, like:</p>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-snapshot-20251002135000/ /
+</code></pre>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Rsync#As_a_backup_utility">Arch Wiki rsync</a></li>
+</ul>
+<ol start="5">
+<li>
+<p>Reinstall the bootloader if necessary.</p>
+</li>
+<li>
+<p>Unmount everything and reboot.</p>
+</li>
+</ol>
+<h3 id="automated-backup"><a class="header" href="#automated-backup">Automated backup</a></h3>
+<p>Create <code>/etc/cron.daily/backup</code>:</p>
+<pre><code class="language-backup">#!/bin/sh
+rsync -a --delete --quiet /path/to/backup /location/of/backup
+</code></pre>
+<p>Change <code>/path/to/backup</code> to what needs to be backed-up such as <code>/home</code> or <code>/</code></p>
 <hr />
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>

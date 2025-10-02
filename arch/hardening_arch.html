@@ -194,10 +194,33 @@ Arch with KVM that is an excellent resource.</p>
 </blockquote>
 <ul>
 <li><a href="https://www.whonix.org/wiki/KVM#Arch_Linux">Whonix KVM#Arch_Linux</a>, if you
-plan on using this think twice before enabling dnscrypt-proxy and you might
-want to consider ufw firewall rather than the nftables I share in this guide.</li>
+plan on using this think twice before enabling <code>dnscrypt-proxy</code> and you might
+want to consider ufw firewall rather than the nftables I share in this guide
+because of Port conflicts.</li>
 </ul>
 <h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
+<p>Backup your system regularly, many guides consider the data already lost if it
+isn't backed up because without a backup, any data loss event (hardware failure,
+ransomware attack, accidental deletion, natural disaster) becomes irreversible.
+Backups act as a critical safety net that enables recovery. Without them, once
+data is corrupted, deleted, or encrypted, there is no reliable way to restore
+it, effectively making it lost permanently.</p>
+<p>The 3-2-1 Backup Rule:</p>
+<ul>
+<li>
+<p>3 copies of data. (Ensuring redundancy)</p>
+</li>
+<li>
+<p>2 storage types. (Reduces risk)</p>
+</li>
+<li>
+<p>1 offsite backup. (Protects against cyber threats and natural disasters)</p>
+</li>
+<li>
+<p>There is a backup guide for btrfs in
+<a href="https://mako088.github.io/arch/enc_install.html">enc_install</a></p>
+</li>
+</ul>
 <p>Encryption is the process of using an algorithm to scramble plaintext data into
 ciphertext, making it unreadable except to a person who has the key to decrypt
 it.</p>
@@ -229,6 +252,9 @@ verifies the UKI's signature, it ensures the integrity and authenticity of:</p>
 <li>
 <p>And indirectly, the bootloader that loads the UKI (since the bootloader
 verifies the UKI signature before execution).</p>
+</li>
+<li>
+<p>Secure boot doesn't protect against runtime kernel exploits.</p>
 </li>
 </ul>
 <p>This means that any tampering with these components, such as injecting malware
@@ -706,7 +732,9 @@ blacklist udf
 <pre><code class="language-bash">mkinitcpio -v &gt; /tmp/mk.txt
 </code></pre>
 <p>Then search through the file and ensure they weren't loaded.</p>
-<h1 id="note-this-may-break-some-networking-and-virtualization-tools"><a class="header" href="#note-this-may-break-some-networking-and-virtualization-tools">Note: This may break some networking and virtualization tools.</a></h1>
+<blockquote>
+<p>❗️ Note: This may break some networking and virtualization tools.</p>
+</blockquote>
 <ul>
 <li>
 <p>Force-enable PTI (Page Table Isolation):</p>
@@ -730,11 +758,16 @@ containers are not required.</p>
 <li>
 <p>SMT/Hyperthreading policy:</p>
 <ul>
-<li>For extra isolation, add <code>nosmt</code> to kernel parameters.</li>
-</ul>
-<h1 id="note-disabling-smt-reduces-performance"><a class="header" href="#note-disabling-smt-reduces-performance">Note: Disabling SMT reduces performance.</a></h1>
+<li>
+<p>For extra isolation, add <code>nosmt</code> to kernel parameters.</p>
+</li>
+<li>
+<p>Disabling SMT reduces performance.</p>
 </li>
 </ul>
+</li>
+</ul>
+<hr />
 <h2 id="firewall"><a class="header" href="#firewall">Firewall</a></h2>
 <p><strong>nftables</strong> is designed to replace <strong>iptables</strong> by providing a modern,
 simplified, and unified packet filtering and classification framework in the
@@ -749,25 +782,7 @@ new kernel API and completely different user-space tool (<code>nft</code>).</p>
 <p>There is an example firewall ruleset located at <code>/etc/nftables.conf</code> and more
 examples located in <code>/usr/share/nftables/</code> and
 <code>/usr/share/doc/nftables/examples/</code></p>
-<p>Flush existing iptables Rules &amp; Disable iptables(only necessary if switching to
-nftables from iptables):</p>
-<blockquote>
-<p>⚠️ <strong>Warning</strong>: Flushing rules will remove all existing firewall
-configurations. Ensure no critical services are running, or review existing
-rules with <code>iptables -L -v -n</code> and <code>ip6tables -L -v -n</code> before proceeding.</p>
-</blockquote>
-<pre><code class="language-bash">sudo iptables -F
-sudo iptables -X
-sudo iptables -t nat -F
-sudo iptables -t nat -X
-sudo ip6tables -F
-sudo ip6tables -X
-
-sudo systemctl disable iptables.service
-sudo systemctl disable ip6tables.service
-sudo systemctl stop iptables.service
-sudo systemctl stop ip6tables.service
-</code></pre>
+<p>Flush existing iptables Rules &amp; Disable iptables if necessary.</p>
 <p><strong>Create nftables ruleset</strong>:</p>
 <pre><code class="language-bash">#!/usr/bin/nft -f
 # vim:set ts=2 sw=2 et:
@@ -805,6 +820,9 @@ table inet filter {
 
          # Allow Git (and general SSH client) outgoing connections
         tcp dport 22 ct state new accept
+        # Allow SSH (port 2222) with rate-limiting to prevent brute-force attacks
+        # tcp dport 2222 ct state new limit rate 15/minute accept
+
 
         # Log packets that reach the end of the chain before they are dropped by the policy (optional)
         log prefix "nft-input-drop: "
@@ -879,7 +897,8 @@ and HTTP/HTTPS.</p>
 <pre><code class="language-bash">sudo nft list ruleset
 </code></pre>
 <hr />
-<h2 id="ssh-keygen"><a class="header" href="#ssh-keygen">ssh-keygen</a></h2>
+<h2 id="ssh--gpg-key-generation-and-safety"><a class="header" href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a></h2>
+<h3 id="ssh-keygen"><a class="header" href="#ssh-keygen">ssh-keygen</a></h3>
 <p>The <code>ed25519</code> algorithm is significantly faster and more secure when compared to
 <code>RSA</code>. You can also specify the key derivation function (KDF) rounds to
 strengthen protection even more.</p>
@@ -902,7 +921,7 @@ adding extra rounds can make it harder to brute-force.</p>
 </li>
 </ul>
 <hr />
-<h2 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h2>
+<h3 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h3>
 <p><code>gpg --full-generate-key</code> can be used to generate a basic keypair.</p>
 <p><code>gpg --expert --full-generate-key</code> can be used for keys that require more
 capabilities.</p>
@@ -1143,7 +1162,7 @@ you from losing access to your keys in the case of disk failure or accidents.</p
 <pre><code class="language-bash">gpg --export --armor --output my-public-keys.gpg
 </code></pre>
 <p>Now if your keys ever get lost or corrupted, you can import these backups.</p>
-<p>--</p>
+<hr />
 <h3 id="remove-and-store-your-primary-key-offline"><a class="header" href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></h3>
 <blockquote>
 <p>❗ NOTE: After you remove your primary key, you will no longer be able to
@@ -1354,8 +1373,25 @@ sudo systemctl start usbguard --now
 </ul>
 <hr />
 <h3 id="firejail"><a class="header" href="#firejail">Firejail</a></h3>
+<blockquote>
+<p>❗️ Critics such as madaidan say that Firejail worsens security by acting as a
+privilege escalation hole. Firejail requires the executable to be setuid,
+meaning it runs with root privileges. Experienced users are encouraged to use
+bubblewrap for it's minimal design and specificity of its purpose.</p>
+</blockquote>
+<p>A <strong>setuid binary</strong> is an executable file with a special permission bit set
+called "set user ID" (setuid). When a user runs a setuid binary, the program
+executes with the permissions of the binary's owner, rather than the permissions
+of the user running it.</p>
+<p>There are mitigations for the above risks I will share further down.</p>
+<p>Another option here is <a href="https://wiki.archlinux.org/title/Bubblewrap">Bubblewrap</a></p>
 <ul>
-<li><a href="https://wiki.archlinux.org/title/Firejail">Arch Wiki Firejail</a></li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Firejail">Arch Wiki Firejail</a></p>
+</li>
+<li>
+<p><a href="https://madaidans-insecurities.github.io/linux.html#firejail">Firejail weaknesses</a></p>
+</li>
 </ul>
 <pre><code class="language-bash">sudo pacman -S firejail
 </code></pre>
@@ -1371,10 +1407,62 @@ sudo systemctl start usbguard --now
 <p>This creates symbolic links in <code>/usr/local/bin/</code> pointing to <code>/usr/bin/firejail</code>
 for programs for which Firejail has default or self-created profiles.</p>
 <p>You can inspect <code>/etc/firejail/</code> to see all the pre-baked profiles available.</p>
+<h2 id="hardening-firejail"><a class="header" href="#hardening-firejail">Hardening Firejail</a></h2>
+<p>Add the following line to <code>/etc/firejail/firejail.config</code>:</p>
+<pre><code class="language-config">force-nonewprivs yes
+</code></pre>
+<ul>
+<li>The above setting prevents Firejail and its child processes from gaining new
+privileges after the sandbox is started.
+<ul>
+<li>Changing the owner and group to <code>root:firejail</code> and permissions to <code>4750</code>
+means Firejail runs with setuid root but only allows execution by users in
+the firejail group reducing the attack surface.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>❗️ This breaks some apps such as VirtualBox which I don't recommend and if
+using the hardened kernel, Wireshark and Chromium-based browsers are also
+affected.</p>
+</blockquote>
+<ul>
+<li><a href="https://www.whonix.org/wiki/KVM#Why_Use_KVM_Over_VirtualBox?">Why Use KVM over VirtualBox</a></li>
+</ul>
+<p>Add a pacman hook to automatically change firejail owner and mode. Create
+<code>/etc/pacman.d/hooks/firejail-permissions.hook</code> and place the following in it:</p>
+<pre><code class="language-hook">[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = firejail
+[Action]
+Depends = coreutils
+Depends = bash
+When = PostTransaction
+Exec = /usr/bin/sh -c "chown root:firejail /usr/bin/firejail &amp;&amp; chmod 4750 /usr/bin/firejail"
+Description = Setting /usr/bin/firejail owner to "root:firejail" and mode "4750"
+</code></pre>
+<p>Create a <code>firejail</code> group:</p>
+<pre><code class="language-bash">sudo groupadd firejail
+</code></pre>
+<p>and add your user to it:</p>
+<pre><code class="language-bash">sudo gpasswd -a $USER firejail
+</code></pre>
+<p><strong>Verify Firejail's being used</strong>:</p>
+<p>Launch the program that you want to ensure is running sandboxed and run:</p>
+<pre><code class="language-bash">firejail --list
+# or more comprehensive
+firejail --tree
+</code></pre>
+<p><strong>Enable AppArmor support</strong>:</p>
+<pre><code class="language-bash">sudo apparmor_parser -r /etc/apparmor.d/firejail-default
+</code></pre>
 <p>With firejail running, I noticed that none of my browsers would allow me to
 download anything. A fix for this is to run:</p>
 <pre><code class="language-bash">sudo firejail --noprofile firefox
 </code></pre>
+<p>Download your file, close firefox and run again in the firejail sandbox.</p>
 <blockquote>
 <p>Tip from Arch Wiki <code>/etc/pacman.d/hooks/firejail.hook</code></p>
 <p>For cases where you need to manually modify the <code>Exec=</code> line of the .desktop
@@ -1397,7 +1485,16 @@ file in <code>~/.local/share/applications</code> to explicitly call Firejail.</p
 <p>To manually map individual applications, execute:</p>
 <pre><code class="language-bash">sudo ln -s /usr/bin/firejail /usr/local/bin/application-to-sandbox
 </code></pre>
-<p>Download your file, close firefox and run again in the firejail sandbox.</p>
+<h3 id="remove-firejail-symlinks"><a class="header" href="#remove-firejail-symlinks">Remove Firejail symlinks</a></h3>
+<pre><code class="language-bash">sudo firecfg --clean
+</code></pre>
+<p>If you would rather confine an app with AppArmor or Bubblewrap:</p>
+<pre><code class="language-bash">sudo rm /usr/local/bin/application
+</code></pre>
+<p>Also, comment out <code>application</code> in the <code>/etc/firejail/firecfg.config</code> to prevent
+it from being added if you run <code>firecfg</code> again.</p>
+<details>
+<summary> ✔️ Click to Expand Firejail Resources </summary>
 <ul>
 <li>
 <p><a href="https://wiki.archlinux.org/title/Firejail">Arch Wiki Firejail</a></p>
@@ -1408,7 +1505,14 @@ file in <code>~/.local/share/applications</code> to explicitly call Firejail.</p
 <li>
 <p><a href="https://firejail.wordpress.com/documentation-2/">Firejail Docs</a></p>
 </li>
+<li>
+<p><a href="https://github.com/netblue30/firejail/wiki/Debugging-Firejail">Debugging Firejail</a></p>
+</li>
+<li>
+<p><a href="https://debugging.works/blog/debugging-firejail/">How to debug a firejail sandbox</a></p>
+</li>
 </ul>
+</details>
 <hr />
 <h2 id="apparmor"><a class="header" href="#apparmor">AppArmor</a></h2>
 <p><a href="https://apparmor.net/">AppArmor</a> is a
@@ -1533,10 +1637,21 @@ surface, consider <code>doas</code>:</p>
 <p>You can add a line below that one like <code>permit nopass your-username as root:</code>
 Enabling your user passwordless usage, it's much less secure but an option none
 the less.</p>
+<p>Alternatively, you can setup the doas persist feature with the following:</p>
+<pre><code class="language-conf">permit persist setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :wheel
+</code></pre>
+<ul>
+<li>With the above setting, after you successfully authenticate. You won't be
+asked for your password for the next 5 minutes. It's disabled by default
+because it can be dangerous if used in the wrong environment.</li>
+</ul>
 <p>For <code>yay</code>, you can run:</p>
 <pre><code class="language-bash">yay --sudo doas --save
 </code></pre>
-<p>For <code>paru</code>, edit <code>/etc/paru.conf</code> and uncomment the line <code>#Sudo = doas</code>.</p>
+<p>For <code>paru</code>, edit <code>/etc/paru.conf</code>. Near bottom:</p>
+<pre><code class="language-conf">Sudo = doas
+</code></pre>
+<p>Edit <code>/etc/mkepkg.conf</code>:</p>
 <pre><code class="language-bash">doas hx /etc/makepkg.conf
 </code></pre>
 <p>At the bottom of the file uncomment <code>PACMAN_AUTH=()</code> and add <code>doas</code>:</p>
@@ -1546,6 +1661,89 @@ the less.</p>
 <pre><code class="language-conf">doas chown -c root:root /etc/doas.conf
 doas chmod -c 0400 /etc/doas.conf
 </code></pre>
+<pre><code class="language-bash">doas pacman -Syu
+</code></pre>
+<p>Test and ensure most commands that you use work before removing sudo so you're
+aware of potential issues. To benefit from the smaller codebase and attack
+surface, you have to remove sudo.</p>
+<pre><code class="language-bash">doas pacman -R sudo base-devel
+</code></pre>
+<p>Create a symlink replacing sudo with doas:</p>
+<pre><code class="language-bash">ln -s $(which doas) /usr/bin/sudo
+</code></pre>
+<p>Now, when you run <code>sudo</code>, <code>doas</code> will be executed. There are some compatibility
+issues with this method but not super common.</p>
+<h2 id="intrusion-detection"><a class="header" href="#intrusion-detection">Intrusion Detection</a></h2>
+<details>
+<summary> ✔️ Click to Expand AIDE Example </summary>
+<pre><code class="language-bash">paru -S aide
+</code></pre>
+<ul>
+<li>
+<p><a href="https://aide.github.io/doc/">AIDE Manual</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/AIDE">Arch Wiki AIDE</a></p>
+</li>
+</ul>
+<p>AIDE is an intrusion detection system (IDS) that will notify us whenever it
+detects that a potential intrusion has occurred. When a system is compromised,
+attackers typically will try to change file permissions and escalate to the root
+user account and start to modify system files, AIDE can detect this.</p>
+<p>To set up AIDE on your system follow these steps:</p>
+<ol>
+<li>
+<p>There is a default config at <code>/etc/aide.conf</code>:</p>
+</li>
+<li>
+<p>Initialize the database:</p>
+</li>
+</ol>
+<pre><code class="language-bash">sudo aide -i
+</code></pre>
+<p>You will see in the output of the above command that
+<code>AIDE successfully initialized database. New AIDE database written to /var/lib/aide/aide.db.new.gz</code></p>
+<ol start="3">
+<li>Move the new database and remove the <code>.new</code>:</li>
+</ol>
+<pre><code class="language-bash">sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+</code></pre>
+<ol start="4">
+<li>Check the system against the baseline database:</li>
+</ol>
+<pre><code class="language-bash">sudo aide -C
+</code></pre>
+<ol start="5">
+<li>Whenever you make changes to system files, or especially after running a
+system update or installing new tools, you have to rescan all files to update
+their checksums in the AIDE database:</li>
+</ol>
+<pre><code class="language-bash">sudo aide -u
+</code></pre>
+<p>Unfortunately, AIDE doesn't automatically replace the old database so you have
+to rename the new one again:</p>
+<pre><code class="language-bash">sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+</code></pre>
+<p>And finally check again:</p>
+<pre><code class="language-bash">sudo aide -C
+Start timestamp: 2025-10-02 14:57:49 -0400 (AIDE 0.19.2)
+AIDE found NO differences between database and filesystem. Looks okay!!
+</code></pre>
+<ul>
+<li>
+<p>The default settings are fairly strict, I kept getting reports of changes
+detected because the mtime and ctime of a directory changed. It's fairly easy
+to set ignore rules by adding a <code>!</code> in front of the path.</p>
+</li>
+<li>
+<p><a href="https://linux.die.net/man/1/aide">aide(1) man page</a></p>
+</li>
+</ul>
+<p>Create the logfile:</p>
+<pre><code class="language-bash">sudo mkdir -p /var/log/aide
+sudo touch /var/log/aide/aide.log
+</code></pre>
+</details>
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>
 <li>
@@ -1553,6 +1751,18 @@ doas chmod -c 0400 /etc/doas.conf
 </li>
 <li>
 <p><a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html">rodsbooks Secure Boot</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140422190914/https://securityinabox.org/en/truecrypt_main">TrueCrypt Guide</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140220055801/http://crunchbang.org:80/forums/viewtopic.php?id=24722">#! Paranoid Security Guide</a></p>
+</li>
+<li>
+<p><a href="https://madaidans-insecurities.github.io/linux.html">madaidans-insecurities</a></p>
+</li>
+<li>
+<p><a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">madaidans-insecurities Linux Hardening Guide</a></p>
 </li>
 </ul>
 
