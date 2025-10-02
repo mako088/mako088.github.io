@@ -217,7 +217,7 @@ release, but the process is the same.</p>
 <pre><code class="language-bash">sq cert export --keyring=release-key.pgp --cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp
 </code></pre>
 <p>Import into your keychain:</p>
-<pre><code class="language-bash"> gpg --import pierre-archlinux.pgp
+<pre><code class="language-bash">gpg --import pierre-archlinux.pgp
 gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
 gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
 gpg: Total number processed: 1
@@ -544,6 +544,13 @@ auto-entries 1
 </code></pre>
 <pre><code class="language-bash">bootctl status
 </code></pre>
+<p>Set a password to protect <code>systemd-boot</code> with <code>systemd-boot-password</code>:</p>
+<pre><code class="language-bash">paru -S systemd-boot-password
+</code></pre>
+<pre><code class="language-bash">sudo sbpctl install /boot
+</code></pre>
+<p>You will now be prompted for your password before you can edit kernel
+parameters.</p>
 <hr />
 <p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
 <p>We already added <code>systemd-ukify</code> in the pacstrap command, let's add a few more
