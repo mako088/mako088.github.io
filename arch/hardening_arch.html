@@ -688,6 +688,24 @@ kernel automatically, edit <code>/boot/loader/loader.conf</code>:</p>
 timeout 4
 console-mode auto
 </code></pre>
+<p>Edit <code>/etc/mkinitcpio.d/linux-hardened.preset</code>:</p>
+<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-hardened' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-hardened"
+
+PRESETS=('default' 'fallback')
+
+#default_config="/etc/mkinitcpio.conf"
+# default_image="/boot/initramfs-linux-hardened.img"
+default_uki="/boot/EFI/Linux/arch-linux-hardened.efi"
+default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+#fallback_config="/etc/mkinitcpio.conf"
+# fallback_image="/boot/initramfs-linux-hardened-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-hardened-fallback.efi"
+fallback_options="-S autodetect"
+</code></pre>
 <p>Reboot and <code>linux-hardened</code> should be chosen by default. You can also choose
 additional kernels if needed.</p>
 <hr />
@@ -1818,6 +1836,12 @@ cat /sys/kernel/security/lsm
 </code></pre>
 <p>Reboot, and run <code>sudo aa-enabled</code>, and <code>sudo aa-status</code>. You should see many
 profiles in enforce mode.</p>
+<p>Check AppArmor log messages:</p>
+<p>Each time AppArmor denies applications from doing something potentially harmful
+the event is logged.</p>
+<pre><code class="language-bash">sudo journalctl -fx
+</code></pre>
+<p>NOTE: Your firewall can also trigger this.</p>
 <p>Further reading:</p>
 <ul>
 <li>
