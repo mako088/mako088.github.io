@@ -198,6 +198,9 @@ plan on using this think twice before enabling <code>dnscrypt-proxy</code> and y
 want to consider ufw firewall rather than the nftables I share in this guide
 because of Port conflicts.</li>
 </ul>
+<p>Keep in mind that Arch’s security posture is ultimately constrained by the
+broader limitations of Linux security mechanisms, upstream tooling, and ongoing
+development priorities.</p>
 <h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
 <p>Backup your system regularly, many guides consider the data already lost if it
 isn't backed up because without a backup, any data loss event (hardware failure,
@@ -285,35 +288,70 @@ clear history. This approach makes it far simpler to revert a breaking change
 and quickly identify what went wrong. Over time, this discipline allows you to
 create security-focused checklists and ensure all angles are covered, building a
 more robust and secure system.</p>
+<p><strong>User and Permission Management</strong></p>
 <ul>
+<li>
+<p>Use distinct user accounts for different tasks to minimize risk from
+compromised accounts.</p>
+</li>
+<li>
+<p>Apply the principle of least privilege by assigning users only the permissions
+they actually need.</p>
+</li>
+<li>
+<p>Avoid running services or applications as root; use dedicated service accounts
+where possible.</p>
+</li>
 <li>
 <p>Use strong passwords and a password manager. The Arch Wiki
 <a href="https://wiki.archlinux.org/title/Security">Security</a> section goes in depth
 about this so I won't cover it here.</p>
 </li>
 <li>
-<p>Update frequently, updates often contain security patches and are important to
-stay on top of.</p>
-</li>
-<li>
-<p>Prefer software/hardware that has privacy respecting defaults and a secure
-posture.</p>
-</li>
-<li>
-<p>Use encrypted DNS and a VPN when possible:</p>
-<ul>
-<li>
-<p><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy w/ dnsmasq guide</a></p>
-</li>
-<li>
-<p>Encrypted DNS protects your DNS queries from being seen and a VPN protects
-your IP address from being exposed. There is a lot to this, just know that a
-VPN isn't made to nor does it protect your anonymity and there are so many
-fingerprinting techniques that encrypted DNS's effectiveness is questionable
-without a VPN.</p>
+<p>Regularly review group memberships and file permissions, especially on
+sensitive system files.</p>
 </li>
 </ul>
+<hr />
+<p><strong>Package Management and System Minimalism</strong></p>
+<ul>
+<li>
+<p>Favor packages from the official Arch repositories managed with pacman, as
+they are cryptographically signed and vetted by trusted Arch developers.</p>
 </li>
+<li>
+<p>Use AUR packages cautiously; they lack official cryptographic signatures and
+require manual review and vetting before installation.</p>
+</li>
+<li>
+<p>Install only the software and services you truly need to reduce the attack
+surface and minimize vulnerabilities.</p>
+</li>
+<li>
+<p>Remove unused packages and disable unnecessary services to free up resources
+and limit potential entry points.</p>
+</li>
+</ul>
+<hr />
+<p><strong>Network and Privacy Best Practices</strong></p>
+<ul>
+<li>
+<p>Prefer software and hardware with privacy-respecting defaults and a strong
+security posture.</p>
+</li>
+<li>
+<p>Use encrypted DNS and VPNs where possible: encrypted DNS protects your
+queries, while VPNs hide your IP address. Note that VPNs do not provide
+anonymity on their own and fingerprinting techniques can still reveal
+information.</p>
+<ul>
+<li><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy w/ dnsmasq guide</a></li>
+</ul>
+</li>
+</ul>
+<hr />
+<p><strong>Cryptography and Future-Proofing</strong></p>
+<ul>
 <li>
 <p>The
 <a href="https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/3498776/post-quantum-cryptography-cisa-nist-and-nsa-recommend-how-to-prepare-now/">NSA, CISA, and NIST warn</a>
@@ -336,6 +374,15 @@ to these new standards as soon as practical.</p>
 <a href="https://www.nist.gov/news-events/news/2022/07/nist-announces-first-four-quantum-resistant-cryptographic-algorithms">Four Quantum-Resistant Cryptographic Algorithms</a>
 warning that public-key cryptography is especially vulnerable and widely used
 to protect digital information.</p>
+</li>
+<li>
+<p>Follow developments from entities like
+<a href="https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards">NIST’s post-quantum encryption standards</a>
+and implement recommendations as soon as practical.</p>
+</li>
+<li>
+<p>Stay informed of quantum-resistant algorithm updates, especially for
+public-key cryptography, as recommended by NIST and security agencies.</p>
 </li>
 </ul>
 <hr />
@@ -364,6 +411,8 @@ systemd-machined.service                  6.2 MEDIUM    😐
 <pre><code class="language-bash">sudo systemctl edit NetworkManager.service
 → Overall exposure level for NetworkManager.service: 9.6 UNSAFE    😨
 </code></pre>
+<p>The following file will open in your $EDITOR, these settings take it from UNSAFE
+to OK:</p>
 <pre><code class="language-conf">[Service]
 NoNewPrivileges = true
 ProtectHome = true
@@ -396,8 +445,6 @@ PrivateDevices=yes
 <pre><code class="language-bash">sudo systemd-analyze security NetworkManager
 → Overall exposure level for NetworkManager.service: 4.5 OK 🙂
 </code></pre>
-<p>There are also tools like <code>lynis</code> which help with hardening different system
-settings and more.</p>
 <p>Further reading on systemd:</p>
 <details>
 <summary> ✔️ Click to Expand Systemd Resources </summary>
@@ -413,6 +460,42 @@ settings and more.</p>
 </li>
 </ul>
 </details>
+<hr />
+<h2 id="lynis-and-other-tools"><a class="header" href="#lynis-and-other-tools">Lynis and other tools</a></h2>
+<p>Lynis is a security auditing tool for systems based on UNIX like Linux, macOS,
+BSD, and others.--<a href="https://github.com/CISOfy/lynis">lynis repo</a></p>
+<pre><code class="language-bash">sudo pacman -S lynis
+</code></pre>
+<p>List commands:</p>
+<pre><code class="language-bash">sudo lynis show commands
+Commands:
+lynis audit
+lynis configure
+lynis generate
+lynis show
+lynis update
+lynis upload-only
+</code></pre>
+<p>Audit the system:</p>
+<pre><code class="language-bash">sudo lynis audit system
+ Lynis security scan details:
+
+  Hardening index : 81 [################    ]
+  Tests performed : 255
+  Plugins enabled : 0
+</code></pre>
+<ul>
+<li>
+<p>The "Lynis hardening index" is an overall impression on how well a system is
+hardened. However, this is just an indicator on measures taken - not a
+percentage of how safe a system might be. A score over 75 typically indicates
+a system with more than average safety measures implemented.</p>
+</li>
+<li>
+<p>Lynis will give you more recommendations for securing your system as well.</p>
+</li>
+</ul>
+<hr />
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
 <p>Given the kernel's central role, it's a frequent target for malicious actors,
 making robust hardening essential.</p>
