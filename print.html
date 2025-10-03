@@ -2474,6 +2474,10 @@ because of Port conflicts.</li>
 <p>Keep in mind that Arch’s security posture is ultimately constrained by the
 broader limitations of Linux security mechanisms, upstream tooling, and ongoing
 development priorities.</p>
+<p>I will assume that you're using a UKI with Secure Boot enabled with systemd-boot
+for this section. If you don't and want to, you can follow the
+<a href="https://mako088.github.io/arch/enc_install.html">Guide</a> that I wrote or more
+obviously, the Wiki.</p>
 <h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
 <p>Backup your system regularly, many guides consider the data already lost if it
 isn't backed up because without a backup, any data loss event (hardware failure,
@@ -2765,7 +2769,9 @@ percentage of how safe a system might be. A score over 75 typically indicates
 a system with more than average safety measures implemented.</p>
 </li>
 <li>
-<p>Lynis will give you more recommendations for securing your system as well.</p>
+<p>Lynis will give you more recommendations for securing your system as well,
+when I ran lynis for example, one suggestion was that I install <code>arch-audit</code>
+to determine vulnerable packages.</p>
 </li>
 </ul>
 <hr />
