@@ -260,7 +260,7 @@ for this section. If you don't and want to, you can follow the
 <a href="https://mako088.github.io/arch/enc_install.html">Guide</a> that I wrote or more
 obviously, the Wiki.</p>
 <h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
-<p>Chech the <a href="https://security.archlinux.org/">Arch Linux Security Tracker</a> for
+<p>Check the <a href="https://security.archlinux.org/">Arch Linux Security Tracker</a> for
 information about known vulnerabilities affecting Arch packages. It lists CVEs
 (Common Vulnerabilities and Exposures) affecting packages, the severity, the
 fixed versions, and advisory details.</p>
@@ -309,7 +309,7 @@ verifies the UKI's signature, it ensures the integrity and authenticity of:</p>
 <p>The kernel itself,</p>
 </li>
 <li>
-<p>The initramfs,</p>
+<p>The <code>initramfs</code>,</p>
 </li>
 <li>
 <p>The kernel command line parameters,</p>
@@ -323,8 +323,8 @@ verifies the UKI signature before execution).</p>
 </li>
 </ul>
 <p>This means that any tampering with these components, such as injecting malware
-into the initramfs, altering boot parameters, or swapping the kernel would break
-the signature verification and prevent the system from booting.</p>
+into the <code>initramfs</code>, altering boot parameters, or swapping the kernel would
+break the signature verification and prevent the system from booting.</p>
 <p><code>systemd-boot</code> has a smaller attack surface and is often recommended over GRUB
 for hardened systems.</p>
 <ul>
@@ -437,6 +437,16 @@ information.</p>
 <ul>
 <li><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy w/ dnsmasq guide</a></li>
 </ul>
+</li>
+<li>
+<p>Implement a firewall to control inbound and outbound network traffic based on
+predefined security rules. Firewalls serve as a critical layer of defense to
+reduce attack surfaces and monitor suspicious activity.</p>
+</li>
+<li>
+<p>Secure SSH access by disabling root login, changing default ports, and
+enforcing public-key authentication to prevent brute-force and unauthorized
+access attempts.</p>
 </li>
 </ul>
 <hr />
@@ -2003,9 +2013,42 @@ sudo touch /var/log/aide/aide.log
 </code></pre>
 </details>
 <h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
 <ul>
 <li>
 <p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki Secure Boot</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/OpenVAS">Arch Wiki OpenVAS</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/AppArmor">Arch Wiki AppArmor</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/SELinux">Arch Wiki SELinux</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Security">Arch Wiki Security</a></p>
+</li>
+<li>
+<p><a href="https://github.com/archlinuxhardened/selinux">archlinuxhardened/selinux</a></p>
+</li>
+<li>
+<p><a href="https://wiki.gentoo.org/wiki/Security_Handbook/Concepts">Gentoo Security_Handbook Concepts</a></p>
+</li>
+<li>
+<p>STIGs are configuration standards developed by the Defense Information Systems
+Agency (DISA) to secure systems and software for the U.S. Department of
+Defense (DoD). They are considered a highly authoritative source for system
+hardening.There are recommendations for hardening all kinds of software in the
+<a href="https://stigviewer.com/stigs">Stig Viewer</a></p>
+</li>
+<li>
+<p><a href="https://www.cisecurity.org/cis-benchmarks">CIS Benchmarks</a></p>
+</li>
+<li>
+<p><a href="https://github.com/nsacyber">NSA Cybersecurity Directorate</a></p>
 </li>
 <li>
 <p><a href="https://www.rodsbooks.com/efi-bootloaders/secureboot.html">rodsbooks Secure Boot</a></p>
@@ -2017,12 +2060,37 @@ sudo touch /var/log/aide/aide.log
 <p><a href="https://web.archive.org/web/20140220055801/http://crunchbang.org:80/forums/viewtopic.php?id=24722">#! Paranoid Security Guide</a></p>
 </li>
 <li>
+<p><a href="https://cybersecuritynews.com/hardening-linux-servers">Hardening-Linux-Servers</a></p>
+</li>
+<li>
+<p><a href="https://linux-audit.com/linux-server-hardening-most-important-steps-to-secure-systems/">linux-audit Linux Server hardening best practices</a></p>
+</li>
+<li>
+<p><a href="https://linux-audit.com/linux-security-guide-extended-version/">linux-audit Linux security guide extended</a></p>
+</li>
+<li>
 <p><a href="https://madaidans-insecurities.github.io/linux.html">madaidans-insecurities</a></p>
 </li>
 <li>
 <p><a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">madaidans-insecurities Linux Hardening Guide</a></p>
 </li>
+<li>
+<p><a href="https://zebracrossing.narwhalacademy.org/">Zebra Crossing digital safety checklist</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/essentials#step-1">DataDetoxKit</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/degooglise/">DataDetox Degooglise</a></p>
+</li>
+<li>
+<p><a href="https://tb-manual.torproject.org/">Tor Browser User Manual</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.torproject.org/tpo/team/-/wikis/home">Tor Wiki</a></p>
+</li>
 </ul>
+</details>
 
                     </main>
 
