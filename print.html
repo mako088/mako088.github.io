@@ -2648,8 +2648,38 @@ security best practices over time.</p>
 <p><strong>User and Permission Management</strong></p>
 <ul>
 <li>
-<p>Use distinct user accounts for different tasks to minimize risk from
+<p><strong>Implement distinct user accounts</strong> to minimize the risk associated with
 compromised accounts.</p>
+</li>
+<li>
+<p><strong>Execute Specific Commands</strong>: Always execute the specific command that
+requires elevation, rather than using sudo to open an entire root shell:</p>
+<ul>
+<li>
+<p><strong>Good</strong>: <code>sudo pacman -Syu</code></p>
+</li>
+<li>
+<p><strong>Bad</strong>: Running <code>sudo su -</code> and then running <code>pacman -Syu</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>Consider using a more secure or minimal form of privilege escalation like
+<code>doas</code>, <code>sudo-rs</code>, or <code>run0</code> instead of standard <code>sudo</code>.</p>
+</li>
+</ul>
+<hr />
+<ul>
+<li>
+<p>Users and groups are used as a form of
+<a href="https://en.wikipedia.org/wiki/access_control#Computer_security">access control</a>.
+They control access to the system's files, directories, and peripherals. This
+is a security feature that limits access in certain specific ways.</p>
+<ul>
+<li>When granting access to a resource, create a specific group and add only the
+necessary users to it, rather than granting broad access to all root or
+wheel users. Demonstrated in: <strong><a href="arch/hardening_arch.html#doas-over-sudo">Doas over sudo</a></strong>.</li>
+</ul>
 </li>
 <li>
 <p>Apply the principle of least privilege by assigning users only the permissions
