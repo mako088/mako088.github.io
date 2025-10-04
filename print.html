@@ -3341,10 +3341,9 @@ examples located in <code>/usr/share/nftables/</code> and
 <code>/usr/share/doc/nftables/examples/</code></p>
 <p>Flush existing iptables Rules &amp; Disable iptables if necessary.</p>
 <p><strong>Create nftables ruleset</strong>:</p>
-<pre><code class="language-bash">#!/usr/bin/nft -f
-# vim:set ts=2 sw=2 et:
-
-# More examples in /usr/share/nftables/ and /usr/share/doc/nftables/examples/.
+<pre><code class="language-bash">#-----------------------------------------------------------------------------
+# Flush existing rules: ensure a clean slate before loading new rules
+#-----------------------------------------------------------------------------
 flush ruleset
 table inet filter {
     # -------------------------------------------------------------------------
@@ -3375,12 +3374,6 @@ table inet filter {
         # Allow HTTP and HTTPS (ports 80 and 443)
         tcp dport { 80, 443 } ct state new accept
 
-         # Allow Git (and general SSH client) outgoing connections
-        tcp dport 22 ct state new accept
-        # Allow SSH (port 2222) with rate-limiting to prevent brute-force attacks
-        # tcp dport 2222 ct state new limit rate 15/minute accept
-
-
         # Log packets that reach the end of the chain before they are dropped by the policy (optional)
         log prefix "nft-input-drop: "
     }
@@ -3404,30 +3397,42 @@ table inet filter {
     # -------------------------------------------------------------------------
     # OUTPUT CHAIN (Outgoing Traffic originating from this host)
     # Default is to DROP all outgoing traffic for maximum security
-    # # Change 'policy drop' to 'policy accept' below if having outbound
-    # # connection problems
     # -------------------------------------------------------------------------
     chain output {
-        type filter hook output priority filter; policy drop;
+    type filter hook output priority filter; policy drop;
 
-        # Allow essential local communication
-        oif "lo" accept
+    # Allow essential local communication
+    oif "lo" accept
 
-        # Allow replies for established and related connections (critical)
-        ct state established,related accept
+    # Allow replies for established and related connections (critical)
+    ct state established,related accept
 
-        # Allow DNS queries (UDP and TCP)
-        udp dport 53 accept
-        tcp dport 53 accept
+    # Allow DNS queries (UDP and TCP)
+    udp dport 53 accept
+    tcp dport 53 accept
 
-        # Allow general outbound web access (e.g., for updates, API calls)
-        tcp dport { 80, 443 } accept
+    # Allow general outbound web access (e.g., for updates, API calls)
+    tcp dport { 80, 443 } accept
 
-        # Allow NTP (Network Time Protocol) for time synchronization
-        udp dport 123 accept
+    # Allow Git (and general SSH client) outgoing connections
+    tcp dport 22 ct state new accept
 
-        # Log packets that reach the end of the chain before they are dropped by the policy (optional)
-        log prefix "nft-output-drop: "
+    # Allow NTP (Network Time Protocol) for time synchronization
+    udp dport 123 accept
+
+    # Use meta l4proto to correctly match MLDv2 Type 143 packets
+    meta l4proto ipv6-icmp icmpv6 type {
+        echo-request,
+        destination-unreachable,
+        time-exceeded,
+        parameter-problem,
+        nd-neighbor-solicit,
+        nd-neighbor-advert,
+        mld2-listener-report
+    } accept
+
+    # Log packets that reach the end of the chain before they are dropped by the policy (optional)
+    log prefix "nft-output-drop: "
     }
 }
 </code></pre>
@@ -4194,19 +4199,30 @@ removing it.</p>
 surface, consider <code>doas</code>:</p>
 <pre><code class="language-bash">sudo pacman -S opendoas
 </code></pre>
+<p>Create a <code>doas</code> group:</p>
+<pre><code class="language-bash">sudo groupadd doas
+</code></pre>
+<p>Add your user to the <code>doas</code> group:</p>
+<pre><code class="language-bash">sudo usermod -aG doas $USER
+</code></pre>
 <p>Create <code>/etc/doas.conf</code> with the following contents:</p>
-<pre><code class="language-conf">permit setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :wheel
+<pre><code class="language-conf">permit setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :doas
 </code></pre>
 <p>You can add a line below that one like <code>permit nopass your-username as root:</code>
-Enabling your user passwordless usage, it's much less secure but an option none
-the less.</p>
+Enabling your user passwordless usage, it's much less secure but an option.</p>
 <p>Alternatively, you can setup the doas persist feature with the following:</p>
-<pre><code class="language-conf">permit persist setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :wheel
+<pre><code class="language-conf">permit persist setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :doas
 </code></pre>
 <ul>
-<li>With the above setting, after you successfully authenticate. You won't be
+<li>
+<p>With the above setting, after you successfully authenticate. You won't be
 asked for your password for the next 5 minutes. It's disabled by default
-because it can be dangerous if used in the wrong environment.</li>
+because it can be dangerous if used in the wrong environment.</p>
+</li>
+<li>
+<p>You may need to either reboot or do a soft-reset for the groups to take
+effect.</p>
+</li>
 </ul>
 <p>For <code>yay</code>, you can run:</p>
 <pre><code class="language-bash">yay --sudo doas --save
