@@ -1923,12 +1923,30 @@ the event is logged.</p>
 <p><a href="https://wiki.archlinux.org/title/AppArmor">Arch Wiki AppArmor</a></p>
 </li>
 </ul>
-<pre><code class="language-bash">paru -S bazaar
-</code></pre>
 <h2 id="creating-profiles-that-arent-pre-configured"><a class="header" href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a></h2>
 <h3 id="auditd"><a class="header" href="#auditd">Auditd</a></h3>
+<p>Linux audit makes your system more secure by providing you the means to analyze
+what's going on in your system in great detail. It does not provide any security
+itself, but instead is useful for tracking these issues and helps you take
+additional security measures to prevent them.</p>
 <p>Install with:</p>
 <pre><code class="language-bash">sudo pacman -S audit
+</code></pre>
+<ul>
+<li>Enable audit at boot-time by setting <code>audit=1</code> as a kernel parameter,
+typically either in <code>/etc/kernel/cmdline</code> or <code>/etc/cmdline.d/security.conf</code>
+for UKIs.</li>
+</ul>
+<p>For example, this is my <code>/etc/cmdline.d/security.conf</code>:</p>
+<pre><code class="language-conf"># enable apparmor                               # enable audit
+lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=256
+</code></pre>
+<p>Create a group to follow principle of least privilege:</p>
+<pre><code class="language-bash">sudo groupadd audit-view
+sudo usermod -a -G audit-view $USER
+</code></pre>
+<p>In <code>/etc/audit/auditd.conf</code>, change <code>log_group = root</code> to:</p>
+<pre><code class="language-conf">log_group = audit-view
 </code></pre>
 <p>Enable:</p>
 <pre><code class="language-bash">sudo systemctl enable auditd
@@ -1950,11 +1968,14 @@ the following contents:</p>
 # Monitor /etc/passwd for modifications
 -w /etc/passwd -p wa -k passwd_changes
 
-# Monitor sudo command execution
--w /usr/bin/sudo -p x -k sudo_usage
+# Monitor doas command execution
+-w /usr/bin/doas -p x -k doas_usage
 
 # Enable auditing
 -e 1
+
+# Make rules immutable
+-e 2
 </code></pre>
 <p>Validate and load the rules, this will populate <code>/etc/audit/audit.rules</code> with
 the rules we just set:</p>
