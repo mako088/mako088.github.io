@@ -1706,7 +1706,9 @@ devices must match an allow rule or get denied implicitly.</p>
 sudo systemctl start usbguard --now
 </code></pre>
 <ul>
-<li>Sometimes a reboot is required.</li>
+<li>Sometimes a reboot is required. If your keyboard doesn't work, after entering
+your encryption passphrase, enter the TTY with <code>Alt+Ctrl+F2</code> and ensure the
+<code>usbguard</code> group exists and your user is a member.</li>
 </ul>
 <p>Check status:</p>
 <pre><code class="language-bash">sudo systemctl status usbguard
