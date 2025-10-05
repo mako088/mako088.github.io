@@ -1236,6 +1236,8 @@ adding extra rounds can make it harder to brute-force.</p>
 </ul>
 <hr />
 <h3 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h3>
+<details>
+<summary> ✔️ Click to Expand GnuPG section </summary>
 <p><code>gpg --full-generate-key</code> can be used to generate a basic keypair.</p>
 <p><code>gpg --expert --full-generate-key</code> can be used for keys that require more
 capabilities.</p>
@@ -1518,8 +1520,20 @@ sec#  ed25519/0x
 </code></pre>
 <p>The above set of commands are from the
 <a href="https://riseup.net/ru/security/message-security/openpgp/gpg-best-practices#keep-your-primary-key-entirely-offline">RiseUp Keep your primary key offline</a></p>
+</details>
 <hr />
 <h2 id="hardening-openssh"><a class="header" href="#hardening-openssh">Hardening OpenSSH</a></h2>
+<p>OpenSSH is a tool that allows you to remotely connect to your machine with the
+SSH protocol. It encrypts all traffic to prevent eavesdropping, connection
+hijacking, and other attacks.</p>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/OpenSSH">Arch Wiki OpenSSH</a></p>
+</li>
+<li>
+<p><a href="https://www.openssh.com/">OpenSSH</a></p>
+</li>
+</ul>
 <p>Install and configure fail2ban:</p>
 <pre><code class="language-bash">sudo pacman -S fail2ban
 </code></pre>
@@ -1574,7 +1588,7 @@ chmod 700 $HOME/.ssh
 <p>Add the output of <code>ssh-add -L</code> to <code>~/.ssh/authorized_keys</code></p>
 <pre><code class="language-bash">echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXwhVokJ6cKgodYT+0+0ZrU0sBqMPPRDPJqFxqRtM+I (none)" &gt; ~/.ssh/authorized_keys
 </code></pre>
-<p>After adding the authorized_key, adjust the permission:</p>
+<p>After adding the <code>authorized_key</code>, adjust the permission:</p>
 <pre><code class="language-bash">chmod 600 $HOME/.ssh/authorized_keys
 </code></pre>
 <p>Finally, test an ssh connection:</p>
@@ -1614,6 +1628,9 @@ SSH, ensuring remote access will work through the firewall.</p>
 </code></pre>
 <hr />
 <h2 id="usb-port-protection"><a class="header" href="#usb-port-protection">USB Port Protection</a></h2>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/USBGuard">Arch Wiki USBGuard</a></li>
+</ul>
 <p>It's important to protect your USB ports to prevent BadUSB attacks, data
 exfiltration, unauthorized device access, malware injection, etc.</p>
 <p>To get a list of your connected USB devices you can use <code>lsusb</code> from the
@@ -1622,25 +1639,39 @@ exfiltration, unauthorized device access, malware injection, etc.</p>
 </code></pre>
 <p>Install usbguard:</p>
 <pre><code class="language-bash">sudo pacman -S usbguard
+# Optionally; paru -S usbguard-notifier fails with bad keys
+# paru -S usbguard-notifier-git
 </code></pre>
-<blockquote>
-<p>❗️ NOTE: Most people use the daemon, this is just an example.</p>
-</blockquote>
+<p>Create a <code>usbguard</code> group and add your user to it:</p>
+<pre><code class="language-bash">sudo groupadd usbguard
+sudo usermod -aG usbguard username
+</code></pre>
 <p>Generate a policy based on your currently attached USB devices with:</p>
 <pre><code class="language-bash">sudo usbguard generate-policy | sudo tee /etc/usbguard/rules.conf
+# Or if everything else fails
+# sudo bash -c "usbguard generate-policy &gt; /etc/usbguard/rules.conf"
 </code></pre>
 <pre><code class="language-bash">sudo chmod 600 /etc/usbguard/rules.d/99-policy.conf
 </code></pre>
 <h3 id="usbguard-daemon"><a class="header" href="#usbguard-daemon">USBGuard Daemon</a></h3>
+<blockquote>
+<p>❗️ If practicing zero-trust, you would want to change your default policy to
+<code>apply-policy</code>. This way any device that isn't explicitly allowed will be
+blocked. It's easy to lock yourself out if done incorrectly.</p>
+</blockquote>
 <p>Edit <code>/etc/usbguard/usbguard-daemon.conf</code> to set the policy to allow devices
-that are already connected for root and your user:</p>
-<pre><code class="language-conf"># Default policy for devices that were already connected when the daemon started.
+that are already connected for members of the <code>usbguard</code> group:</p>
+<pre><code class="language-conf"># ...snip...
+RuleFile=/etc/usbguard/rules.conf
+
+# Default policy for devices that were already connected when the daemon started.
 # Supported values: apply-policy, allow, block, reject, keep.
 PresentDevicePolicy=allow
 
 # A list of users and groups that are allowed to interact with the daemon
 # via the IPC interface.
-IPCAllowedUsers=root your-user
+#IPCAllowedUsers=root your-user
+IPCAllowedUsers=usbguard
 </code></pre>
 <p>From the above file we can see that it expects its configuration file to be
 located at <code>/etc/usbguard/rules.d/</code>:</p>
@@ -1674,8 +1705,13 @@ devices must match an allow rule or get denied implicitly.</p>
 <pre><code class="language-bash">sudo systemctl enable usbguard
 sudo systemctl start usbguard --now
 </code></pre>
+<ul>
+<li>Sometimes a reboot is required.</li>
+</ul>
 <p>Check status:</p>
 <pre><code class="language-bash">sudo systemctl status usbguard
+</code></pre>
+<pre><code class="language-bash">sudo usbguard list-devices
 </code></pre>
 <ul>
 <li>
