@@ -203,7 +203,8 @@
 <li><a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></li>
 </ul>
 </li>
-<li><a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a>
+<li><a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></li>
+<li><a href="#wireguard">WireGuard</a>
 <ul>
 <li><a href="#logs">Logs</a></li>
 <li><a href="#resources">Resources</a></li>
@@ -971,6 +972,33 @@ either, it simply directs certain app traffic through a proxy server without
 creating a full encrypted tunnel from your device like a VPN does.</p>
 </li>
 </ul>
+<hr />
+<h2 id="wireguard"><a class="header" href="#wireguard">WireGuard</a></h2>
+<p><code>Configure -&gt; Proxy -&gt; Setup WireGuard -&gt; +</code>:</p>
+<p>With the WireGuard protocol, the provider usually gives you either a QR Code, or
+a configuration file (e.g., <code>.conf</code> file) which is a plaintext file that
+contains what is needed. You download that file and Click <code>IMPORT</code> which brings
+up your phones filesystem.</p>
+<p>There is also a <code>CREATE</code> option for advanced users who are setting up their own
+WireGuard network, typically if you host your own VPN server.</p>
+<p>After this is setup you should always verify that your traffic is encrypted
+(hidden IP) and your DNS queries are protected (no leaks).</p>
+<p>You could:</p>
+<ol>
+<li>
+<p>First check what your IP address is before enabling WireGuard at
+<code>whatismyipaddress.com</code> or <code>ipleak.net</code>, take note of your Public IP, ISP,
+and City/Country this is your real info that the VPN needs to hide.</p>
+</li>
+<li>
+<p>Connect to Wireguard/VPN. Choose the server location you want and go back to
+check again.</p>
+</li>
+<li>
+<p>Check for leaks, go to <code>dnsleaktest.com</code> and run a Standard test. If you
+don't see your Public IP listed anywhere, you don't have a leak.</p>
+</li>
+</ol>
 <hr />
 <h3 id="logs"><a class="header" href="#logs"><a href="#logs">Logs</a></a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
