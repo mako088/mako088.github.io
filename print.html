@@ -270,7 +270,7 @@ from there.</p>
 </ul>
 </li>
 <li><a href="android/RethinkDNS_Guide.html#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></li>
-<li><a href="android/RethinkDNS_Guide.html#wireguard">WireGuard</a>
+<li><a href="android/RethinkDNS_Guide.html#wireguardvpn">WireGuard/VPN</a>
 <ul>
 <li><a href="android/RethinkDNS_Guide.html#logs">Logs</a></li>
 <li><a href="android/RethinkDNS_Guide.html#resources">Resources</a></li>
@@ -496,6 +496,9 @@ Obtainium installed, Click <code>Add app</code> and paste
 <hr />
 <h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
 <h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
+<p>Throughout this article, I'll be discussing the <strong>RethinkDNS Android App</strong>.
+We'll later reference the <strong>DNS Blocklist configuring website</strong>, which is
+available at <a href="https://rethinkdns.com/configure">rethinkdns.com/configure</a>.</p>
 <blockquote>
 <p>❗ NOTE: When you switch to an encrypted DNS resolver, you are shifting your
 trust from your ISP's DNS servers to the third-party DNS provider you choose.
@@ -504,13 +507,13 @@ outsiders, like your ISP or network eavesdroppers, which improves privacy.
 However, the DNS resolver itself still sees all your queries and could
 potentially log, analyze, or misuse that data.</p>
 </blockquote>
-<p>Throughout this article, I'll be discussing the <strong>RethinkDNS Android App</strong>.
-We'll later reference the <strong>DNS Blocklist configuring website</strong>, which is
-available at <a href="https://rethinkdns.com/configure">rethinkdns.com/configure</a>.</p>
 <p>That said, it's quite common for ISPs to engage in practices that compromise
 user privacy. Do some research, whats their business model, privacy policy, etc.
 Unfortunately, with a VPN you are also just shifting the trust. Don't blindly
 choose a VPN either, I haven't found a free VPN that I would trust...</p>
+<ul>
+<li><a href="https://cyberinsider.com/internet-service-providers-isp-privacy-data-collection/">ISP data-collection</a></li>
+</ul>
 <p><code>Configure -&gt; DNS -&gt; Other DNS</code>:</p>
 <ul>
 <li>Choose the type of resolver you want, I use DNSCrypt. Once you click you can
@@ -554,7 +557,7 @@ enable <code>Prompt on blocklist update</code>.</p>
 </li>
 </ul>
 <hr />
-<p>**F-Droid &amp; Github Versions **</p>
+<p><strong>F-Droid &amp; Github Versions</strong></p>
 <p>When on the F-Droid and GitHub versions of the Rethink, you can download
 blocklists from <code>Configure -&gt; DNS -&gt; On-device blocklists</code>, and have them setup
 for <strong>any</strong> DNS upstream.</p>
@@ -980,20 +983,15 @@ up the SOCKS5 proxy to work correctly which is pretty straightforward.</p>
 consume, no algorithm involved!</p>
 <p>This can also be useful on public Wi-Fi or other insecure networks.</p>
 <ul>
-<li>You can also open Orbot and <code>Choose How to Connect</code>, if you want to hide Tor
-use.</li>
-<li>When you're done, you can switch <code>Setup Orbot</code> back to <code>None (default)</code>. If
-you're completely done with it you can click <code>Add / Remove (1 app)</code>, search
-for the Apps you've added and de-select them.</li>
-<li>Go to <code>Home</code> and now below <code>Stop</code> it should just say <code>Protected</code>.</li>
-<li>If you live in an area where Tor use isn't discriminated against, consider
+<li>
+<p>You can also open Orbot and <code>Choose How to Connect</code>, if you want to hide Tor
+use.</p>
+</li>
+<li>
+<p>If you live in an area where Tor use isn't discriminated against, consider
 Activating your Orbot <code>Kindness</code> tab so others that are in oppressive regimes
-can use your device as a bridge. This is a great way to give back!</li>
-<li>A good use for this could to switch it on and off as needed such as when you
-check your online banking, want to send a private email, or browse sensitive
-topics. It has been proven that people that feel like they are being watched
-are less creative and curious.</li>
-<li>When it really matters consider using Tor Browser through Tails OS or Whonix.</li>
+can use your device as a bridge. This is a great way to give back!</p>
+</li>
 </ul>
 <hr />
 <h2 id="setting-up-a-socks5-proxy"><a class="header" href="#setting-up-a-socks5-proxy"><a href="android/RethinkDNS_Guide.html#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></a></h2>
@@ -1039,7 +1037,7 @@ creating a full encrypted tunnel from your device like a VPN does.</p>
 </li>
 </ul>
 <hr />
-<h2 id="wireguard"><a class="header" href="#wireguard">WireGuard</a></h2>
+<h2 id="wireguardvpn"><a class="header" href="#wireguardvpn">WireGuard/VPN</a></h2>
 <p><code>Configure -&gt; Proxy -&gt; Setup WireGuard -&gt; +</code>:</p>
 <p>With the WireGuard protocol, the provider usually gives you either a QR Code, or
 a configuration file (e.g., <code>.conf</code> file) which is a plaintext file that
