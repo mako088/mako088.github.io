@@ -572,6 +572,10 @@ PrivateDevices=yes
 
 ### Edits below this comment will be discarded
 </code></pre>
+<pre><code class="language-bash">sudo systemctl daemon-reload
+sudo systemctl restart NetworkManager
+</code></pre>
+<p>Sometimes you may need to reboot for the changes to take effect.</p>
 <pre><code class="language-bash">sudo systemd-analyze security NetworkManager
 → Overall exposure level for NetworkManager.service: 4.5 OK 🙂
 </code></pre>
