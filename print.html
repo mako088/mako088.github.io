@@ -1859,6 +1859,8 @@ reboot
 <ul>
 <li><a href="arch/enc_dns.html#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></li>
 <li><a href="arch/enc_dns.html#testing">Testing</a></li>
+<li><a href="arch/enc_dns.html#enable-mac-randomization">Enable MAC Randomization</a></li>
+<li><a href="arch/enc_dns.html#add-blocklists">Add Blocklists</a></li>
 </ul>
 </details>
 <blockquote>
@@ -2058,6 +2060,126 @@ the above configuration with Quad9's resolvers, you should see all WoodyNet ISPs
 listed in Germany. If not, something is wrong and you have a DNS leak.</p>
 <p>I have noticed dnsleaktest having issues lately, <code>https://ipleak.net</code> works for
 this as well.</p>
+<h2 id="enable-mac-randomization"><a class="header" href="#enable-mac-randomization">Enable MAC Randomization</a></h2>
+<pre><code class="language-bash">sudo mkdir -p /etc/NetworkManager/conf.d
+sudo hx /etc/NetworkManager/conf.d/20-mac-randomization.conf
+</code></pre>
+<p>Add the following for randomization (use <code>stable</code> for consistent per-network
+MACs; change to <code>random</code> if preferred)</p>
+<pre><code class="language-conf">[device]
+wifi.scan-rand-mac-address=yes
+
+[connection]
+wifi.cloned-mac-address=random
+ethernet.cloned-mac-address=random
+</code></pre>
+<ul>
+<li>
+<p><code>wifi.scan-rand-mac-address=yes</code>: Enables randomization during Wi-Fi scans
+(default, but explicit for clarity).</p>
+</li>
+<li>
+<p><code>wifi.cloned-mac-address=stable</code> / <code>ethernet.cloned-mac-address=stable</code>:
+Applies to Wi-Fi and Ethernet connections.</p>
+</li>
+</ul>
+<p><strong>Verify MAC Randomization</strong></p>
+<p>Check your interface (e.g., <code>wlan3</code> for Wi-Fi, find with <code>ip link</code>)</p>
+<pre><code class="language-bash">ip link show wlp3s0 | grep link/ether
+</code></pre>
+<pre><code class="language-bash">nmcli connection down "YourSSID"
+nmcli connection up "YourSSID"
+</code></pre>
+<p>Check MAC again:</p>
+<pre><code class="language-bash">cat /sys/class/net/wlp3s0/address
+</code></pre>
+<pre><code class="language-bash">sudo systemctl status dnscrypt-proxy dnsmasq
+</code></pre>
+<pre><code class="language-bash">nslookup example.com
+</code></pre>
+<hr />
+<p><strong>Enable dnsmasq caching</strong></p>
+<p><code>/etc/NetworkManager/dnsmasq.d/cache.conf</code>:</p>
+<pre><code class="language-conf">cache-size=1000
+</code></pre>
+<hr />
+<p>This may help with IPv6 connectivity, add the following to
+<code>/etc/NetworkManager/dnsmasq.d/ipv6-listen.conf</code>:</p>
+<pre><code class="language-bash">listen-address=::1
+</code></pre>
+<hr />
+<p><strong>Enable DNSSEC validation</strong>:</p>
+<p><code>/etc/NetworkManager/dnsmasq.d/dnssec.conf</code>:</p>
+<pre><code class="language-conf">conf-file=/usr/share/dnsmasq/trust-anchors.conf
+dnssec
+</code></pre>
+<h2 id="add-blocklists"><a class="header" href="#add-blocklists">Add Blocklists</a></h2>
+<ul>
+<li><a href="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/Filters">dnscrypt-proxy Filters</a></li>
+</ul>
+<p>Configure filter list sources in
+<code>/usr/share/dnscrypt-proxy/utils/generate-domains-blocklist/domains-blocklist.conf</code>:</p>
+<pre><code class="language-conf"># NextDNS CNAME cloaking list
+https://raw.githubusercontent.com/nextdns/cname-cloaking-blocklist/master/domains
+
+# AdGuard Simplified Domain Names filter
+https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+
+# OISD Big list
+https://big.oisd.nl/domainswild
+
+# HaGeZi Multi PRO
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt
+
+# HaGeZi Threat Intelligence Feeds
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif-onlydomains.txt
+</code></pre>
+<pre><code class="language-bash">sudo mkdir -p /etc/dnscrypt-proxy-blocklist
+sudo cp -r /usr/share/dnscrypt-proxy/utils/generate-domains-blocklist/* /etc/dnscrypt-proxy-blocklist/
+</code></pre>
+<p>Test and generate a blocklist manually</p>
+<pre><code class="language-bash">cd /etc/dnscrypt-proxy-blocklist
+sudo ./generate-domains-blocklist -a domains-allowlist.txt -o blocklist.txt
+</code></pre>
+<p>Create a service to download &amp; combine filter lists:
+<code>/etc/systemd/system/dnscrypt-filterlist-update.service</code>:</p>
+<pre><code class="language-.service">[Unit]
+Description=DNSCrypt Filterlist Update
+
+[Service]
+Type=oneshot
+ExecStart=/etc/dnscrypt-proxy-blocklist/generate-domains-blocklist -a /etc/dnscrypt-proxy-blocklist/domains-allowlist.txt -o /etc/dnscrypt-proxy-blocklist/blocklist.txt
+ExecStartPost=/usr/bin/sleep 2
+ExecStartPost=/usr/bin/systemctl restart dnscrypt-proxy.service
+</code></pre>
+<p>Create a timer to run at boot &amp; every 5 hours.
+<code>/etc/systemd/system/dnscrypt-filterlist-update.timer</code>:</p>
+<pre><code class="language-.timer">[Unit]
+Description=Run filterlist update 15min after boot and every 5h
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=5h
+
+[Install]
+WantedBy=timers.target
+</code></pre>
+<pre><code class="language-bash">sudo systemctl daemon-reload
+sudo systemctl enable dnscrypt-filterlist-update.timer
+</code></pre>
+<p>Configure dnscrypt-proxy to use the blocklist:</p>
+<p><code>/etc/dnscrypt-proxy/dnscrypt-proxy.toml</code>:</p>
+<pre><code class="language-toml">blocked_names_file = "/usr/share/dnscrypt-proxy/utils/generate-domains-blocklist/blocklist.txt"
+log_file = '/var/log/dnscrypt-proxy/blocked-names.log'
+</code></pre>
+<p>Restart the service:</p>
+<pre><code class="language-bash">sudo systemctl restart dnscrypt-proxy
+</code></pre>
+<p>Reboot.</p>
+<p>Verify blocklist works</p>
+<pre><code class="language-bash">dig examplead.com @127.0.0.1 -p 53
+</code></pre>
+<p>They should resolve to NXDOMAIN or fail according to our config</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-firefox-on-arch"><a class="header" href="#hardening-firefox-on-arch">Hardening Firefox on Arch</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
