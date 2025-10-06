@@ -2771,6 +2771,7 @@ also lets you create phone number aliases that forward to your phone number.</p>
 <li><a href="arch/hardening_arch.html#the-basics">The Basics</a>
 <ul>
 <li><a href="arch/hardening_arch.html#best-practices-and-standards">Best Practices and Standards</a></li>
+<li><a href="arch/hardening_arch.html#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></li>
 </ul>
 </li>
 <li><a href="arch/hardening_arch.html#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></li>
@@ -2987,6 +2988,7 @@ requires elevation, rather than using sudo to open an entire root shell:</p>
 </li>
 </ul>
 <hr />
+<h3 id="user-and-group-management--strong-passwords"><a class="header" href="#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></h3>
 <ul>
 <li>
 <p>Users and groups are used as a form of
@@ -3007,10 +3009,26 @@ they actually need.</p>
 <p>Avoid running services or applications as root; use dedicated service accounts
 where possible.</p>
 </li>
+</ul>
+<p><strong>Passwords/Password Quality</strong></p>
+<pre><code class="language-bash">sudo pacman -S libpwquality
+</code></pre>
+<p>Edit <code>/etc/pam.d/passwd</code> file to read as:</p>
+<pre><code class="language-passwd">#%PAM-1.0
+password required pam_pwquality.so retry=2 minlen=10 difok=6 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 [badwords=myservice mydomain] enforce_for_root
+password required pam_unix.so use_authtok sha512 shadow
+</code></pre>
+<ul>
+<li>
+<p><a href="https://man.archlinux.org/man/pam_pwquality.8">pam_pwuality(8)</a></p>
+</li>
+<li>
+<p><a href="https://man.archlinux.org/man/pam_unix.8">pam_unix(8)</a></p>
+</li>
 <li>
 <p>Use strong passwords and a password manager. The Arch Wiki
 <a href="https://wiki.archlinux.org/title/Security">Security</a> section goes in depth
-about this so I won't cover it here.</p>
+about this.</p>
 </li>
 <li>
 <p>Regularly review group memberships and file permissions, especially on
