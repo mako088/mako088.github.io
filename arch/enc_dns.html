@@ -175,6 +175,7 @@
 <li><a href="#testing">Testing</a></li>
 <li><a href="#enable-mac-randomization">Enable MAC Randomization</a></li>
 <li><a href="#add-blocklists">Add Blocklists</a></li>
+<li><a href="#enable-privacy-extensions">Enable Privacy Extensions</a></li>
 </ul>
 </details>
 <blockquote>
@@ -501,6 +502,23 @@ log_file = '/var/log/dnscrypt-proxy/blocked-names.log'
 dm.csl.academy.         10      IN      HINFO   "This query has been locally blocked" "by dnscrypt-proxy"
 </code></pre>
 <p>They should resolve to NXDOMAIN or fail according to our config</p>
+<h2 id="enable-privacy-extensions"><a class="header" href="#enable-privacy-extensions">Enable Privacy Extensions</a></h2>
+<p>Add this to <code>/etc/sysctl.d/40-ipv6.conf</code>:</p>
+<pre><code class="language-conf"># Enable IPv6 Privacy Extensions
+net.ipv6.conf.all.use_tempaddr = 2
+net.ipv6.conf.default.use_tempaddr = 2
+net.ipv6.conf.nic.use_tempaddr = 2
+</code></pre>
+<pre><code class="language-bash"># find nic
+ip link
+net.ipv6.conf.wlp3s0.use_tempaddr = 2
+</code></pre>
+<pre><code class="language-bash">sudo sysctl --system
+</code></pre>
+<p><code>/etc/NetworkManager/conf.d/ip6-privacy.conf</code>:</p>
+<pre><code class="language-conf">[connection]
+ipv6.ip6-privacy=2
+</code></pre>
 
                     </main>
 
