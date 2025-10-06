@@ -867,7 +867,13 @@ already gives you great privacy and security benefits.</p>
 </blockquote>
 <p>If you read the following GrapheneOS discussion forum written by an RDNS dev:</p>
 <ul>
-<li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
+<li>
+<p><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></p>
+</li>
+<li>
+<p>See also
+<a href="https://www.reddit.com/r/rethinkdns/comments/1elOuOq/comment/ljzjwd2/">This Comment by celezero</a></p>
+</li>
 </ul>
 <p>The post suggests you go to <code>Home -&gt; Apps</code> and right under <code>Showing all apps</code>
 click on the grayed out 🛜📶 to set a rule to <strong>block both Metered and Unmetered
@@ -1035,8 +1041,8 @@ creating a full encrypted tunnel from your device like a VPN does.</p>
 a configuration file (e.g., <code>.conf</code> file) which is a plaintext file that
 contains what is needed. You download that file and Click <code>IMPORT</code> which brings
 up your phones filesystem.</p>
-<p>There is also a <code>CREATE</code> option for advanced users who are setting up their own
-WireGuard network, typically if you host your own VPN server.</p>
+<p>Alternatively, the <code>CREATE</code> option for advanced users who are setting up their
+own WireGuard network, typically if you host your own VPN server.</p>
 <p>After this is setup you should always verify that your traffic is encrypted
 (hidden IP) and your DNS queries are protected (no leaks).</p>
 <p>You could:</p>
@@ -1047,8 +1053,8 @@ WireGuard network, typically if you host your own VPN server.</p>
 and City/Country this is your real info that the VPN needs to hide.</p>
 </li>
 <li>
-<p>Connect to Wireguard/VPN. Choose the server location you want and go back to
-check again.</p>
+<p>Connect to your Wireguard/VPN server. Choose the server location you want and
+go back to check again.</p>
 </li>
 <li>
 <p>Check for leaks, go to <code>dnsleaktest.com</code> and run a Standard test. If you
@@ -2137,9 +2143,12 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif-onlydo
 <pre><code class="language-bash">sudo mkdir -p /etc/dnscrypt-proxy-blocklist
 sudo cp -r /usr/share/dnscrypt-proxy/utils/generate-domains-blocklist/* /etc/dnscrypt-proxy-blocklist/
 </code></pre>
-<p>Test and generate a blocklist manually</p>
+<p>Test and generate a blocklist manually, the <code>generate-domains-blocklist.py</code> can
+be found
+<a href="https://raw.githubusercontent.com/DNSCrypt/dnscrypt-proxy/master/utils/generate-domains-blocklist/generate-domains-blocklist.py">Here</a>.
+Save this file to <code>/usr/share/dnscrypt-proxy/utils/generate-domains-blocklist</code></p>
 <pre><code class="language-bash">cd /etc/dnscrypt-proxy-blocklist
-sudo ./generate-domains-blocklist -a domains-allowlist.txt -o blocklist.txt
+sudo python3 generate-domains-blocklist.py -o blocklist.txt
 </code></pre>
 <p>Create a service to download &amp; combine filter lists:
 <code>/etc/systemd/system/dnscrypt-filterlist-update.service</code>:</p>
@@ -2176,8 +2185,12 @@ log_file = '/var/log/dnscrypt-proxy/blocked-names.log'
 <pre><code class="language-bash">sudo systemctl restart dnscrypt-proxy
 </code></pre>
 <p>Reboot.</p>
-<p>Verify blocklist works</p>
-<pre><code class="language-bash">dig examplead.com @127.0.0.1 -p 53
+<p>Verify blocklist works against an address listed in <code>blocklist.txt</code>:</p>
+<pre><code class="language-bash">dig dm.csl.academy @127.0.0.1 -p 53
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-bash">;; ANSWER SECTION:
+dm.csl.academy.         10      IN      HINFO   "This query has been locally blocked" "by dnscrypt-proxy"
 </code></pre>
 <p>They should resolve to NXDOMAIN or fail according to our config</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-firefox-on-arch"><a class="header" href="#hardening-firefox-on-arch">Hardening Firefox on Arch</a></h1>

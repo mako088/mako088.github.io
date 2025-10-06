@@ -451,9 +451,12 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif-onlydo
 <pre><code class="language-bash">sudo mkdir -p /etc/dnscrypt-proxy-blocklist
 sudo cp -r /usr/share/dnscrypt-proxy/utils/generate-domains-blocklist/* /etc/dnscrypt-proxy-blocklist/
 </code></pre>
-<p>Test and generate a blocklist manually</p>
+<p>Test and generate a blocklist manually, the <code>generate-domains-blocklist.py</code> can
+be found
+<a href="https://raw.githubusercontent.com/DNSCrypt/dnscrypt-proxy/master/utils/generate-domains-blocklist/generate-domains-blocklist.py">Here</a>.
+Save this file to <code>/usr/share/dnscrypt-proxy/utils/generate-domains-blocklist</code></p>
 <pre><code class="language-bash">cd /etc/dnscrypt-proxy-blocklist
-sudo ./generate-domains-blocklist -a domains-allowlist.txt -o blocklist.txt
+sudo python3 generate-domains-blocklist.py -o blocklist.txt
 </code></pre>
 <p>Create a service to download &amp; combine filter lists:
 <code>/etc/systemd/system/dnscrypt-filterlist-update.service</code>:</p>
@@ -490,8 +493,12 @@ log_file = '/var/log/dnscrypt-proxy/blocked-names.log'
 <pre><code class="language-bash">sudo systemctl restart dnscrypt-proxy
 </code></pre>
 <p>Reboot.</p>
-<p>Verify blocklist works</p>
-<pre><code class="language-bash">dig examplead.com @127.0.0.1 -p 53
+<p>Verify blocklist works against an address listed in <code>blocklist.txt</code>:</p>
+<pre><code class="language-bash">dig dm.csl.academy @127.0.0.1 -p 53
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-bash">;; ANSWER SECTION:
+dm.csl.academy.         10      IN      HINFO   "This query has been locally blocked" "by dnscrypt-proxy"
 </code></pre>
 <p>They should resolve to NXDOMAIN or fail according to our config</p>
 
