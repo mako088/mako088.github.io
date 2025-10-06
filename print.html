@@ -575,29 +575,76 @@ strict levels.</p>
 </code></pre>
 <hr />
 <h3 id="network"><a class="header" href="#network">Network</a></h3>
+<p>Settings explained:</p>
+<ul>
+<li>
+<p><strong>Loopback proxy forwarder apps</strong>: Enable when you want all of your devices
+proxy-related traffic to also flow through Rethinks encrypted tunnel. It
+ensures apps that proxy DNS/HTTP/SOCKS traffic don't leak outside the VPN.</p>
+</li>
+<li>
+<p><strong>Do not route Private IPs</strong>: Prevents routing traffic destined for private IP
+address ranges (like 192.168.x.x, 10.x.x.x) through the tunnel. Instead, this
+traffic goes directly over the local network or system default route. Most
+useful when you want devices on your local network (NAS, printers, etc.) to be
+reachable by apps on your phone without routing the traffic through Rethinks
+tunnel, improving performance and reliability of local connections but
+possibly reducing privacy.</p>
+</li>
+<li>
+<p><strong>Loopback (experimental)</strong>: When enabled, this routes RethinkDNS's own
+internal traffic, such as blocklist downloads, connectivity checks, and DNS
+queries made by the app itself, back into the encrypted tunnel through the
+loopback device.</p>
+</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Setting</th><th>Function</th><th>When to Use</th></tr></thead><tbody>
+<tr><td>Loopback Proxy Forwarder Apps</td><td>Route proxy-forwarder app traffic back into Rethink VPN tunnel</td><td>When you want consistent VPN/privacy coverage for proxies</td></tr>
+<tr><td>Do Not Route Private IPs</td><td>Avoid routing local network/private IP traffic through VPN (send directly)</td><td>To access local devices without VPN bottlenecks</td></tr>
+<tr><td>Loopback (Experimental)</td><td>Route Rethink’s own app traffic (updates/checks) back through VPN tunnel</td><td>To fully protect app's own DNS/blocklist traffic</td></tr>
+</tbody></table>
+</div>
+<p>NOTE: The above settings are disabled by default because some are experimental
+and can easily break functionality.</p>
 <p><code>Configure -&gt; Network</code>:</p>
 <ul>
-<li>Set <code>Use all available networks</code> to ON. This enables Wifi and mobile data to
-be used at the same time by Rethink. (Optional, may use more battery)</li>
-<li><strong>Set your IP version</strong>: The default is <code>IPv4</code>, you can choose between
-<code>IPv6 (experimental)</code> and <code>Auto (experimental)</code>.</li>
-<li>Using the <code>Loopback</code> sounds like a good idea but it makes many of the
+<li>
+<p>Set <code>Use all available networks</code> to ON. This enables Wifi and mobile data to
+be used at the same time by Rethink. (Optional, may use more battery)</p>
+</li>
+<li>
+<p><strong>Set your IP version</strong>: The default is <code>IPv4</code>, you can choose between
+<code>IPv6 (experimental)</code> and <code>Auto (experimental)</code>.</p>
+</li>
+<li>
+<p>Using the <code>Loopback</code> sounds like a good idea but it makes many of the
 resolvers fail. You may have better luck, just remember that this could be
-what's causing your connectivity issues if you're having any.</li>
-<li><strong>Choose fallback DNS</strong>: When your user-preferred DNS is not reachable,
-fallback DNS will be used. I typically choose RethinkDNS as the fallback.</li>
-<li>You may want to experiment with shutting off <code>Enable network visibility</code>, just
+what's causing your connectivity issues if you're having any.</p>
+</li>
+<li>
+<p><strong>Choose fallback DNS</strong>: When your user-preferred DNS is not reachable,
+fallback DNS will be used. I typically choose RethinkDNS as the fallback.</p>
+</li>
+<li>
+<p>You may want to experiment with shutting off <code>Enable network visibility</code>, just
 keep in mind that some apps may break. "Shutting this off prevents apps from
 accessing all available networks, stopping them from bypassing Rethinks
-tunnel". This caused issues with the browser when turned off.</li>
+tunnel". This caused issues with the browser when turned off.</p>
+</li>
 </ul>
 <hr />
 <h3 id="firewall"><a class="header" href="#firewall">Firewall</a></h3>
 <p><code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following to ON:</p>
 <ul>
-<li><code>Block all apps when device is locked</code></li>
-<li><code>Block when DNS is bypassed</code></li>
-<li><code>Block port 80 (insecure HTTP) traffic</code></li>
+<li>
+<p><code>Block all apps when device is locked</code></p>
+</li>
+<li>
+<p><code>Block when DNS is bypassed</code></p>
+</li>
+<li>
+<p><code>Block port 80 (insecure HTTP) traffic</code></p>
+</li>
 </ul>
 <p>You can get more restrictive from here, but it will take some manual
 intervention to get everything working correctly.</p>
