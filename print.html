@@ -257,6 +257,11 @@ from there.</p>
 </ul>
 </li>
 <li><a href="android/RethinkDNS_Guide.html#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></li>
+</ul>
+</li>
+<li><a href="android/RethinkDNS_Guide.html#ublock-origin">uBlock Origin</a>
+<ul>
+<li><a href="android/RethinkDNS_Guide.html#adding-other-lists">Adding other lists</a></li>
 <li><a href="android/RethinkDNS_Guide.html#tor">Tor</a></li>
 <li><a href="android/RethinkDNS_Guide.html#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></li>
 </ul>
@@ -1062,7 +1067,101 @@ to disable their data collection strategies. This is why you won't find many
 privacy by default browsers in Google Play. Browsers like IronFox and Cromite
 are solid options that disable telemetry and more that are available outside of
 the Play ecosystem.</p>
+<p>I personally use IronFox as my default and have been happy with it so far. It
+comes with uBlock installed by default which I recommend that you learn how to
+get the most out of. With Firefox fingerprint protection, a few about:config
+tweaks, and uBlock you can accomplish what used to take 6 extensions to do.</p>
+<details>
+<summary> ✔️ Click to Expand uBlock Guide </summary>
+<h2 id="ublock-origin"><a class="header" href="#ublock-origin">uBlock Origin</a></h2>
+<p>BetterFox does a great job explaining how to use uBlock with solid
+recommendations.</p>
 <ul>
+<li><a href="https://github.com/yokoffing/filterlists?tab=readme-ov-file#guidelines">BetterFox uBlock filterlists</a></li>
+</ul>
+<p>If you wanted to apply the
+<a href="https://github.com/yokoffing/filterlists/blob/main/privacy_essentials.txt">Privacy Essentials</a>
+list you would click
+<a href="https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt&amp;title=Privacy%20Essentials">subscribe</a>,
+which launches the uBlock asset viewer where you can see all of the domains that
+will be blocked before clicking <code>Subscribe</code> again to apply them.</p>
+<h3 id="adding-other-lists"><a class="header" href="#adding-other-lists">Adding other lists</a></h3>
+<ul>
+<li>
+<p><a href="https://github.com/hagezi/dns-blocklists">Hagezi dns-blocklists</a></p>
+</li>
+<li>
+<p><a href="https://github.com/ppfeufer/adguard-filter-list">adguard-filter-list</a></p>
+</li>
+</ul>
+<p>Click the uBlock logo, Settings, Filter lists, scroll to the bottom and choose
+Import..., Paste the url of your chosen list, and click Apply changes.</p>
+<p>For example, Arkenfox suggests adding the Actually Legitimate URL Shortener
+Tool. Add
+<a href="https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt">https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt</a>
+to the Import... section and click Apply changes. If you scroll up, you'll see
+that it was added and chosen.</p>
+<p>Setup your <a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode">Blocking mode</a></p>
+<p>Many opt for
+<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-medium-mode">medium mode</a>.
+To do so you need to:</p>
+<p><strong>Settings pane</strong>:</p>
+<ul>
+<li>Open the dashboard, and choose I am an advanced user.</li>
+</ul>
+<p><strong>Filter lists pane</strong>:</p>
+<ul>
+<li>
+<p>All of uBO's filter lists: checked</p>
+</li>
+<li>
+<p>EasyList: checked</p>
+</li>
+<li>
+<p>Peter Lowe's Ad server list: checked</p>
+</li>
+<li>
+<p>EasyPrivacy: checked</p>
+</li>
+<li>
+<p>Online Malicious URL Blocklist: checked</p>
+</li>
+</ul>
+<p><strong>My rules pane (4th pane from the left)</strong>:</p>
+<p>Underneath Temporary rules add, you literally type this in:</p>
+<ul>
+<li>
+<p>Add <code>* * 3p-script block</code></p>
+</li>
+<li>
+<p>Add <code>* * 3p-frame block</code></p>
+</li>
+<li>
+<p>Click <code>Save</code></p>
+</li>
+<li>
+<p>Click <code>&lt;- Commit</code> (Not required on phone)</p>
+</li>
+<li>
+<p>Setting medium mode on your phone is likely overkill because it's not super
+quick to switch broken sites to easy mode as it is on a computer.</p>
+</li>
+</ul>
+<p><strong>Fallback to
+<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-easy-mode">easy mode</a></strong></p>
+<p>Click the uBlock logo while on the site you want to use easy mode on. You'll see
+the power button to the top right, the Global rules and the Local rules which
+start 3 boxes from the left. Click the box under the Local rules for 3rd-party
+scripts. The box will change colors, dark gray = NOOP (No Operation). This tells
+uBO to ignore the aggressive global block for this site, and let the normal
+filter lists handle the blocking.</p>
+<p>You can also disable JavaScript in Settings as needed replacing the need for
+NoScript.</p>
+</details>
+<ul>
+<li>
+<p><a href="https://github.com/gorhill/uBlock/wiki">uBlock Wiki</a></p>
+</li>
 <li>
 <p><a href="https://arstechnica.com/gadgets/2025/09/f-droid-calls-for-regulators-to-stop-googles-crackdown-on-sideloading/">Ars Technica F-Droid &amp; sideloading restrictions</a></p>
 </li>
@@ -2879,7 +2978,7 @@ captcha requests constantly.</p>
 <a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
 <p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
 <hr />
-<h2 id="ublock-origin"><a class="header" href="#ublock-origin">uBlock Origin</a></h2>
+<h2 id="ublock-origin-1"><a class="header" href="#ublock-origin-1">uBlock Origin</a></h2>
 <p>BetterFox does a great job explaining how to use uBlock with solid
 recommendations.</p>
 <ul>
@@ -2891,7 +2990,7 @@ list you would click
 <a href="https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt&amp;title=Privacy%20Essentials">subscribe</a>,
 which launches the uBlock asset viewer where you can see all of the domains that
 will be blocked before clicking <code>Subscribe</code> again to apply them.</p>
-<h3 id="adding-other-lists"><a class="header" href="#adding-other-lists">Adding other lists</a></h3>
+<h3 id="adding-other-lists-1"><a class="header" href="#adding-other-lists-1">Adding other lists</a></h3>
 <ul>
 <li>
 <p><a href="https://github.com/hagezi/dns-blocklists">Hagezi dns-blocklists</a></p>
