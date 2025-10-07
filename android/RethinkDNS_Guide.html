@@ -437,23 +437,56 @@ choose a VPN either, I haven't found a free VPN that I would trust...</p>
 </ul>
 <p><code>Configure -&gt; DNS -&gt; Other DNS</code>:</p>
 <ul>
-<li>Choose the type of resolver you want, I use DNSCrypt. Once you click you can
+<li>
+<p>Choose the type of resolver you want, I use DNSCrypt. Once you click you can
 choose the specific resolver you want such as Quad9. You may notice that it
 says <code>Failed: using fallback DNS</code>. This is only because we haven't turned it
-on yet, we will recheck this once we turn it on.</li>
-<li>If you want a relay in a specific country, you can click the <code>Relays</code> tab. For
+on yet, we will recheck this once we turn it on.</p>
+</li>
+<li>
+<p>If you want a relay in a specific country, you can click the <code>Relays</code> tab. For
 DNSCrypt you are given the choice between the Netherlands, France, Sweden, Los
 Angeles, and Singapore. You might do this if you were trying to circumvent
-censorship.</li>
+censorship.</p>
+</li>
 </ul>
 <p><strong>Rules</strong> set the following:</p>
 <ul>
-<li><code>Advanced DNS filtering (experimental)</code>: Assign unique IP per DNS request.</li>
-<li><code>Prompt on blocklist updates</code>: This is for if you use Rethink's custom
-blocklists.</li>
+<li>
+<p><code>Advanced DNS filtering (experimental)</code>: Assign unique IP per DNS request.</p>
+</li>
+<li>
+<p><code>Prompt on blocklist updates</code>: This is for if you use Rethink's custom
+blocklists.</p>
+</li>
+<li>
+<p><code>Prevent DNS leaks</code>: When enabled, Rethink captures all packets on port 53 and
+forwards it to a user-set DNS endpoint.</p>
+</li>
 </ul>
 <p>Leave all the <code>Advanced</code> defaults unless you plan on setting up a SOCKS5 proxy,
 in which case you will want to enable <code>Configure -&gt; DNS -&gt; Never proxy DNS</code>.</p>
+<hr />
+<p>F-Droid Specific:</p>
+<ul>
+<li>
+<p><code>Split DNS (experimental)</code>: Forward DNS queries from proxied apps to the
+proxy's DNS servers.</p>
+</li>
+<li>
+<p><code>Treat DNS rules as firewall rules (experimental)</code>: DNS blocking will be
+bypassed during resolution; the decision will be made at connection time.</p>
+</li>
+<li>
+<p>Set <code>Use fallback DNS as bypass</code>: where it always uses your fallback DNS for
+bypassed apps, domains and IPs.</p>
+</li>
+<li>
+<p>You can also set <code>Use System DNS for undelgated domains</code> which is generally
+safe to enable and useful if access to local network devices or custom
+internal domains is needed.</p>
+</li>
+</ul>
 <hr />
 <p><strong>Blocklists</strong>:</p>
 <p>This is a cool feature, similar to NextDNS if I understand correctly. Since it's
@@ -626,16 +659,16 @@ have set.</p>
 <code>Bypass DNS &amp; Firewall</code>. Try the app again, does it work? If not:</p>
 </li>
 <li>
-<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app and is
-often what is required for Reddit. It is my understanding that after you
-<code>Exclude</code> Reddit for example, your systems Automatic Secure DNS will pick it
-up.</p>
-</li>
-<li>
 <p>You can also <code>Isolate</code> an App, you then have to set up <em>trust | allow</em> rules
 for domains or IPs over a period of time which can take a while. You can go to
 <code>Apps</code> and search for the app in question, click on it and at the bottom of
 the screen you'll see <code>IP Logs</code>, and <code>Domain Logs</code> to help with this.</p>
+</li>
+<li>
+<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app and is
+often what is required for Reddit. It is my understanding that after you
+<code>Exclude</code> Reddit for example, your systems Automatic Secure DNS will pick it
+up.</p>
 </li>
 </ul>
 <hr />
@@ -842,14 +875,9 @@ be the reason it ignored Rethink, I don't care to test further...</p>
 </ul>
 <hr />
 <h3 id="more-fine-grained-control--enhanced-privacy"><a class="header" href="#more-fine-grained-control--enhanced-privacy"><a href="#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></a></h3>
-<blockquote>
-<p>❗ NOTE: If you are happy with the functionality as is it is unnecessary to
-follow these steps. If you already only install the minimal apps needed on
-your phone (i.e. Only install what you use) you can probably just go to
-individual Apps and block their networking that you are worried about such as
-Facebook and Google. Routing all of your Apps through RethinkDNS + Firewall
-already gives you great privacy and security benefits.</p>
-</blockquote>
+<p>In this section we will switch from a default allow to a default deny; blocking
+network access to every app. We will then go through and only enable networking
+for the apps that we need and trust.</p>
 <p>If you read the following GrapheneOS discussion forum written by an RDNS dev:</p>
 <ul>
 <li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
@@ -859,20 +887,64 @@ click on the grayed out 🛜📶 to set a rule to <strong>block both Metered and
 connections to all apps by default</strong>. This will block both Wi-Fi and mobile data
 connections to <strong>all apps</strong> on your device.</p>
 <p>The point here is that not every App on your device needs network access all the
-time or at all in some cases. Watch your Logs and see which apps "phone home"
-the most. Think about which Apps would leave you the most vulnerable and either
-block network access completely or block and unblock as needed based on your
-threat model.</p>
-<p>I would recommend removing network access from your password manager until you
-need it or better yet use something completely offline like
-<a href="https://www.keepassdx.com/">KeePassDX</a>.</p>
-<p>I have never used <code>Link to Windows</code> and I <code>Disable</code> &amp; <code>Force Stop</code> it and
-<code>Link to Windows</code> is still my most blocked App of all time by Rethink...</p>
-<p>If you go for the default deny, you will have to search for every app that you
-use and start by enabling networking and then following the
-<code>Apps that don't work</code> section for each app until they work as expected. If you
-really think about it, the number of apps that require constant networking
-should be limited.</p>
+time or at all in some cases.</p>
+<p>Search for the apps you use/trust and:</p>
+<ul>
+<li>
+<p>start by enabling Wi-Fi 🛜 and mobile-data 📶</p>
+</li>
+<li>
+<p>Next, check your logs and see why it's being blocked. Look at the domains
+involved and set trust rules for said domains. If it is unclear why networking
+still isn't working, you can:</p>
+</li>
+<li>
+<p><code>Bypass Universal</code>, this allows it to bypass any Universal Firewall rules you
+have set.</p>
+</li>
+<li>
+<p>If you're using Rethink's DNS, you can try allowing the app to
+<code>Bypass DNS &amp; Firewall</code>. Try the app again, does it work? If not:</p>
+</li>
+<li>
+<p>You can also <code>Isolate</code> an App, you then have to set up <em>trust | allow</em> rules
+for domains or IPs over a period of time which can take a while.</p>
+</li>
+<li>
+<p><code>Exclude</code> the app. This makes RethinkDNS completely unaware of the app and is
+often what is required for Reddit. It is my understanding that after you
+<code>Exclude</code> an App, your systems Automatic Secure DNS will pick it up.</p>
+</li>
+</ul>
+<p>A few apps that typically need network access on Android:</p>
+<ul>
+<li>
+<p>Google Play services (<code>com.google.android.gms</code>): push notifications, safety
+checks, etc.</p>
+</li>
+<li>
+<p>Google Play Store (<code>com.android.vending</code>) app updates and downloads</p>
+</li>
+<li>
+<p>Android System (usually UID 1000, often <code>android</code> or <code>system</code>): Core OS
+connectivity checks, NTP time sync, and network management. Blocking can cause
+"no internet" errors.</p>
+</li>
+<li>
+<p>Android System WebView (<code>com.google.android.webview</code>): Renders web contents in
+apps.</p>
+</li>
+<li>
+<p>Download Manager (<code>com.android.providers.downloads</code>): Manages file downloads
+from apps/browser. Without it, downloads stall.</p>
+</li>
+<li>
+<p>Media Storage</p>
+</li>
+<li>
+<p>Settings</p>
+</li>
+</ul>
 <hr />
 <h3 id="tor"><a class="header" href="#tor"><a href="#tor">Tor</a></a></h3>
 <p>If you want to learn how Tor works, I suggest reading the following in this
