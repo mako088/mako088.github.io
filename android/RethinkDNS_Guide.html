@@ -613,6 +613,9 @@ tunnel". This caused issues with the browser when turned off.</p>
 </ul>
 <p>You can get more restrictive from here, but it will take some manual
 intervention to get everything working correctly.</p>
+<p>Keep your firewall rules in mind when you're setting per app settings. If the
+Universal firewall blocks all apps when the device is locked, do you want this
+app affected by this or do you want to let it Bypass the Universal firewall?</p>
 <hr />
 <h2 id="turn-on-dns-and-firewall"><a class="header" href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a></h2>
 <p><code>Home</code> 🏠:</p>
@@ -647,8 +650,9 @@ the same process for other Apps that aren't working.</p>
 <ul>
 <li>
 <p>First, you should check your logs and see why it's being blocked. Look at the
-domains involved and set trust rules for said domains. If it is unclear why
-networking still isn't working, you can:</p>
+domains involved and set trust rules for said domains. (start by trusting
+reddit.com). Check the logs again, add any domains that were blocked related
+to reddit. If it is unclear why networking still isn't working, you can:</p>
 </li>
 <li>
 <p><code>Bypass Universal</code>, this allows it to bypass any Universal Firewall rules you
@@ -772,6 +776,15 @@ OrgAbuseRef:    https://rdap.arin.net/registry/entity/ABUSE4771-ARIN
 #
 # Copyright 1997-2025, American Registry for Internet Numbers, Ltd.
 </code></pre>
+<blockquote>
+<p>⚠️ Use caution when setting trust rules for subnet ranges, as this grants
+access to all services hosted within that range, potentially including
+services unrelated to the one you intend to access. Best practice is to first
+attempt to trust the specific domain name (e.g., reddit.com), which is
+generally the most granular and secure method. Only consider trusting broader
+subnet ranges (like 151.101.0.0/16) as a last resort if domain-based rules
+fail to resolve connectivity issues for the intended service.</p>
+</blockquote>
 <p>We can see that:</p>
 <ul>
 <li>The subnet range for that IP: <code>151.101.0.0 - 151.101.255.255</code> (CIDR notation:
@@ -780,10 +793,16 @@ OrgAbuseRef:    https://rdap.arin.net/registry/entity/ABUSE4771-ARIN
 <p>So as a starting point to get Reddit working we could trust the following subnet
 range:</p>
 <ul>
-<li>IPv4: <code>151.101.0.0/16</code></li>
-<li>This subnet covers the full range from <code>151.101.0.0</code> to <code>151.101.255.255</code>,
-which includes all related IPs Reddit uses via Fastly’s CDN.</li>
-<li>The owning organization: <code>Fastly, Inc.</code> &amp; More...</li>
+<li>
+<p>IPv4: <code>151.101.0.0/16</code></p>
+</li>
+<li>
+<p>This subnet covers the full range from <code>151.101.0.0</code> to <code>151.101.255.255</code>,
+which includes all related IPs Reddit uses via Fastly’s CDN.</p>
+</li>
+<li>
+<p>The owning organization: <code>Fastly, Inc.</code> &amp; More...</p>
+</li>
 </ul>
 </details>
 <hr />
@@ -891,16 +910,14 @@ time or at all in some cases.</p>
 <p>Search for the apps you use/trust and:</p>
 <ul>
 <li>
-<p>start by enabling Wi-Fi 🛜 and mobile-data 📶</p>
+<p>start by enabling Wi-Fi 🛜 and mobile-data 📶 as well as Bypass Universal so
+your required apps aren't blocked right when the screen shuts off or affected
+by the firewall.</p>
 </li>
 <li>
 <p>Next, check your logs and see why it's being blocked. Look at the domains
 involved and set trust rules for said domains. If it is unclear why networking
 still isn't working, you can:</p>
-</li>
-<li>
-<p><code>Bypass Universal</code>, this allows it to bypass any Universal Firewall rules you
-have set.</p>
 </li>
 <li>
 <p>If you're using Rethink's DNS, you can try allowing the app to
