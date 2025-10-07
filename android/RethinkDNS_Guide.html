@@ -897,6 +897,85 @@ be the reason it ignored Rethink, I don't care to test further...</p>
 <p>In this section we will switch from a default allow to a default deny; blocking
 network access to every app. We will then go through and only enable networking
 for the apps that we need and trust.</p>
+<details>
+<summary> ✔️ Click to Expand Android Privacy Tips </summary>
+<p>If you don't like the idea of someone forcing you to unlock your phone so they
+can sift through your data:</p>
+<ul>
+<li>
+<p>It's often recommended to <strong>not</strong> use biometrics as they can be forcibly be
+taken from you while a password typically can't.</p>
+</li>
+<li>
+<p>Cellibrite relies on your phone being in AFU mode which is After first unlock.</p>
+</li>
+</ul>
+<p><strong>BFU</strong>: Before First Unlock. This refers to the state right after a device
+restarts. Since the user hasn't entered their password yet, the system has not
+unlocked the phone's storage, so its contents remain encrypted.</p>
+<p><strong>AFU</strong>: After First Unlock. In this state, the device has been unlocked at
+least once since it was powered on, even if it is currently locked. The
+encryption keys are loaded into RAM, making the device's stored data more
+accessible and increasing the potential attack surface compared to the BFU
+state.</p>
+<ul>
+<li>
+<p>Set the Auto optimization (Auto Restart) to the shortest amount of time
+possible. When your phone first reboots it is in BFU mode which is Before
+first unlock mode. Biometrics are usually disabled in this mode and the
+encryption keys are <strong>not</strong> saved in RAM making the attack surface much
+smaller.(i.e., they typically have to guess the password or brute-force it)</p>
+<ul>
+<li>That said, if someone gets your phone while it's in AFU mode they will only
+have the amount of time until your next auto reboot to try to extract your
+data.</li>
+</ul>
+</li>
+<li>
+<p>You can also try to reduce the number of unlock attempts before the device
+wipes. The default is typically 20 attempts, I haven't found a way to lower
+this.</p>
+</li>
+<li>
+<p>You can't really trust Airplane mode on anything but GrapheneOS. If you are
+able to remove your battery, do that when it matters.</p>
+</li>
+</ul>
+<p><strong>Google</strong></p>
+<p>In <code>Settings -&gt; Google</code> in
+<code>Google services -&gt; All services -&gt; Privacy &amp; security</code> Select <code>Ads</code> and either
+Reset advertising ID every so often, or Delete advertising ID but know the
+consequences of the latter.</p>
+<p>In the same <code>All services</code> area, click <code>Usage &amp; diagnostics</code> to disable it.</p>
+<p>Turn off <code>Improve Location Accuracy</code></p>
+<p>Go to your accounts <code>Manage your Google Account</code>, <code>Data &amp; privacy</code> and disable
+all of the Activity tracking (Pause it or turn it off).</p>
+<p>If you rely on Google services, in the <code>Data &amp; privacy</code> section, it is helpful
+to run a <code>Privacy Checkup</code>.</p>
+<p>When you're done, always go to <code>Settings -&gt; Accounts and backup</code> and remove the
+Google account.</p>
+<p><strong>F-Droid</strong></p>
+<p>F-Droid is a free and open-source app store for Android that only distributes
+open-source software, without ads, proprietary code, or user tracking. All apps
+are vetted for privacy and transparency, making it a strong alternative to
+Google Play.</p>
+<p>No registration or account is required, further protecting privacy.</p>
+<p>I recommended that you <strong>remove Android System SafetyCore</strong>. Android silently
+added spyware calling it a service, it provides child protection by scanning
+every message for nudes and communicating with messaging apps to blur or stop
+it. Google has been known to ban accounts with no recourse for perceived CSAM
+found while scanning your device in the background, often your own baby
+pictures. This is a form of the client side loading that you hear about if I
+understand correctly, the technology that makes e2ee useless.</p>
+<ul>
+<li>
+<p><a href="https://www.protectstar.com/en/blog/android-system-safetycore-hidden-installation-and-what-you-should-know">What is SafetyCore and why you should delete it</a></p>
+</li>
+<li>
+<p><a href="https://www.kaspersky.com.au/blog/what-are-android-safetycore-and-key-verifier/34736/">Google forcing Android System SafetyCore on users to scan for nudes</a></p>
+</li>
+</ul>
+</details>
 <p>If you read the following GrapheneOS discussion forum written by an RDNS dev:</p>
 <ul>
 <li><a href="https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54">GrapheneOS Discussion Forum on Rethink</a></li>
