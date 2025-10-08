@@ -209,9 +209,15 @@
 <li><a href="#remove-firejail-symlinks">Remove Firejail symlinks</a></li>
 </ul>
 </li>
-<li><a href="#apparmor">AppArmor</a></li>
-<li><a href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a>
+<li><a href="#apparmor">AppArmor</a>
 <ul>
+<li><a href="#switching-an-app-from-unconfined-mode-to-enforce">Switching an app from unconfined mode to enforce</a></li>
+<li><a href="#disabling-apparmor">Disabling AppArmor</a></li>
+</ul>
+</li>
+<li><a href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren't pre-configured</a>
+<ul>
+<li><a href="#profiling-by-hand">Profiling by Hand</a></li>
 <li><a href="#auditd">Auditd</a></li>
 <li><a href="#doas-over-sudo">Doas over sudo</a></li>
 </ul>
@@ -1912,8 +1918,8 @@ lsm=landlock,lockdown,yama,integrity,apparmor,bpf audit=1 audit_backlog_limit=25
 </code></pre>
 <p>Save &amp; Reboot</p>
 <p>Start/Enable AppArmor:</p>
-<pre><code class="language-bash">sudo systemctl start apparmor
-sudo systemctl enable apparmor
+<pre><code class="language-bash">sudo systemctl enable apparmor
+sudo systemctl start apparmor
 </code></pre>
 <p>Ensure the LSM is loaded with:</p>
 <pre><code class="language-bash">zgrep CONFIG_LSM=/proc/config.gz
@@ -1922,12 +1928,20 @@ cat /sys/kernel/security/lsm
 </code></pre>
 <p>Reboot, and run <code>sudo aa-enabled</code>, and <code>sudo aa-status</code>. You should see many
 profiles in enforce mode.</p>
+<h3 id="switching-an-app-from-unconfined-mode-to-enforce"><a class="header" href="#switching-an-app-from-unconfined-mode-to-enforce">Switching an app from unconfined mode to enforce</a></h3>
+<ul>
+<li>First, ensure a profile exists</li>
+</ul>
 <p>Check AppArmor log messages:</p>
 <p>Each time AppArmor denies applications from doing something potentially harmful
 the event is logged.</p>
 <pre><code class="language-bash">sudo journalctl -fx
 </code></pre>
 <p>NOTE: Your firewall can also trigger this.</p>
+<h3 id="disabling-apparmor"><a class="header" href="#disabling-apparmor">Disabling AppArmor</a></h3>
+<p>Disable AppArmor by unloading all profiles for the current session:</p>
+<pre><code class="language-bash">sudo aa-teardown
+</code></pre>
 <p>Further reading:</p>
 <ul>
 <li>
@@ -1940,7 +1954,86 @@ the event is logged.</p>
 <p><a href="https://wiki.archlinux.org/title/AppArmor">Arch Wiki AppArmor</a></p>
 </li>
 </ul>
-<h2 id="creating-profiles-that-arent-pre-configured"><a class="header" href="#creating-profiles-that-arent-pre-configured">Creating profiles that aren't pre-configured</a></h2>
+<h2 id="creating-or-adding-profiles-that-arent-pre-configured"><a class="header" href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren't pre-configured</a></h2>
+<p>For example, thunderbird came with a profile that just allowed everything.
+Rather than creating my own profile I cloned the <code>apparmor-profiles</code> repo and
+got it from there.</p>
+<pre><code class="language-bash">mkdir aa &amp;&amp; cd aa
+git clone git://git.launchpad.net/apparmor-profiles
+</code></pre>
+<pre><code class="language-bash">sudo cp ~/aa/apparmor-profiles/thunderbird /etc/apparmor.d/usr.bin.thunderbird
+</code></pre>
+<p>Create a local override file, this is where you will make your personal changes
+to existing profiles:</p>
+<pre><code class="language-bash">sudo mkdir -p /etc/apparmor.d/local
+sudo touch /etc/apparmor.d/local/usr.bin.thunderbird
+</code></pre>
+<p>Set the new profile to enforce mode:</p>
+<pre><code class="language-bash">sudo aa-enforce /etc/apparmor.d/usr.bin.thunderbird
+</code></pre>
+<hr />
+<p><strong>Creating a new profile</strong></p>
+<ul>
+<li><a href="https://gitlab.com/apparmor/apparmor/-/wikis/Profiling_with_tools">Profiling_with_tools</a></li>
+</ul>
+<ol>
+<li>Temporarily disable kernel rate limiting on logs:</li>
+</ol>
+<pre><code class="language-bash">sudo sysctl -w kernel.printk_ratelimit=0
+</code></pre>
+<ol start="2">
+<li>Start <code>aa-genprof</code>:</li>
+</ol>
+<pre><code class="language-bash">sudo aa-genprof &lt;path-to-executable&gt;
+# Example
+sudo aa-genprof /usr/bin/brave
+</code></pre>
+<ol start="3">
+<li>Execute a test plan, open and close brave, download a file through brave,
+adjust settings, do anything you can think of with brave.</li>
+</ol>
+<ul>
+<li>
+<p>Press S to Scan system log for AppArmor events</p>
+</li>
+<li>
+<p>Press F to Finish</p>
+</li>
+</ul>
+<p>This simple example created this profile in <code>/etc/apparmor.d/usr.bin.brave</code>:</p>
+<pre><code class="language-text"># Last Modified: Wed Oct  8 09:29:51 2025
+abi &lt;abi/4.0&gt;,
+
+include &lt;tunables/global&gt;
+
+/usr/bin/brave flags=(complain) {
+  include &lt;abstractions/base&gt;
+
+  /usr/bin/brave r,
+  /usr/bin/env ix,
+
+}
+</code></pre>
+<h3 id="profiling-by-hand"><a class="header" href="#profiling-by-hand">Profiling by Hand</a></h3>
+<p>Disable kernel rate limiting:</p>
+<pre><code class="language-bash">sysctl -w kernel.printk_ratelimit=0
+</code></pre>
+<p>Lets pick up from our /usr/bin/brave example:</p>
+<p>Create a preliminary profile</p>
+<pre><code class="language-text"># Last Modified: Wed Oct  8 09:29:51 2025
+abi &lt;abi/4.0&gt;,
+
+include &lt;tunables/global&gt;
+
+/usr/bin/brave flags=(complain) {
+  include &lt;abstractions/base&gt;
+
+  /usr/bin/brave r,
+  /usr/bin/env ix,
+
+}
+
+</code></pre>
 <h3 id="auditd"><a class="header" href="#auditd">Auditd</a></h3>
 <p>Linux audit makes your system more secure by providing you the means to analyze
 what's going on in your system in great detail. It does not provide any security
