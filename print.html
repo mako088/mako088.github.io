@@ -994,7 +994,7 @@ be the reason it ignored Rethink, I don't care to test further...</p>
 network access to every app. We will then go through and only enable networking
 for the apps that we need and trust.</p>
 <details>
-<summary> ✔️ Click to Expand Android Privacy Tips </summary>
+<summary> ✔️ Click to Expand Android Privacy Tips for the paranoid </summary>
 <p>If you don't like the idea of someone forcing you to unlock your phone so they
 can sift through your data:</p>
 <ul>
@@ -1003,7 +1003,8 @@ can sift through your data:</p>
 taken from you while a password typically can't.</p>
 </li>
 <li>
-<p>Cellibrite relies on your phone being in AFU mode which is After first unlock.</p>
+<p><a href="https://en.wikipedia.org/wiki/Cellebrite">Cellebrite</a> relies on your phone
+being in AFU mode which is After first unlock.</p>
 </li>
 </ul>
 <p><strong>BFU</strong>: Before First Unlock. This refers to the state right after a device
@@ -1058,7 +1059,19 @@ zones to strategically place adds on the most traveled areas.</p>
 <li>
 <p><a href="https://www.forbes.com/sites/alexvakulov/2025/02/20/11-types-of-bluetooth-attacks-and-how-to-protect-your-devices/">Types of bluetooth attacks</a></p>
 </li>
+<li>
+<p>Turn off Wi-Fi, Bluetooth, Location, Nearby device scanning, etc. when not in
+use or needed. Your weather app doesn't need your location 24/7, find one that
+lets you manually enter your location and time zone.</p>
+</li>
+<li>
+<p>Use a password manager rather than using the one built into the browser, I
+like BitWarden for sync and KeepassDX for self storage. Since you don't have
+to remember the passwords, have it generate long complex unique passwords for
+each app.</p>
+</li>
 </ul>
+<hr />
 <p><strong>Google</strong></p>
 <p>In <code>Settings -&gt; Google</code> in
 <code>Google services -&gt; All services -&gt; Privacy &amp; security</code> Select <code>Ads</code> and either
@@ -1081,6 +1094,7 @@ Google account.</p>
 <p><a href="https://www.kaspersky.com.au/blog/what-are-android-safetycore-and-key-verifier/34736/">Google forcing Android System SafetyCore on users to scan for nudes</a></p>
 </li>
 </ul>
+<hr />
 <p><strong>F-Droid</strong></p>
 <p>F-Droid is a free and open-source app store for Android that only distributes
 open-source software, without ads, proprietary code, or user tracking. All apps
@@ -1095,15 +1109,61 @@ the Play ecosystem.</p>
 <p>I personally use IronFox as my default and have been happy with it so far. It
 comes with uBlock installed by default which I recommend that you learn how to
 get the most out of. With Firefox fingerprint protection, a few about:config
-tweaks, and uBlock you can accomplish what used to take 6 extensions to do.</p>
+tweaks, and uBlock you can accomplish what used to take 6 extensions to do. See:
+<a href="android/RethinkDNS_Guide.html#ublock-origin">uBlock Origin</a></p>
+<hr />
+<p><strong>SearXNG</strong></p>
+<p>While we're on the topic of browsers, it's worth considering a privacy-focused
+metasearch engine like SearXNG. SearXNG anonymizes your search queries and
+removes any identifying data before passing them along to Google or other search
+engines. This way, you can receive top-quality search results while keeping your
+privacy intact</p>
+<p>To get started find a few <a href="https://searx.space/">local instances</a> and
+<a href="https://searx.neocities.org/nojs.html">others</a> and either bookmark them for
+quick access or do what I do and add them to use as your default search engine.</p>
+<p>In Firefox go to <code>about:preferences#search</code>, scroll to the bottom and click
+<code>Add</code>. Name it whatever you want and for the URL add one of the local instances
+followed by <code>search?q=%s</code> for example, for an instance in the US with A+
+ratings:</p>
+<pre><code class="language-text">https://searx.ankha.ac/search?q=%s
+</code></pre>
+<p>Then click <code>Add Engine</code>, and back near the top of the page you can set one
+instance as your default search engine and another for private windows. I have
+had a good experience so far using SearXNG with the occasional problem that is
+solved by using a different instance.</p>
+<blockquote>
+<p>❗️ Note: When using a public SearXNG instance from someone you don’t know, you
+are trusting the operator since they can see the IP address making the
+searches and might keep logs. The site https://searx.space/ provides helpful
+details to choose instances based on trust and location. If you want the
+highest level of privacy and full control, running your own instance is the
+best option—though it requires more setup. Using public instances is a great
+way to get started and improve privacy compared to regular search engines.</p>
+</blockquote>
+<p><strong>Browser compartmentalization</strong> is a technique where you use multiple browsers
+to separate different types of online activities. Instead of doing all browsing
+in a single browser, you dedicate specific browsers to distinct tasks, for
+example, one browser for email and banking, another for social media, and a
+third for casual web surfing. This separation makes it difficult for websites
+and trackers to link your activities across different contexts because cookies,
+trackers, and browsing data are isolated within each browser.</p>
+<ul>
+<li>AI and social media Apps often require extensive permissions and deep access
+to your device data and can run background processes that you can't easily
+monitor. If you avoid the apps and only access AI and social media in your
+browser you get the benefits of browser sandboxing, tracking prevention,
+cookie controls and more. You gain more benefits by using the
+compartmentalization technique explained above, possibly one for AI and one
+for social media.</li>
+</ul>
+<hr />
 <details>
 <summary> ✔️ Click to Expand uBlock Guide </summary>
 <h2 id="ublock-origin"><a class="header" href="#ublock-origin">uBlock Origin</a></h2>
-<p>Obviously, if you're already running your browser through Rethink and using
-Rethinks blocklists it's unnecessary to add more. I have found that it's helpful
-to have one browser excluded and use the built-in DNS over HTTPS with uBlock.</p>
-<p>BetterFox does a great job explaining how to use uBlock with solid
-recommendations.</p>
+<p>Arkenfox and Betterfox are JavaScript configuration files used to harden/control
+Firefox settings on a computer.</p>
+<p><a href="https://github.com/yokoffing/BetterFox?tab=readme-ov-file">BetterFox</a> does a
+great job explaining how to use uBlock with solid recommendations.</p>
 <ul>
 <li><a href="https://github.com/yokoffing/filterlists?tab=readme-ov-file#guidelines">BetterFox uBlock filterlists</a></li>
 </ul>
@@ -1124,8 +1184,8 @@ will be blocked before clicking <code>Subscribe</code> again to apply them.</p>
 </ul>
 <p>Click the uBlock logo, Settings, Filter lists, scroll to the bottom and choose
 Import..., Paste the url of your chosen list, and click Apply changes.</p>
-<p>For example, Arkenfox suggests adding the Actually Legitimate URL Shortener
-Tool. Add
+<p>For example, <a href="https://github.com/arkenfox/user.js/">Arkenfox</a> suggests adding
+the Actually Legitimate URL Shortener Tool. Add
 <a href="https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt">https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt</a>
 to the Import... section and click Apply changes. If you scroll up, you'll see
 that it was added and chosen.</p>
