@@ -171,7 +171,11 @@
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
 <li><a href="#fingerprinting-explained">Fingerprinting Explained</a></li>
+</ul>
+</li>
 <li><a href="#metasearch-engines">Metasearch Engines</a>
 <ul>
 <li><a href="#searxng">SearXNG</a>
@@ -200,10 +204,36 @@
 </li>
 </ul>
 </details>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<ul>
+<li>
+<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
+by disabling or restricting features like JavaScript, cookies, telemetry, and
+third-party scripts.</p>
+</li>
+<li>
+<p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser
+indistinguishable from others. Instead of just blocking data collection, it
+ensures that your browser’s configuration; screen size, fonts, user agent,
+etc. matches a large group of users, so you blend in.</p>
+</li>
+<li>
+<p><strong>Browser compartmentalization</strong> is a technique where different browsers are
+dedicated to distinct online activities to isolate cookies, trackers, and
+browsing data. For example, Mullvad Browser can be used solely for activities
+where fingerprinting resistance is critical, such as anonymous browsing or
+visiting privacy-sensitive sites. Meanwhile, a hardened LibreWolf or Firefox
+can be used for general browsing, email, or banking where you want solid
+security and feature flexibility but aren't as concerned about fingerprint
+uniqueness.</p>
+</li>
+</ul>
 <blockquote>
-<p>❗️ NOTE: Browser hardening recommendations have started to change from
-suggesting that you install a bunch of add-ons to choosing secure defaults and
-changing minimal settings to get the most out of it.</p>
+<p>Tor Browser is <strong>not</strong> the most secure browser, anonymity and security can
+often be at odds with each other. Having the exact same browser as many other
+people isn't the best security practice, but it is great for anonymity. Tor is
+also based on Firefox Esr, which only receives patches for vulnerabilities
+considered Critical or High which can be taken advantage of.</p>
 </blockquote>
 <h3 id="fingerprinting-explained"><a class="header" href="#fingerprinting-explained">Fingerprinting Explained</a></h3>
 <p>Browser fingerprinting is a tracking technique, often done by third-party
@@ -261,7 +291,7 @@ add the <code>search?q=%s</code> to the end of it. For example, I'm using
 <code>https://priv.au/search?q=%s</code>. This gives much better results than DDG in my
 opinion.</p>
 </blockquote>
-<p>Searx is a bit different, you can choose which search engine you want for your
+<p>SearXNG is a bit different, you can choose which search engine you want for your
 current search with <code>!ddg search term</code> to use duckduckgo for example.</p>
 <ul>
 <li><a href="https://github.com/searxng/searxng?tab=readme-ov-file">searxng repo</a>
@@ -318,9 +348,6 @@ to prevent DNS spoofing attacks.</p>
 <details>
 <summary> ✔️ Click to Expand DNS Resources </summary>
 <ul>
-<li>
-<p><a href="https://wiki.nixos.org/wiki/Encrypted_DNS">NixOS Wiki Encrypted DNS</a></p>
-</li>
 <li>
 <p><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">Domain Name System (DNS)</a></p>
 </li>
@@ -756,6 +783,15 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </li>
 <li>
 <p><a href="https://cyberinsider.com/firefox-privacy/">cyberinsider Firefox privacy 2025</a></p>
+</li>
+<li>
+<p><a href="https://cyberinsider.com/browser-fingerprinting/">cyberinsider Browser Fingerprinting</a></p>
+</li>
+<li>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/Privacy">Mozilla Web Docs Privacy on the web</a></p>
+</li>
+<li>
+<p><a href="https://adguard-dns.io/en/blog/techtok-9-browser-extensions-and-firewall.html">Adguard Blog Browser Extensions and Firewalls explained</a></p>
 </li>
 </ul>
 </details>
