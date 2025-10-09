@@ -1299,6 +1299,14 @@ from apps/browser. Without it, downloads stall.</p>
 </ul>
 <hr />
 <h3 id="tor"><a class="header" href="#tor"><a href="#tor">Tor</a></a></h3>
+<p>Tor itself is a network and software that anonymizes traffic by encrypting it
+and bouncing it though a series of volunteer-operated relays around the world
+before reaching the destination. Orbot uses this Tor network to encrypt and
+anonymize internet traffic for Android apps.</p>
+<p>Orbot routes app traffic through Tor but doesn't provide the same kind of
+traffic isolation and sandboxing that Tor browser offers on desktop. Be aware of
+the limitations and use Tor Browser on a hardened system or specialized software
+such as Tails or Whonix when anonymity truly matters.</p>
 <p>If you want to learn how Tor works, I suggest reading the following in this
 order:</p>
 <ol>
@@ -1320,6 +1328,21 @@ technologies.--<a href="https://www.privacyguides.org/articles/2025/04/30/in-pra
 <summary>
 ✔️ Click to Expand Tor Section
 </summary>
+<blockquote>
+<p>❗️ WARNING: Tor gets much of its funding from the US government and is not
+immune to vulnerabilities or misconfigurations.Tor Browser is <strong>not</strong> the most
+secure browser, anonymity and security can often be at odds with each other.
+Having the exact same browser as many other people isn't the best security
+practice, but it is great for anonymity. Tor is also based on Firefox Esr,
+which only receives patches for vulnerabilities considered Critical or High
+which can be taken advantage of.</p>
+</blockquote>
+<p>Tor Project has also done some sketchy/questionable things lately such as
+removing user agent spoofing which made every user appear as if they were using
+the same version of Windows. This decision reduces anonymity and is questionable
+at best, seems to me there ought to be a very good reason for doing this which I
+can't find. Tor is still one of the best anonymity solutions, just stay informed
+and cautious.</p>
 <p>The following is a summary of some of the Tor Overview, all credit goes to them.
 It is important to spread the word when you can!</p>
 <p>If you are fortunate to live outside of oppressive regimes with extreme
@@ -1339,6 +1362,9 @@ privacy and freedom for all.</p>
 <hr />
 <h3 id="setting-up-orbot-with-a-tcp-only-proxy"><a class="header" href="#setting-up-orbot-with-a-tcp-only-proxy"><a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></a></h3>
 <p><img src="../images/orbot.png" alt="Orbot Logo" /></p>
+<ul>
+<li>Helpful guide, <a href="https://thecyberexpress.com/what-is-orbot/">What is Orbot?</a></li>
+</ul>
 <p>TCP-Only Proxies forward all TCP-level connections from selected apps to Orbot.</p>
 <p>TCP-Only Proxies work best for Apps that use multiple TCP protocols beyond just
 basic web browsing (HTTP/HTTPS) like messaging apps (Signal), search apps (DDG),
