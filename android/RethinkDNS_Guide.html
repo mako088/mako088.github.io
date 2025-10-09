@@ -308,6 +308,19 @@ to complete a single DNS lookup.</p>
 names into IP addresses that devices use to communicate.</p>
 </li>
 <li>
+<p><strong>Unicast DNS</strong>: The traditional DNS setup where each DNS server is assigned a
+unique, single IP address. DNS queries from clients are directed to this
+specific server regardless of the clients location.</p>
+</li>
+<li>
+<p><strong>Anycast DNS</strong>: Anycast allows a single IP address to be used by multiple
+servers. In Anycast DNS, a DNS query can be answered by any one of several DNS
+servers, usually the one closest to the user by geographic or network
+proximity. This setup reduces latency, increases the availability of DNS
+resolution services, and offers protection against DNS flood DDoS attacks by
+distributing traffic across multiple servers.</p>
+</li>
+<li>
 <p><strong>Recursive resolver</strong> (DNS recursor): is typically the first stop in the
 series of the above servers.</p>
 </li>
@@ -1562,6 +1575,12 @@ state-of-the-art cryptography. --<a href="https://www.wireguard.com/">Wireguard.
 </li>
 <li>
 <p><a href="https://www.cloudflare.com/learning/dns/what-is-a-dns-server/">What is a DNS Server?</a></p>
+</li>
+<li>
+<p><a href="https://www.cloudflare.com/learning/dns/what-is-anycast-dns/">What is Anycast</a></p>
+</li>
+<li>
+<p><a href="https://dn.org/anycast-dns-vs-unicast-dns-a-comparative-guide/">anycast-dns-vs-unicast-dns</a></p>
 </li>
 <li>
 <p><a href="https://www.cloudflare.com/learning/ddos/glossary/user-datagram-protocol-udp/">What is UDP?</a></p>
