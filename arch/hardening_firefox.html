@@ -171,25 +171,27 @@
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <ul>
-<li><a href="#introduction">Introduction</a>
+<li><a href="#-key-terms">🔑 Key Terms</a>
 <ul>
 <li><a href="#fingerprinting-explained">Fingerprinting Explained</a></li>
 </ul>
 </li>
 <li><a href="#metasearch-engines">Metasearch Engines</a>
 <ul>
-<li><a href="#searxng">SearXNG</a>
+<li><a href="#searxng">SearXNG</a></li>
+</ul>
+</li>
+<li><a href="#defenses">Defenses</a>
 <ul>
 <li><a href="#encrypted-dns">Encrypted DNS</a></li>
 <li><a href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></li>
+<li><a href="#resist-fingerprinting">Resist Fingerprinting</a></li>
 </ul>
 </li>
-<li><a href="#fingerprinting">Fingerprinting</a></li>
-</ul>
-</li>
-<li><a href="#webrtc">WebRTC</a></li>
-<li><a href="#canvas-fingerprinting">Canvas Fingerprinting</a></li>
-<li><a href="#webgl">WebGL</a></li>
+<li><a href="#disable-javascript">Disable JavaScript</a></li>
+<li><a href="#disable-webrtc">Disable WebRTC</a></li>
+<li><a href="#disable-canvas-fingerprinting">Disable Canvas Fingerprinting</a></li>
+<li><a href="#disable-webgl">Disable WebGL</a></li>
 <li><a href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></li>
 <li><a href="#apply">Apply</a></li>
 <li><a href="#check">Check</a>
@@ -206,7 +208,7 @@
 <li><a href="#setup-an-arti-service-to-run-in-the-background">Setup an Arti service to run in the background</a></li>
 </ul>
 </details>
-<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<h2 id="-key-terms"><a class="header" href="#-key-terms">🔑 Key Terms</a></h2>
 <ul>
 <li>
 <p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
@@ -229,6 +231,19 @@ can be used for general browsing, email, or banking where you want solid
 security and feature flexibility but aren't as concerned about fingerprint
 uniqueness.</p>
 </li>
+<li>
+<p><strong>Web APIs</strong>: are sets of rules and protocols that allow browsers or servers
+to communicate and share data or functions over the internet. It lets
+developers access features or data of a web service or application without
+exposing the underlying system details, enabling different software to
+interact smoothly and securely.</p>
+</li>
+<li>
+<p><strong>Entropy</strong>: in this context, is a measure of how much unique information a
+specific browser feature contributes to your fingerprint. It's often
+quantified in <strong>bits of entropy</strong>, where higher bits mean more uniqueness
+(i.e., easier to identify you).</p>
+</li>
 </ul>
 <blockquote>
 <p>Tor Browser is <strong>not</strong> the most secure browser, anonymity and security can
@@ -238,6 +253,12 @@ also based on Firefox Esr, which only receives patches for vulnerabilities
 considered Critical or High which can be taken advantage of.</p>
 </blockquote>
 <h3 id="fingerprinting-explained"><a class="header" href="#fingerprinting-explained">Fingerprinting Explained</a></h3>
+<p>Modern Web APIs enable highly customized user experiences but also expose
+detailed device information that attackers can exploit to create browser
+fingerprints, unique identifiers used for covert tracking, even when cookies are
+blocked.</p>
+<p><strong>Entropy</strong>, a measure of randomness or uniqueness in data, is a critical metric
+for assessing the risk of browser fingerprinting.</p>
 <p>Browser fingerprinting is a tracking technique, often done by third-party
 companies that specialize in it. They provide code (usually JavaScript) that a
 website owner can embed on their site. When you visit the site, the script runs
@@ -271,6 +292,9 @@ you. Brave has this feature.</p>
 fingerprint, change one metric and check it again over and over skewing the
 results. It is helpful for knowing what the values actually are and seeing what
 the tracking companies see.</p>
+<ul>
+<li><a href="https://forum.torproject.org/t/browser-fingerprinting/1228/25">Browser Fingerprinting Tor Forum</a></li>
+</ul>
 <p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
 JavaScript, preventing the scripts from running that do most of the
 fingerprinting. Extensions can make you more unique but it's a give and take.</p>
@@ -318,6 +342,7 @@ current search with <code>!ddg search term</code> to use duckduckgo for example.
 </li>
 </ul>
 <hr />
+<h2 id="defenses"><a class="header" href="#defenses">Defenses</a></h2>
 <h4 id="encrypted-dns"><a class="header" href="#encrypted-dns">Encrypted DNS</a></h4>
 <p>DNS (Domain Name System) resolution is the process of translating a website's
 domain name into its corresponding IP address. By default, this traffic isn't
@@ -403,7 +428,7 @@ companies from using them to track your browsing from site to site.</p>
 From the Tor Uplift Project.</p>
 </li>
 </ul>
-<h3 id="fingerprinting"><a class="header" href="#fingerprinting">Fingerprinting</a></h3>
+<h3 id="resist-fingerprinting"><a class="header" href="#resist-fingerprinting">Resist Fingerprinting</a></h3>
 <ul>
 <li>
 <p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
@@ -443,10 +468,26 @@ features.</p>
 </li>
 </ul>
 <hr />
-<h2 id="webrtc"><a class="header" href="#webrtc">WebRTC</a></h2>
+<h2 id="disable-javascript"><a class="header" href="#disable-javascript">Disable JavaScript</a></h2>
+<ul>
+<li>
+<p><a href="https://noscript.net/">NoScript</a> lets you selectively block scripts on
+websites. Its core function is to block all scripts by default on websites,
+allowing you to manually enable scripts on trusted sites.</p>
+<p><a href="https://blog.jeaye.com/2017/11/30/noscript/">NoScript PrivacyGuides</a> should</p>
+</li>
+<li>
+<p><a href="https://ublockorigin.com/">uBlock Origin</a> also lets you block JavaScript,
+just be aware that many sites may break so you'll have to whitelist
+selectively.</p>
+</li>
+</ul>
+<h2 id="disable-webrtc"><a class="header" href="#disable-webrtc">Disable WebRTC</a></h2>
 <p>The main reason people disable WebRTC is to prevent an IP address leak. WebRTC
 is designed for real-time communication like video calls and file sharing. If
 you don't use those features, it makes sense to disable it.</p>
+<p>Disabling WebRTC eliminates specific data points that trackers use, reducing
+entropy &amp; the uniqueness of your fingerprint.</p>
 <p>In <code>about:preferences#privacy</code> -&gt; <code>Privacy &amp; Security</code> -&gt; <code>Permissions</code>. Click
 <code>Settings</code>.</p>
 <ul>
@@ -465,7 +506,7 @@ Block new requests asking to access your camera</p>
 <p>You can also use the master switch by going to <code>about:config</code> and setting
 <code>media.peerconnection.enabled</code> to <code>false</code></p>
 <hr />
-<h2 id="canvas-fingerprinting"><a class="header" href="#canvas-fingerprinting">Canvas Fingerprinting</a></h2>
+<h2 id="disable-canvas-fingerprinting"><a class="header" href="#disable-canvas-fingerprinting">Disable Canvas Fingerprinting</a></h2>
 <p>Canvas Fingerprinting uses the HTML5 <code>&lt;canvas&gt;</code> element to generate a
 fingerprint. It gets your device to render an image or text on a canvas and then
 reads the pixel data. Since devices render things differently, those differences
@@ -473,7 +514,7 @@ are identifiable.</p>
 <p>When you set <code>privacy.resistFingerprinting</code> it modifies both Canvas and WebGL
 behavior to make their outputs non-unique.</p>
 <hr />
-<h2 id="webgl"><a class="header" href="#webgl">WebGL</a></h2>
+<h2 id="disable-webgl"><a class="header" href="#disable-webgl">Disable WebGL</a></h2>
 <p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
 and 3D graphics. The way your system renders these graphics provides information
 about your GPU and graphics drivers, which contributes to your unique
@@ -927,6 +968,9 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </li>
 <li>
 <p><a href="https://adguard-dns.io/en/blog/techtok-9-browser-extensions-and-firewall.html">Adguard Blog Browser Extensions and Firewalls explained</a></p>
+</li>
+<li>
+<p><a href="https://searchfox.org/firefox-main/source/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc">searchfox RFPTargetsDefault</a></p>
 </li>
 </ul>
 </details>
