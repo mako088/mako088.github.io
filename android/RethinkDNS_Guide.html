@@ -1503,6 +1503,21 @@ go back to check again.</p>
 don't see your Public IP listed anywhere, you don't have a leak.</p>
 </li>
 </ol>
+<p><strong>Fixing DNS Leaks</strong>:</p>
+<ul>
+<li>
+<p>Use WireGuard in Simple mode.</p>
+</li>
+<li>
+<p>Or, use <code>Configure -&gt; DNS -&gt; Split DNS</code> with WireGuard in
+<code>Advanved + Lockdown</code> mode (if running on Android 12+)</p>
+</li>
+</ul>
+<p>To ensure your DNS requests go through your VPN, check
+<code>Configure -&gt; Logs -&gt; DNS</code>. Tap on the entries that appear there, which should
+bring up a bottomsheet with more info about the request and how it was handled.
+Requests handled by WireGuard are shown with sub-text "resolved x min ago by
+wg..." --celzero</p>
 <hr />
 <h3 id="logs"><a class="header" href="#logs"><a href="#logs">Logs</a></a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
