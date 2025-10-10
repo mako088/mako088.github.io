@@ -202,6 +202,8 @@
 <li><a href="#adding-other-lists">Adding other lists</a></li>
 </ul>
 </li>
+<li><a href="#set-up-a-socks5-proxy-with-arti">Set up a SOCKS5 Proxy with Arti</a></li>
+<li><a href="#setup-an-arti-service-to-run-in-the-background">Setup an Arti service to run in the background</a></li>
 </ul>
 </details>
 <h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
@@ -699,6 +701,127 @@ scripts. The box will change colors, dark gray = NOOP (No Operation). This tells
 uBO to ignore the aggressive global block for this site, and let the normal
 filter lists handle the blocking.</p>
 <p>You can also disable JavaScript in My rules as needed.</p>
+<hr />
+<h2 id="set-up-a-socks5-proxy-with-arti"><a class="header" href="#set-up-a-socks5-proxy-with-arti">Set up a SOCKS5 Proxy with Arti</a></h2>
+<blockquote>
+<p>❗️ NOTE: This is one example of using a SOCKS5 proxy to circumvent censorship
+or add additional privacy without the Tor Browser. You can also route other
+apps through the proxy, such as email clients, messaging apps, torrent
+clients, and more.</p>
+</blockquote>
+<ol>
+<li>Clone the arti repo:</li>
+</ol>
+<pre><code class="language-bash"># clone the repo
+git clone https://gitlab.torproject.org/tpo/core/arti.git
+
+# navigate to the directory
+cd arti
+</code></pre>
+<hr />
+<ol start="2">
+<li>To build the Arti binary, compile the code and generate the executable run:</li>
+</ol>
+<p>These are the safer build options so you can leave the arti repo in your home
+directory without it leaking your username:</p>
+<pre><code class="language-bash">RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=." \
+   cargo build --release -p arti
+</code></pre>
+<hr />
+<ol start="3">
+<li>To allow Arti SOCKS proxy traffic you need to add a rule permitting incoming
+connections to port 9150.</li>
+</ol>
+<p>For nftables, you would open <code>/etc/nftables.conf</code> and add:</p>
+<pre><code class="language-conf">chain input {
+  # ...snip...
+
+  # Allow Arti SOCKS proxy (port 9150)
+    tcp dport 9150 ct state new accept
+
+  # ...snip...
+}
+</code></pre>
+<p>Enable it with <code>sudo nft -f /etc/nftables.conf</code></p>
+<hr />
+<ol start="4">
+<li>To run Arti as a SOCKS proxy on port <code>9150</code>, execute:</li>
+</ol>
+<pre><code class="language-bash">./target/release/arti proxy
+</code></pre>
+<hr />
+<ol start="5">
+<li>Configure LibreWolf/Firefox to use the Arti proxy:</li>
+</ol>
+<p>Open LibreWolf or Firefox</p>
+<p>Go to the menu and open <code>Preferences/Settings</code>.</p>
+<p>Scroll to the bottom <code>Network Settings</code> section.</p>
+<p>Click on "<code>Settings...</code>" under Network Settings.</p>
+<p>In the connection settings dialog:</p>
+<p>Select "<code>Manual proxy configuration</code>".</p>
+<p>For "SOCKS Host", enter <code>127.0.0.1</code>.</p>
+<p>For the port next to SOCKS Host, enter <code>9150</code>.</p>
+<p>Select the SOCKS version 5 option (<code>SOCKS v5</code>).</p>
+<p>Optionally check the box "<code>Proxy DNS when using SOCKS v5</code>" to route DNS queries
+through the proxy for enhanced privacy.</p>
+<p>Click "<code>OK</code>" to apply the settings.</p>
+<hr />
+<ol start="6">
+<li>Verify Your Proxy Setup Open a new tab and visit <code>https://dnsleaktest.com</code>
+and run an <code>Extended Test</code>.</li>
+</ol>
+<p>Your IP address should now appear as a Tor exit node IP, indicating your traffic
+is routed through the Arti proxy.</p>
+<ul>
+<li>
+<p>Make sure Arti is running in its terminal or background before you start
+browsing.</p>
+</li>
+<li>
+<p>If you close the terminal or stop Arti, your browser will lose the proxy
+connection.</p>
+</li>
+</ul>
+<p>This setup only proxies the configured browser traffic; other apps are not
+affected unless configured similarly.</p>
+<p>This setup turns LibreWolf or Firefox into a Tor-enabled browser without
+installing the Tor Browser Bundle, using the Arti SOCKS proxy instead. It can be
+useful if you want to use a more customizable or alternative browser while still
+accessing the Tor network securely.</p>
+<blockquote>
+<p>⚠️ While using LibreWolf with the Arti SOCKS5 proxy provides network-level
+anonymity by routing traffic through the Tor network, it does not include the
+extensive browser-level privacy and security enhancements found in the
+official Tor Browser. For casual or moderate privacy needs the SOCKS proxy can
+be useful but for stronger anonymity guarantees and protection, the Tor
+Browser is recommended.</p>
+</blockquote>
+<h2 id="setup-an-arti-service-to-run-in-the-background"><a class="header" href="#setup-an-arti-service-to-run-in-the-background">Setup an Arti service to run in the background</a></h2>
+<p>Create a service file at <code>/etc/systemd/system/arti.service</code>:</p>
+<p>Replace <code>your-username</code> with your username</p>
+<pre><code class="language-.service">[Unit]
+Description=Arti Tor Proxy Service
+After=network.target
+
+[Service]
+ExecStart=/home/your-username/arti/target/release/arti proxy
+Restart=on-failure
+User=jr
+Group=jr
+WorkingDirectory=/home/your-username/arti
+Environment=RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=."
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Enable &amp; Start the service:</p>
+<pre><code class="language-bash">sudo systemctl enable arti
+sudo systemctl start arti --now
+</code></pre>
+<p>Ensure its running:</p>
+<pre><code class="language-bash">sudo systemctl status arti
+</code></pre>
+<hr />
 <details>
 <summary> ✔️ Click to Expand Resources </summary>
 <ul>
