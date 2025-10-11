@@ -1161,6 +1161,19 @@ comes with uBlock installed by default which I recommend that you learn how to
 get the most out of. With Firefox fingerprint protection, a few about:config
 tweaks, and uBlock you can accomplish what used to take 6 extensions to do. See:
 <a href="android/RethinkDNS_Guide.html#ublock-origin">uBlock Origin</a></p>
+<p>For more compartmentalization, Brave Browser now has an F-Droid repository that
+can be added.</p>
+<p>Open F-Droid, in Settings click Repositories, click +, and for the Brave
+official repository add the following:</p>
+<pre><code class="language-text">https://brave-browser-apk-release.s3.brave.com/fdroid/repo
+</code></pre>
+<p>Or you can visit
+<a href="https://brave-browser-apk-release.s3.brave.com/fdroid/repo/index.html">https://brave-browser-apk-release.s3.brave.com/fdroid/repo/index.html</a> and scan
+the QR code.</p>
+<p>Another app that I recently discovered on F-Droid is the
+<a href="https://f-droid.org/en/packages/de.marmaro.krt.ffupdater/">FFUpdater</a> app. It
+enables you to install and update different privacy friendly browsers as well as
+updating FairEmail, K-9 Mail/Thunderbird, and Orbot in a privacy respecting way.</p>
 <hr />
 <p><strong>SearXNG</strong></p>
 <p>While we're on the topic of browsers, it's worth considering a privacy-focused
@@ -1205,6 +1218,12 @@ browser you get the benefits of browser sandboxing, tracking prevention,
 cookie controls and more. You gain more benefits by using the
 compartmentalization technique explained above, possibly one for AI and one
 for social media.</li>
+</ul>
+<hr />
+<p>The following website lists the tracking protection mechanisms implemented by
+the major browsers and browser engines:</p>
+<ul>
+<li><a href="https://www.cookiestatus.com/">Cookie Status</a></li>
 </ul>
 <hr />
 <details>
@@ -1482,7 +1501,7 @@ expected. This confirms that my DNS traffic is not leaking to my ISP and is
 properly anonymized through Tor and Quad9. As long as you don't see your
 actual ISP's servers in the results, your setup is working as intended.</p>
 </blockquote>
-<p>Now you can add more apps that would benefit from anonymity such as FairMail,
+<p>Now you can add more apps that would benefit from anonymity such as FairEmail,
 RSS feeds, and crypto wallets. I believe for Signal, it requires that you to set
 up the SOCKS5 proxy to work correctly which is pretty straightforward.</p>
 <p>Look into an RSS Feed, they give you complete control of the content you
@@ -2953,6 +2972,11 @@ results. It is helpful for knowing the fingerprint values that trackers track.</
 <p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
 JavaScript, preventing the scripts from running that do most of the
 fingerprinting. Extensions can make you more unique but it's a give and take.</p>
+<p>The following website lists the tracking protection mechanisms implemented by
+the major browsers and browser engines:</p>
+<ul>
+<li><a href="https://www.cookiestatus.com/">Cookie Status</a></li>
+</ul>
 <hr />
 <h2 id="metasearch-engines"><a class="header" href="#metasearch-engines">Metasearch Engines</a></h2>
 <ul>
@@ -3060,6 +3084,8 @@ to prevent DNS spoofing attacks.</p>
 <code>Max Protection</code> -&gt; <code>Custom</code> -&gt; <code>https://dns.quad9.net/dns-query</code></p>
 <hr />
 <h4 id="enhanced-tracking-protection-etp"><a class="header" href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></h4>
+<p>Browsers that have a form of tracking protection typically use lists of known
+trackers and match each outgoing request against these lists.</p>
 <p>Enhanced Tracking Protection is how you deal with cookies and more on Firefox.</p>
 <ul>
 <li>
@@ -3130,6 +3156,8 @@ features.</p>
 </ul>
 <hr />
 <h2 id="disable-javascript"><a class="header" href="#disable-javascript">Disable JavaScript</a></h2>
+<p>Most trackers run on JavaScript, thus blocking JavaScript prevents them from
+gathering much of the info needed to form a browser fingerprint.</p>
 <ul>
 <li>
 <p><a href="https://noscript.net/">NoScript</a> lets you selectively block scripts on
@@ -3166,14 +3194,30 @@ Block new requests asking to access your camera</p>
 </ul>
 <p>You can also use the master switch by going to <code>about:config</code> and setting
 <code>media.peerconnection.enabled</code> to <code>false</code></p>
+<p><code>user.js</code> settings related to WebRTC:</p>
+<pre><code class="language-js">/* 2002: force WebRTC inside the proxy [FF70+] ***/
+user_pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
+ * When using a system-wide proxy, it uses the proxy interface
+ * [1] https://developer.mozilla.org/docs/Web/API/RTCIceCandidate
+ * [2] https://wiki.mozilla.org/Media/WebRTC/Privacy ***/
+user_pref("media.peerconnection.ice.default_address_only", true);
+user_pref("media.peerconnection.enabled", false);
+user_pref("media.peerconnection.ice.obfuscate_host_address", true);
+/* 2004: force exclusion of private IPs from ICE candidates [FF51+]
+ * [SETUP-HARDEN] This will protect your private IP even in TRUSTED scenarios after you
+ * grant device access, but often results in breakage on video-conferencing platforms ***/
+user_pref("media.peerconnection.ice.no_host", true);
+</code></pre>
 <hr />
 <h2 id="disable-canvas-fingerprinting"><a class="header" href="#disable-canvas-fingerprinting">Disable Canvas Fingerprinting</a></h2>
 <p>Canvas Fingerprinting uses the HTML5 <code>&lt;canvas&gt;</code> element to generate a
 fingerprint. It gets your device to render an image or text on a canvas and then
 reads the pixel data. Since devices render things differently, those differences
 are identifiable.</p>
-<p>When you set <code>privacy.resistFingerprinting</code> it modifies both Canvas and WebGL
-behavior to make their outputs non-unique.</p>
+<p>When the pref <code>privacy.resistFingerprinting</code> is set to <code>true</code>, restricts APIs
+commonly used for fingerprinting, including the HTML5 Canvas API. When enabled,
+it returns a randomized or generic canvas output to prevent unique
+identification.</p>
 <hr />
 <h2 id="disable-webgl"><a class="header" href="#disable-webgl">Disable WebGL</a></h2>
 <p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
@@ -3642,6 +3686,9 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </li>
 <li>
 <p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Wikipedia Entropy (computing)</a></p>
+</li>
+<li>
+<p><a href="https://brave.com/blog/">Brave Blog</a></p>
 </li>
 </ul>
 </details>
