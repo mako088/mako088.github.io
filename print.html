@@ -2871,14 +2871,29 @@ exposing the underlying system details, enabling different software to
 interact smoothly and securely.</p>
 </li>
 <li>
-<p><strong>Entropy</strong>: in this context, is a measure of how much unique information a
-specific browser feature contributes to your fingerprint. It's often
-quantified in <strong>bits of entropy</strong>, where higher bits mean more uniqueness
-(i.e., easier to identify you).</p>
+<p><strong>Anonymity</strong>: Maximizing anonymity often means restricting or masking
+features (setting a generic fingerprint, disabling browser APIs, blocking
+trackers) so the browser blends in with many others. This reduces uniqueness
+but can break website functionality, cause CAPTCHAs, and limit usability.</p>
+</li>
+<li>
+<p><strong>Usability</strong>: Keeping your browser features enabled improves compatibility
+and user experience but increase uniqueness and thus make you easier to track.</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Entropy</a>: in this
+context, is a measure of how much unique information a specific browser
+feature contributes to your fingerprint. It's often quantified in <strong>bits of
+entropy</strong>, where higher bits mean more uniqueness (i.e., easier to identify
+you).</p>
+<ul>
+<li>A "bit" is a basic unit of information for computers. Entropy measuring
+sites results are measured in "bits of identifying information".</li>
+</ul>
 </li>
 </ul>
 <blockquote>
-<p>Tor Browser is <strong>not</strong> the most secure browser, anonymity and security can
+<p>Tor Browser is <strong>not</strong> the most secure browser, anonymity, and security can
 often be at odds with each other. Having the exact same browser as many other
 people isn't the best security practice, but it is great for anonymity. Tor is
 also based on Firefox Esr, which only receives patches for vulnerabilities
@@ -2895,20 +2910,20 @@ for assessing the risk of browser fingerprinting.</p>
 companies that specialize in it. They provide code (usually JavaScript) that a
 website owner can embed on their site. When you visit the site, the script runs
 in the background, silently collecting data about your device and browser.</p>
-<p>The most concerning aspect of browser fingerprinting is that it operates
-silently and without user consent. It's not something you can easily see or
-something like cookies that you can opt-out or delete. Browser fingerprinting is
-stateless meaning that it doesn't need to store any data on your computer. It
-can identify you while behind a VPN or in incognito mode as well.</p>
 <p>There are two main approaches to obfuscating your fingerprint:</p>
 <ul>
 <li>
-<p>Standardization: Make browsers standardized and therefore have the same
-fingerprint to blend into a crowd. This is what Tor does.</p>
+<p><strong>Standardization</strong>: Make browsers standardized and therefore have the same
+fingerprint to blend into a crowd. This is what Tor and Mullvad Browser do.
+Best for anonymity; increases the crowd you blend into, but may decrease
+usability (site breakage, CAPTCHAs); adversaries may still find subtle
+differences.</p>
 </li>
 <li>
-<p>Randomization: Randomize fingerprint metrics so it's not directly tieable to
-you. Brave has this feature.</p>
+<p><strong>Randomization</strong>: Randomize fingerprint metrics so it's not directly linkable
+to you. Brave has this feature, if you run coveryourtracks with Brave you will
+get a result of "your browser has a randomized fingerprint". This is good for
+privacy but may be detectable by advanced scripts.</p>
 </li>
 </ul>
 <p>Test your browsers fingerprint:</p>
@@ -2920,12 +2935,20 @@ you. Brave has this feature.</p>
 <p><a href="https://amiunique.org/">AmIUnique</a></p>
 </li>
 </ul>
+<p>Test the sites you visit for trackers:</p>
+<ul>
+<li><a href="https://themarkup.org/ask-the-markup/2020/09/22/i-scanned-the-websites-i-visit-with-blacklight-and-its-horrifying-now-what">Blacklight</a></li>
+</ul>
 <p>Don't put too much weight into the results as people often check their
 fingerprint, change one metric and check it again over and over skewing the
-results. It is helpful for knowing what the values actually are and seeing what
-the tracking companies see.</p>
+results. It is helpful for knowing the fingerprint values that trackers track.</p>
 <ul>
-<li><a href="https://forum.torproject.org/t/browser-fingerprinting/1228/25">Browser Fingerprinting Tor Forum</a></li>
+<li>
+<p><a href="https://forum.torproject.org/t/browser-fingerprinting/1228/25">Browser Fingerprinting Tor Forum</a></p>
+</li>
+<li>
+<p><a href="https://madaidans-insecurities.github.io/browser-tracking.html">Madaidans Hot Take on Browser Tracking</a></p>
+</li>
 </ul>
 <p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
 JavaScript, preventing the scripts from running that do most of the
@@ -3037,21 +3060,27 @@ to prevent DNS spoofing attacks.</p>
 <code>Max Protection</code> -&gt; <code>Custom</code> -&gt; <code>https://dns.quad9.net/dns-query</code></p>
 <hr />
 <h4 id="enhanced-tracking-protection-etp"><a class="header" href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></h4>
+<p>Enhanced Tracking Protection is how you deal with cookies and more on Firefox.</p>
 <ul>
 <li>
-<p><a href="https://blog.mozilla.org/security/2020/01/07/firefox-72-fingerprinting/">Enhanced Tracking Protection (ETP)</a>
+<p><a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop">Enhanced Tracking Protection (ETP)</a>
 blocks known "third-party requests" to companies that participate in
 fingerprinting, according to the
 <a href="https://disconnect.me/trackerprotection">Disconnect List</a></p>
 <ul>
 <li>
 <p>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
-either Strict or Custom enables FPP as well explained further down.</p>
+either Strict or Custom enables FPP as well, explained further down.</p>
 </li>
 <li>
-<p>When you enable ETP strict mode, Total Cookie Protection is enabled by
-default. It confines cookies to the site where they were created, preventing
-companies from using them to track your browsing from site to site.</p>
+<p><a href="https://blog.mozilla.org/mozilla/firefox-rolls-out-total-cookie-protection-by-default-to-all-users-worldwide/">Total Cookie Protection</a>
+is enabled by default in Standard mode.</p>
+</li>
+<li>
+<p>When you set ETP to Strict, it includes
+<a href="https://blog.mozilla.org/security/2021/08/10/firefox-91-introduces-enhanced-cookie-clearing/">Enhanced Cookie Clearing</a>,
+which improves on the removal of third-party cookies, as well as Bounce
+Tracking Protection that prevents redirect trackers.</p>
 </li>
 </ul>
 </li>
@@ -3158,6 +3187,13 @@ will likely make you stand out more because most people don't disable it.</p>
 <p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
 <hr />
 <h2 id="install-firefoxlibrewolf--arkenfox"><a class="header" href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></h2>
+<blockquote>
+<p>⚠️ Firefox offers excellent privacy and customization but falls behind
+Chromium-based browsers in isolation and patch timing. Compartmentalization
+can help balance strong privacy with optimal security by using Brave or
+Chromium for high-risk browsing alongside Firefox for general and
+privacy-focused tasks.</p>
+</blockquote>
 <p>Download Firefox from the
 <a href="https://ftp.mozilla.org/pub/firefox/releases/">Mozilla FTP site</a> if you are
 worried about the download token, the FTP site lets you download the version you
@@ -3603,6 +3639,9 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </li>
 <li>
 <p><a href="https://searchfox.org/firefox-main/source/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc">searchfox RFPTargetsDefault</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Wikipedia Entropy (computing)</a></p>
 </li>
 </ul>
 </details>
