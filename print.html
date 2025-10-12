@@ -5965,6 +5965,40 @@ Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>
 </code></pre>
 <pre><code class="language-bash">sudo usermod -aG network $USER
 </code></pre>
+<h2 id="investigate-sockets"><a class="header" href="#investigate-sockets">Investigate sockets</a></h2>
+<p>Display all TCP Sockets with service names:</p>
+<pre><code class="language-bash">ss -at
+</code></pre>
+<p>Display all TCP Sockets with port numbers:</p>
+<pre><code class="language-bash">ss -atn
+</code></pre>
+<p>Display all UDP Sockets:</p>
+<pre><code class="language-bash">ss -au
+</code></pre>
+<h2 id="configure-networkmanager-to-use-quad9s-dot"><a class="header" href="#configure-networkmanager-to-use-quad9s-dot">Configure NetworkManager to use Quad9s DoT</a></h2>
+<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
+<pre><code class="language-.nmconnection">[connection]
+dns-over-tls=2
+
+[ipv4]
+dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
+ignore-auto-dns=true
+
+[ipv6]
+dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
+ignore-auto-dns=true
+</code></pre>
+<pre><code class="language-bash">sudo systemctl restart NetworkManager
+</code></pre>
+<h2 id="resources-3"><a class="header" href="#resources-3">Resources</a></h2>
+<ul>
+<li>
+<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
+</li>
+</ul>
 
                     </main>
 
