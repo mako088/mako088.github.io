@@ -1026,22 +1026,9 @@ servers.</p>
 <p><code>dnsleaktest.com</code> showed all <code>WoodyNet</code> ISPs indicating success.</p>
 <hr />
 <h4 id="chromium-based-browsers-brave"><a class="header" href="#chromium-based-browsers-brave"><a href="android/RethinkDNS_Guide.html#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></a></h4>
-<p>Brave would not work when routed through Rethink and Chrome completely ignored
-it. Brave is definitely better if you must use a Chrome derivative.</p>
-<ul>
-<li>
-<p>I tried disabling the Brave Shield <code>Use Secure DNS</code> to see if that helped, it
-didn't. There may be more you could do here to get it working...</p>
-</li>
-<li>
-<p>I do have Chrome and google apps disabled on my main device and only active in
-the Secure Folder which is like a sandboxed environment. This could very well
-be the reason it ignored Rethink, I don't care to test further...</p>
-</li>
-<li>
-<p><a href="https://techstory.in/eu-hits-google-with-3-5-billion-antitrust-fine-over-adtech-practices/">EU Hits Google with 3.5 Billion Antitrust</a></p>
-</li>
-</ul>
+<p>For Brave, if you want your DNS routed through Rethink you have to turn
+<code>Use secure DNS</code> off.</p>
+<p>I also had to set Brave to <em>Bypass Universal</em></p>
 <hr />
 <h3 id="more-fine-grained-control--enhanced-privacy"><a class="header" href="#more-fine-grained-control--enhanced-privacy"><a href="android/RethinkDNS_Guide.html#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></a></h3>
 <p>In this section we will switch from a default allow to a default deny; blocking
