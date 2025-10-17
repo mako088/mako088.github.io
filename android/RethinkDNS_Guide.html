@@ -510,9 +510,7 @@ potentially log, analyze, or misuse that data.</p>
 <p>That said, it's quite common for ISPs to engage in practices that compromise
 user privacy. Do some research, whats their business model, privacy policy, etc.
 Unfortunately, with a VPN you are also just shifting the trust. Don't blindly
-choose a VPN either. As a free VPN, in my mind ProtonVPN has more to loose by
-doing something shady effecting their whole mission. Just be aware of the risks
-in using free VPNs.</p>
+choose a VPN either.</p>
 <ul>
 <li><a href="https://cyberinsider.com/internet-service-providers-isp-privacy-data-collection/">ISP data-collection</a></li>
 </ul>
@@ -663,19 +661,23 @@ be used at the same time by Rethink. (Optional, may use more battery)</p>
 <code>IPv6 (experimental)</code> and <code>Auto (experimental)</code>.</p>
 </li>
 <li>
-<p>Using the <code>Loopback</code> sounds like a good idea but it makes many of the
-resolvers fail. You may have better luck, just remember that this could be
-what's causing your connectivity issues if you're having any.</p>
-</li>
-<li>
 <p><strong>Choose fallback DNS</strong>: When your user-preferred DNS is not reachable,
-fallback DNS will be used. I typically choose RethinkDNS as the fallback.</p>
+fallback DNS will used.</p>
+<ul>
+<li>With the F-Droid version in <code>Configure -&gt; DNS -&gt; ADVANCED</code>. You can enable
+<code>Use fallback DNS as bypass</code>, which always uses fallback DNS for bypassed
+apps, domains, and IPs.</li>
+</ul>
 </li>
 <li>
-<p>You may want to experiment with shutting off <code>Enable network visibility</code>, just
-keep in mind that some apps may break. "Shutting this off prevents apps from
-accessing all available networks, stopping them from bypassing Rethinks
-tunnel". This caused issues with the browser when turned off.</p>
+<p>I personally disable <code>Enable network visibility</code>, just keep in mind that some
+apps may break.</p>
+<ul>
+<li>"Shutting this off prevents apps from accessing all available networks,
+stopping them from bypassing Rethinks tunnel". This caused issues with the
+browser when turned off.(Some audio/video conference apps like Zoom and Meet
+require this)</li>
+</ul>
 </li>
 </ul>
 <hr />
@@ -1539,6 +1541,9 @@ creating a full encrypted tunnel from your device like a VPN does.</p>
 </ul>
 <hr />
 <h2 id="wireguardvpn"><a class="header" href="#wireguardvpn">WireGuard/VPN</a></h2>
+<p>Keep your goals in mind before paying for a VPN, some allow you to pay with cash
+anonymously such as Mullvad VPN and a few others. Remember that you are
+transferring trust, from your ISP to the VPN provider.</p>
 <p><code>Configure -&gt; Proxy -&gt; Setup WireGuard -&gt; +</code>:</p>
 <p>With the WireGuard protocol, the provider usually gives you either a QR Code, or
 a configuration file (e.g., <code>.conf</code> file) which is a plaintext file that
@@ -1679,6 +1684,25 @@ will be routed by this one.</p>
 <p>Always make sure to watch your Logs as well as test with something like
 &lt;dnsleaktest.com&gt;, you shouldn't see your actual Public IP anywhere. It's
 advisable to check for WebRTC Leaks as well if you have that enabled.</p>
+<p><strong>Troubleshooting VPN issues</strong></p>
+<p>There are a few Proxy settings in <code>Configure -&gt; Network -&gt; PROXY</code>, where you
+can:</p>
+<ul>
+<li>
+<p>Enable <code>Do not randomize WireGuard listen port</code>: Keep WireGuard listen ports
+fixed (no randomization) in Advanced mode.</p>
+</li>
+<li>
+<p>Enable <code>Endpoint-Independent mapping</code>: When enabled, UDP sockets maintain a
+fixed address and port for all destinations.</p>
+</li>
+</ul>
+<p><strong>Check your Logs</strong></p>
+<p>In <code>Configure -&gt; Proxy -&gt; Setup WireGuard</code>, click on your VPN which will give
+you access to the <code>LOGS</code>.</p>
+<p>Click the top entry, it will bring up the IP address and domain and show your
+rules the app. You can click the dropdown menu's to set new Universal Firewall
+rules, as well as block/trust rules for IPs and domains.</p>
 <hr />
 <h3 id="logs"><a class="header" href="#logs"><a href="#logs">Logs</a></a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
