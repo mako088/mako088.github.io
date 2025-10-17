@@ -1581,6 +1581,7 @@ Requests handled by WireGuard are shown with sub-text "resolved x min ago by
 wg..." --celzero</p>
 <hr />
 <p><strong>Proton VPN</strong></p>
+<p>This works for ProtonVPN Free as well.</p>
 <p>Written by celzero
 <a href="https://www.reddit.com/r/rethinkdns/comments/163e83l/proton_vpn/">Here</a></p>
 <ol>
@@ -1643,11 +1644,41 @@ to the list.</p>
 <li>Enable / disable that wg profile as desirable.</li>
 </ol>
 <ul>
-<li>On my Samsung phone, when I saved the VPN profile, my phone automatically
-added <code>.txt</code> to the end of the file causing it to fail. Entering the info
-manually didn't work for me. I was able to open my phones documents and long
-hold the file to rename it, afterwards it let me import it.</li>
+<li>On my phone, when I saved the VPN profile, it automatically added <code>.txt</code> to
+the end of the file causing the import to fail. I was able to open my phones
+documents and long hold the file to rename it, afterwards I was able import
+it.</li>
 </ul>
+<hr />
+<p><strong>SIMPLE</strong></p>
+<p>When you enable: <code>Configure -&gt; Proxy -&gt; Setup WireGuard - SIMPLE</code></p>
+<p>All connections from all apps, including DNS, will be routed to a single, active
+WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.</p>
+<p>If you tap SIMPLE, you can see the name of your VPN, check your Logs, and see
+your Peer connection.(your device that participates in the VPN network)</p>
+<hr />
+<p><strong>ADVANCED</strong></p>
+<p>Same as above but tap <code>ADVANCED</code> before enabling the toggle. This lets you
+choose which apps will be routed through the VPN while the rest are routed as
+usual.</p>
+<p>This Mode also lets you enable:</p>
+<ul>
+<li>
+<p><strong>Lockdown</strong>: Selected apps will only be routed through this WireGuard VPN,
+regardless of whether the VPN is active or disabled.</p>
+</li>
+<li>
+<p><strong>Always-on</strong>: All connections and apps not routed by other WireGuard VPNs
+will be routed by this one.</p>
+</li>
+<li>
+<p><strong>Mobile only</strong>: Use this WireGuard exclusively over mobile data.</p>
+</li>
+</ul>
+<p>After you configure your Advanced settings as needed, enable the toggle.</p>
+<p>Always make sure to watch your Logs as well as test with something like
+&lt;dnsleaktest.com&gt;, you shouldn't see your actual Public IP anywhere. It's
+advisable to check for WebRTC Leaks as well if you have that enabled.</p>
 <hr />
 <h3 id="logs"><a class="header" href="#logs"><a href="#logs">Logs</a></a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
