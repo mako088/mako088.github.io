@@ -2055,6 +2055,8 @@ reflector --list-countries
 # Example if you live in the US
 reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
 </code></pre>
+<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
+both HTTP and HTTPS are used.</p>
 <p>NOTE: This can take a bit and you can expect some failures..</p>
 <hr />
 <ol start="3">
@@ -4170,6 +4172,9 @@ where possible.</p>
 password required pam_pwquality.so retry=2 minlen=10 difok=6 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 [badwords=myservice mydomain] enforce_for_root
 password required pam_unix.so use_authtok sha512 shadow
 </code></pre>
+<p>The <code>/etc/pam.d/passwd</code> file with <code>pam_pwquality.so</code> specifies the enforcement
+directives and some immediate password rules, which apply dynamically during
+password changes.</p>
 <ul>
 <li>
 <p><a href="https://man.archlinux.org/man/pam_pwquality.8">pam_pwuality(8)</a></p>
@@ -4185,6 +4190,40 @@ about this.</p>
 <li>
 <p>Regularly review group memberships and file permissions, especially on
 sensitive system files.</p>
+</li>
+</ul>
+<p>Edit <code>/etc/security/pwquality.conf</code> to read as:</p>
+<pre><code class="language-pwquality.conf">minlen = 15
+# digit
+dcredit = -1
+# uppercase
+ucredit = -1
+# lowercase
+lcredit = -1
+# Special character
+ocredit = -1
+# dictionary checks
+dictcheck = 1
+# username checks
+usercheck = 1
+usersubstr = 5
+enforcing = 1
+# check roots pwquality
+enforce_for_root
+</code></pre>
+<p>The <code>/etc/security/pwquality.conf</code> file holds system-wide default parameters
+that cannot all be easy expressed on the PAM line. This is a bit more
+comprehensive than <code>/etc/pam.d/passwd</code>.</p>
+<p>Setting <code>enforcing = 0</code> disables enforcement.</p>
+<ul>
+<li>
+<p>Using negative values like <code>dcredit = -1</code>, <code>ucredit = -1</code>, <code>lcredit = -1</code>, and
+<code>ocredit = -1</code> requires at least one digit, uppercase, lowercase, and other
+(special) character respectively.</p>
+</li>
+<li>
+<p><code>dictcheck = 1</code> and <code>usercheck = 1</code> enable dictionary checks and user name
+checks to prevent weak or related passwords.</p>
 </li>
 </ul>
 <hr />
