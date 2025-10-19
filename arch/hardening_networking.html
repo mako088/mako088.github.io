@@ -200,6 +200,23 @@ ignore-auto-dns=true
 </code></pre>
 <pre><code class="language-bash">sudo systemctl restart NetworkManager
 </code></pre>
+<p><strong>Wi-Fi MAC randomization</strong></p>
+<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
+<pre><code class="language-conf">[device-mac-randomization]
+# "yes" is already the default for scanning
+wifi.scan-rand-mac-address=yes
+
+[connection-mac-randomization]
+# Randomize MAC for every ethernet connection
+ethernet.cloned-mac-address=random
+# Generate a random MAC every time you connect to a wifi network
+wifi.cloned-mac-address=random
+</code></pre>
+<p><strong>Unique DUID per connection</strong></p>
+<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
+<pre><code class="language-conf">[connection]
+ipv6.dhcp-duid=stable-uuid
+</code></pre>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
 <ul>
 <li>
