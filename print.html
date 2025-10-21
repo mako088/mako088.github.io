@@ -1032,6 +1032,10 @@ separate may be a better option, the choice is yours.</p>
 visit the site that wouldn't work while watching the logs. You should see
 <code>Firefox</code> pop up, click it, in the top right of the pop up should be the reason
 it was blocked.</p>
+<ul>
+<li><a href="https://privacytests.org/">PrivacyTests.org</a>, tests different browsers in
+different privacy categories.</li>
+</ul>
 <hr />
 <h3 id="duckduckgo"><a class="header" href="#duckduckgo"><a href="android/RethinkDNS_Guide.html#duckduckgo">DuckDuckGo</a></a></h3>
 <p>I also tested DuckDuckGo with its stock configuration and <code>dnsleaktest.com</code>
@@ -3953,6 +3957,9 @@ Most hardened.</p>
 <p><a href="https://www.privacytools.io/private-browser">PrivacyTools.io</a></p>
 </li>
 <li>
+<p><a href="https://privacytests.org/">PrivacyTests.org</a></p>
+</li>
+<li>
 <p><a href="https://github.com/simeononsecurity/FireFox-Privacy-Script">simeononsecurity Firefox-Privacy-Script</a></p>
 </li>
 <li>
@@ -4047,6 +4054,15 @@ also lets you create phone number aliases that forward to your phone number.</p>
 <li>
 <p><a href="https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html">Zero Trust Architecture Cheat Sheet</a></p>
 </li>
+<li>
+<p><a href="https://we.riseup.net/riseup+tech/entropy">riseup entropy</a></p>
+</li>
+<li>
+<p><a href="https://www.kicksecure.com/wiki/Dev/Entropy">kicksecure entropy</a></p>
+</li>
+<li>
+<p><a href="https://riseup.net/en/security">riseup Digital Security</a></p>
+</li>
 </ul>
 </details>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
@@ -4063,6 +4079,7 @@ also lets you create phone number aliases that forward to your phone number.</p>
 <li><a href="arch/hardening_arch.html#lynis-and-other-tools">Lynis and other tools</a></li>
 <li><a href="arch/hardening_arch.html#hardening-the-kernel">Hardening the Kernel</a></li>
 <li><a href="arch/hardening_arch.html#hardening-your-current-kernel">Hardening your current Kernel</a></li>
+<li><a href="arch/hardening_arch.html#disable-core-dumps">Disable Core Dumps</a></li>
 <li><a href="arch/hardening_arch.html#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></li>
 <li><a href="arch/hardening_arch.html#firewall">Firewall</a></li>
 <li><a href="arch/hardening_arch.html#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a>
@@ -4893,6 +4910,32 @@ net.ipv4.tcp_fastopen = 3
 # Bufferbloat mitigations + slight improvement in throughput &amp; latency
 net.ipv4.tcp_congestion_control = bbr
 net.core.default_qdisc = cake
+</code></pre>
+<h2 id="disable-core-dumps"><a class="header" href="#disable-core-dumps">Disable Core Dumps</a></h2>
+<p>A core dump consists of the recorded state of the working memory of a computer
+program at a specific time, generally when a program crashes or terminates
+abnormally. They can be useful for debugging but can also contain sensitive
+information, to disable core dumps:</p>
+<p>Create <code>/etc/sysctl.d/50-coredump.conf</code>:</p>
+<pre><code class="language-conf"># disable coredumps
+kernel.core_pattern = |/bin/false
+# disable core dumps from setuid binaries
+fs.suid_dumpable = 0
+</code></pre>
+<p>Apply with:</p>
+<pre><code class="language-bash">sudo sysctl --system
+# or
+sudo sysctl -p /etc/sysctl.d/50-coredump.conf
+</code></pre>
+<p>Arch uses <code>systemd-coredump</code> by default, which still intercepts dumps. To fully
+disable that component, create <code>/etc/systemd/coredump.conf/custom.conf</code>:</p>
+<pre><code class="language-conf">[Coredump]
+Storage=none
+ProcessSizeMax=0
+</code></pre>
+<p>Then reload systemd:</p>
+<pre><code class="language-bash">sudo systemctl daemon-reload
+sudo systemctl mask systemd-coredump.socket
 </code></pre>
 </details>
 <h2 id="kernel-and-namespace-hardening-and-blacklisting"><a class="header" href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></h2>

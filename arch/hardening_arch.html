@@ -181,6 +181,7 @@
 <li><a href="#lynis-and-other-tools">Lynis and other tools</a></li>
 <li><a href="#hardening-the-kernel">Hardening the Kernel</a></li>
 <li><a href="#hardening-your-current-kernel">Hardening your current Kernel</a></li>
+<li><a href="#disable-core-dumps">Disable Core Dumps</a></li>
 <li><a href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></li>
 <li><a href="#firewall">Firewall</a></li>
 <li><a href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a>
@@ -1011,6 +1012,32 @@ net.ipv4.tcp_fastopen = 3
 # Bufferbloat mitigations + slight improvement in throughput &amp; latency
 net.ipv4.tcp_congestion_control = bbr
 net.core.default_qdisc = cake
+</code></pre>
+<h2 id="disable-core-dumps"><a class="header" href="#disable-core-dumps">Disable Core Dumps</a></h2>
+<p>A core dump consists of the recorded state of the working memory of a computer
+program at a specific time, generally when a program crashes or terminates
+abnormally. They can be useful for debugging but can also contain sensitive
+information, to disable core dumps:</p>
+<p>Create <code>/etc/sysctl.d/50-coredump.conf</code>:</p>
+<pre><code class="language-conf"># disable coredumps
+kernel.core_pattern = |/bin/false
+# disable core dumps from setuid binaries
+fs.suid_dumpable = 0
+</code></pre>
+<p>Apply with:</p>
+<pre><code class="language-bash">sudo sysctl --system
+# or
+sudo sysctl -p /etc/sysctl.d/50-coredump.conf
+</code></pre>
+<p>Arch uses <code>systemd-coredump</code> by default, which still intercepts dumps. To fully
+disable that component, create <code>/etc/systemd/coredump.conf/custom.conf</code>:</p>
+<pre><code class="language-conf">[Coredump]
+Storage=none
+ProcessSizeMax=0
+</code></pre>
+<p>Then reload systemd:</p>
+<pre><code class="language-bash">sudo systemctl daemon-reload
+sudo systemctl mask systemd-coredump.socket
 </code></pre>
 </details>
 <h2 id="kernel-and-namespace-hardening-and-blacklisting"><a class="header" href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></h2>
