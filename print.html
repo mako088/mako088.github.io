@@ -232,7 +232,7 @@ history shows that entire populations can be harmed</p>
 and will attempt to keep the information up-to-date. For now it's not meant to
 be read cover to cover, just pick the link/chapter you're interested in and go
 from there.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="browser_fingerprinting"><a class="header" href="#browser_fingerprinting">Browser_Fingerprinting</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="android-privacy--security"><a class="header" href="#android-privacy--security">Android Privacy &amp; Security</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rethinkdns"><a class="header" href="#rethinkdns">RethinkDNS</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
@@ -519,6 +519,19 @@ The best version in my opinion is the F-Droid version.</p>
 <hr />
 <h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
 <h3 id="dns"><a class="header" href="#dns">DNS</a></h3>
+<p>I was surprised to see that GrapheneOS recommends that people use their own
+"network provided DNS servers for general purpose usage" (i.e., Your ISPs DNS).
+They say that "using the network-provided DNS servers is the best way to blend
+in with other users". Network and web sites can fingerprint and track users
+based on non-default DNS configurations.
+--<a href="https://grapheneos.org/faq#default-dns">grapheneos default-dns</a></p>
+<p>Given that it is a fact that many ISPs are known to share this data and do other
+privacy disrespecting things, I would personally rather make it harder for them.
+I included this because they are the experts and the choice is yours, I use a
+custom DNS myself. I guess since so many people virtue-signal saying that they
+"have nothing to hide"(a reckless, privileged notion) that not many people truly
+care about privacy and are likely using the default. The more people that we can
+convince to use privacy respecting tools, the better it is for everybody.</p>
 <p>Recommended Resolvers:</p>
 <details>
 <summary> ✔️ Click to Expand recommended resolvers </summary>
@@ -558,7 +571,9 @@ first to use DNSSEC cryptographic validation.</p>
 </li>
 <li>
 <p>Cloudflare publishes regular transparency reports and undergoes independent
-audits and have a great blog explaining the technology which is a major plus.</p>
+audits and have a great blog explaining the technology which is a major plus.
+GrapheneOS sets Cloudflare as the fallback due to their good privacy policy,
+and widespread usage.</p>
 <ul>
 <li><a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a></li>
 </ul>
