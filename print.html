@@ -1616,7 +1616,6 @@ creating a full encrypted tunnel from your device like a VPN does.</p>
 </ul>
 <hr />
 <h2 id="wireguardvpn"><a class="header" href="#wireguardvpn">WireGuard/VPN</a></h2>
-<p><img src="android/../images/wireguard.png" alt="WireGuard Logo" /></p>
 <p>Keep your goals in mind before paying for a VPN, some allow you to pay with cash
 anonymously such as Mullvad VPN and a few others. Remember that you are
 transferring trust, from your ISP to the VPN provider.</p>
@@ -4623,7 +4622,14 @@ SCRIPTWHITELIST=/usr/bin/vendor_perl/GET
 <hr />
 <p><strong>ClamAV</strong></p>
 <ul>
-<li><a href="https://wiki.archlinux.org/title/ClamAV">Arch Wiki ClamAV</a></li>
+<li>
+<p>Malware stands for malicious software. A computer virus is an undesirable
+program running on the user's computer often without their consent or even
+without their knowledge.</p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/ClamAV">Arch Wiki ClamAV</a></p>
+</li>
 </ul>
 <pre><code class="language-bash">sudo pacman -S clamav
 </code></pre>
@@ -6353,8 +6359,76 @@ wifi.cloned-mac-address=random
 <pre><code class="language-conf">[connection]
 ipv6.dhcp-duid=stable-uuid
 </code></pre>
+<h2 id="mac-address-spoofing"><a class="header" href="#mac-address-spoofing">MAC Address spoofing</a></h2>
+<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
+<p><strong>Manual MAC randomization with macchanger</strong></p>
+<p>Find your device interface and check your current MAC address:</p>
+<pre><code class="language-bash"># find interface
+ip add
+sudo iplink show wlp3s0
+</code></pre>
+<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
+it:</p>
+<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
+# or
+# sudo ifconfig wlp3s0 down
+</code></pre>
+<p>Install the <code>macchanger</code> package and run:</p>
+<pre><code class="language-bash">sudo macchanger -a wlp3s0
+</code></pre>
+<ul>
+<li>
+<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
+</li>
+<li>
+<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
+</li>
+</ul>
+<p><strong>Automatically with systemd &amp; macchanger</strong></p>
+<p>systemd unit setting a random address while preserving the original NIC vendor
+bytes.</p>
+<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
+<pre><code class="language-macspoof@.service">[Unit]
+Description=macchanger on %I
+Wants=network-pre.target
+Before=network-pre.target
+BindsTo=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+ExecStart=/usr/bin/macchanger -e %I
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<ul>
+<li>
+<p>You can use <code>-r</code> to randomize everything but it's important that the vendor
+bytes actually match something and aren't just random numbers so it's less
+recommended.</p>
+</li>
+<li>
+<p>The <code>@.service</code> pattern allows per-interface instantiation like
+<code>macspoof@wlp3s0.service</code>.</p>
+</li>
+<li>
+<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
+</li>
+<li>
+<p>You only need to append your interface name when enabling the service.</p>
+</li>
+</ul>
+<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
+</code></pre>
 <h2 id="resources-3"><a class="header" href="#resources-3">Resources</a></h2>
 <ul>
+<li>
+<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
+</li>
 <li>
 <p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
 </li>
