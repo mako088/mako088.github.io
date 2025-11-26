@@ -29,6 +29,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/header-buttons-af1bc2f9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,7 +37,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b335fda1.js";
+            window.path_to_searchindex_js = "searchindex-f6cb4a43.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ef0a3a41.js"></script>
@@ -245,7 +246,48 @@ from there.</p>
 <h1 id="rethinkdns"><a class="header" href="#rethinkdns">RethinkDNS</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#-key-terms">🔑 Key Terms</a></li>
+<li>[<a href="#rethinkdns-overview">RethinkDNS Overview</a></li>
+<li><a href="#getting-started">Getting Started</a>
+<ul>
+<li><a href="#dns">DNS</a></li>
+<li><a href="#network">Network</a></li>
+<li><a href="#firewall">Firewall</a></li>
+</ul>
+</li>
+<li><a href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a>
+<ul>
+<li><a href="#apps-that-dont-work">Apps that Don’t work</a></li>
+<li><a href="#other-methods">Other Methods</a></li>
+<li><a href="#firefox-encrypted-dns-through-rethink">Firefox Encrypted DNS through Rethink</a></li>
+<li>[<a href="#duckduckgo">DuckDuckGo</a>
+<ul>
+<li>[<a href="#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></li>
+</ul>
+</li>
+<li>[<a href="#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></li>
+</ul>
+</li>
+<li><a href="#ublock-origin">uBlock Origin</a>
+<ul>
+<li><a href="#adding-other-lists">Adding other lists</a></li>
+</ul>
+</li>
+<li><a href="#default-deny">Default Deny</a>
+<ul>
+<li>[<a href="#tor">Tor</a></li>
+<li>[<a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></li>
+</ul>
+</li>
+<li>[<a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></li>
+<li><a href="#wireguardvpn">WireGuard/VPN</a>
+<ul>
+<li>[<a href="#logs">Logs</a></li>
+<li>[<a href="#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
 </details>
 <p><img src="images/rethinkdns.cleaned.png" alt="RethinkDNS Logo"></p>
 <blockquote>
@@ -1960,7 +2002,17 @@ state-of-the-art cryptography. –<a href="https://www.wireguard.com/">Wireguard
 <h1 id="encrypted-arch-install-for-uefi-systems-with-uki-and-secure-boot"><a class="header" href="#encrypted-arch-install-for-uefi-systems-with-uki-and-secure-boot">Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#install-the-base-system-on-mnt-with-pacstrap">Install the Base System on <code>/mnt</code> with <code>pacstrap</code></a>
+<ul>
+<li><a href="#creating-a-readonly-snapshot-of-your-root-subvolume">Creating a readonly snapshot of your root subvolume:</a></li>
+<li><a href="#restoring-from-a-backup">Restoring from a Backup</a></li>
+<li><a href="#automated-backup">Automated backup</a></li>
+<li><a href="#arch-chroot">arch-chroot</a></li>
+<li><a href="#resources-1">Resources</a></li>
+</ul>
+</li>
+</ul>
 </details>
 <p>The ultimate installation resource is always goint to be the:</p>
 <ul>
@@ -2720,7 +2772,13 @@ reboot
 <h1 id="encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq"><a class="header" href="#encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq">Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></li>
+<li><a href="#add-blocklists">Add Blocklists</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#enable-mac-randomization">Enable MAC Randomization</a></li>
+<li><a href="#enable-privacy-extensions">Enable Privacy Extensions</a></li>
+</ul>
 </details>
 <blockquote>
 <p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
@@ -3126,7 +3184,43 @@ ipv6.ip6-privacy=2
 <h1 id="hardening-firefox-on-arch"><a class="header" href="#hardening-firefox-on-arch">Hardening Firefox on Arch</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#-key-terms-1">🔑 Key Terms</a>
+<ul>
+<li><a href="#fingerprinting-explained">Fingerprinting Explained</a></li>
+</ul>
+</li>
+<li><a href="#metasearch-engines">Metasearch Engines</a>
+<ul>
+<li><a href="#searxng">SearXNG</a></li>
+</ul>
+</li>
+<li><a href="#defenses">Defenses</a>
+<ul>
+<li><a href="#encrypted-dns">Encrypted DNS</a></li>
+<li><a href="#enhanced-tracking-protection-etp">Enhanced Tracking Protection (ETP)</a></li>
+<li><a href="#resist-fingerprinting">Resist Fingerprinting</a></li>
+</ul>
+</li>
+<li><a href="#disable-javascript">Disable JavaScript</a></li>
+<li><a href="#disable-webrtc">Disable WebRTC</a></li>
+<li><a href="#disable-canvas-fingerprinting">Disable Canvas Fingerprinting</a></li>
+<li><a href="#disable-webgl">Disable WebGL</a></li>
+<li><a href="#install-firefoxlibrewolf--arkenfox">Install Firefox/LibreWolf &amp; ArkenFox</a></li>
+<li><a href="#apply">Apply</a></li>
+<li><a href="#check">Check</a>
+<ul>
+<li><a href="#user-agent-spoofing">User Agent Spoofing</a></li>
+</ul>
+</li>
+<li><a href="#ublock-origin-1">uBlock Origin</a>
+<ul>
+<li><a href="#adding-other-lists-1">Adding other lists</a></li>
+</ul>
+</li>
+<li><a href="#set-up-a-socks5-proxy-with-arti">Set up a SOCKS5 Proxy with Arti</a></li>
+<li><a href="#setup-an-arti-service-to-run-in-the-background">Setup an Arti service to run in the background</a></li>
+</ul>
 </details>
 <h2 id="-key-terms-1"><a class="header" href="#-key-terms-1">🔑 Key Terms</a></h2>
 <ul>
@@ -4013,7 +4107,65 @@ also lets you create phone number aliases that forward to your phone number.</p>
 <h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#the-basics">The Basics</a>
+<ul>
+<li><a href="#best-practices-and-standards">Best Practices and Standards</a></li>
+<li><a href="#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></li>
+</ul>
+</li>
+<li><a href="#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></li>
+<li><a href="#lynis-and-other-tools">Lynis and other tools</a></li>
+<li><a href="#hardening-the-kernel">Hardening the Kernel</a></li>
+<li><a href="#hardening-your-current-kernel">Hardening your current Kernel</a></li>
+<li><a href="#disable-core-dumps">Disable Core Dumps</a></li>
+<li><a href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></li>
+<li><a href="#firewall-1">Firewall</a></li>
+<li><a href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a>
+<ul>
+<li><a href="#ssh-keygen">ssh-keygen</a></li>
+<li><a href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></li>
+<li><a href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></li>
+<li><a href="#generate-gpg-subkeys">Generate Gpg Subkeys</a></li>
+<li><a href="#backing-up-your-keys">Backing up Your Keys</a></li>
+<li><a href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></li>
+</ul>
+</li>
+<li><a href="#hardening-openssh">Hardening OpenSSH</a>
+<ul>
+<li><a href="#tip-change-the-default-port">Tip Change the Default Port</a></li>
+</ul>
+</li>
+<li><a href="#usb-port-protection">USB Port Protection</a>
+<ul>
+<li><a href="#usbguard-daemon">USBGuard Daemon</a></li>
+<li><a href="#firejail">Firejail</a></li>
+</ul>
+</li>
+<li><a href="#hardening-firejail">Hardening Firejail</a>
+<ul>
+<li><a href="#remove-firejail-symlinks">Remove Firejail symlinks</a></li>
+</ul>
+</li>
+<li><a href="#apparmor">AppArmor</a>
+<ul>
+<li><a href="#switching-an-app-from-unconfined-mode-to-enforce">Switching an app from unconfined mode to enforce</a></li>
+<li><a href="#disabling-apparmor">Disabling AppArmor</a></li>
+</ul>
+</li>
+<li><a href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren’t pre-configured</a>
+<ul>
+<li><a href="#profiling-by-hand">Profiling by Hand</a></li>
+<li><a href="#auditd">Auditd</a></li>
+<li><a href="#doas-over-sudo">Doas over sudo</a></li>
+</ul>
+</li>
+<li><a href="#intrusion-detection">Intrusion Detection</a>
+<ul>
+<li><a href="#resources-2">Resources</a></li>
+</ul>
+</li>
+</ul>
 </details>
 <blockquote>
 <p>⚠️ Warning: I am not a security expert. This guide presents various options
@@ -6365,6 +6517,7 @@ recommended.</p>
         <script src="book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="theme/header-buttons-02f32270.js"></script>
 
         <script>
         window.addEventListener('load', function() {
