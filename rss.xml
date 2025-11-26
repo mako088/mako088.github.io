@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>My mdBook</title><link>https://mako088.github.io/</link><description>An mdBook-generated site</description><generator>mdbook-rss-feed 0.1.0</generator><item><title>enc_install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<pre><code class="language-bash">pacman -Syyu
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>An mdBook-generated site</description><generator>mdbook-rss-feed 0.1.0</generator><item><title>enc_install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<pre><code class="language-bash">pacman -Syyu
 </code></pre>
 <p>Save a backup of your current mirrorlist so we can safely update it:</p><pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 </code></pre>
