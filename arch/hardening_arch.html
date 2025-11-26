@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Hardening Arch Linux - privacy-book</title>
+        <title>Hardening Arch Linux</title>
 
 
         <!-- Custom HTML head -->
@@ -12,21 +12,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
-        <link rel="stylesheet" href="../css/print.css" media="print">
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
 
@@ -36,12 +35,12 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-b335fda1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
+        <script src="../toc-ef0a3a41.js"></script>
     </head>
     <body>
-    <a href="#" class="top-link" id="back-to-top">↑</a>
     <div id="mdbook-help-container">
         <div id="mdbook-help-popup">
             <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
@@ -53,7 +52,7 @@
             </div>
         </div>
     </div>
-    <div id="body-container">
+    <div id="mdbook-body-container">
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
@@ -82,153 +81,103 @@
             html.classList.add("js");
         </script>
 
-        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
             let sidebar = null;
-            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
+                sidebar_toggle.checked = false;
             }
-            sidebar_toggle.checked = sidebar === 'visible';
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
         </script>
 
-        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
                 <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
             </div>
         </nav>
 
-        <div id="page-wrapper" class="page-wrapper">
+        <div id="mdbook-page-wrapper" class="page-wrapper">
 
             <div class="page">
-                <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                            <i class="fa fa-bars"></i>
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
                         </label>
-                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                            <i class="fa fa-paint-brush"></i>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
                         </button>
-                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
                         </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
-                            <i class="fa fa-search"></i>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
                         </button>
                     </div>
 
-                    <h1 class="menu-title">privacy-book</h1>
+                    <h1 class="menu-title"></h1>
 
                     <div class="right-buttons">
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
-                            <i id="print-button" class="fa fa-print"></i>
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
                         </a>
 
                     </div>
                 </div>
 
-                <div id="search-wrapper" class="hidden">
-                    <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
                     </form>
-                    <div id="searchresults-outer" class="searchresults-outer hidden">
-                        <div id="searchresults-header" class="searchresults-header"></div>
-                        <ul id="searchresults">
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
                         </ul>
                     </div>
                 </div>
 
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script>
-                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
-                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
-                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
                         link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
                     });
                 </script>
 
-                <div id="content" class="content">
+                <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<ul>
-<li><a href="#the-basics">The Basics</a>
-<ul>
-<li><a href="#best-practices-and-standards">Best Practices and Standards</a></li>
-<li><a href="#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></li>
-</ul>
-</li>
-<li><a href="#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></li>
-<li><a href="#lynis-and-other-tools">Lynis and other tools</a></li>
-<li><a href="#hardening-the-kernel">Hardening the Kernel</a></li>
-<li><a href="#hardening-your-current-kernel">Hardening your current Kernel</a></li>
-<li><a href="#disable-core-dumps">Disable Core Dumps</a></li>
-<li><a href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></li>
-<li><a href="#firewall">Firewall</a></li>
-<li><a href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a>
-<ul>
-<li><a href="#ssh-keygen">ssh-keygen</a></li>
-<li><a href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></li>
-<li><a href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></li>
-<li><a href="#generate-gpg-subkeys">Generate Gpg Subkeys</a></li>
-<li><a href="#backing-up-your-keys">Backing up Your Keys</a></li>
-<li><a href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></li>
-</ul>
-</li>
-<li><a href="#hardening-openssh">Hardening OpenSSH</a>
-<ul>
-<li><a href="#tip-change-the-default-port">Tip Change the Default Port</a></li>
-</ul>
-</li>
-<li><a href="#usb-port-protection">USB Port Protection</a>
-<ul>
-<li><a href="#usbguard-daemon">USBGuard Daemon</a></li>
-<li><a href="#firejail">Firejail</a></li>
-</ul>
-</li>
-<li><a href="#hardening-firejail">Hardening Firejail</a>
-<ul>
-<li><a href="#remove-firejail-symlinks">Remove Firejail symlinks</a></li>
-</ul>
-</li>
-<li><a href="#apparmor">AppArmor</a>
-<ul>
-<li><a href="#switching-an-app-from-unconfined-mode-to-enforce">Switching an app from unconfined mode to enforce</a></li>
-<li><a href="#disabling-apparmor">Disabling AppArmor</a></li>
-</ul>
-</li>
-<li><a href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren't pre-configured</a>
-<ul>
-<li><a href="#profiling-by-hand">Profiling by Hand</a></li>
-<li><a href="#auditd">Auditd</a></li>
-<li><a href="#doas-over-sudo">Doas over sudo</a></li>
-</ul>
-</li>
-<li><a href="#intrusion-detection">Intrusion Detection</a>
-<ul>
-<li><a href="#resources">Resources</a></li>
-</ul>
-</li>
-</ul>
+<!-- toc -->
 </details>
 <blockquote>
 <p>⚠️ Warning: I am not a security expert. This guide presents various options
@@ -242,7 +191,7 @@ plug and play one size fits all security solutions.</p>
 <blockquote>
 <p>Much of this guide draws inspiration or recommendations from the well-known
 <a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">Linux Hardening Guide</a>
-by Madaidan's Insecurities and the Arch Wiki. Arch is great but when anonymity
+by Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity
 truly matters, use Whonix or Tails. The Whonix Docs have a specific section or
 Arch with KVM that is an excellent resource.</p>
 </blockquote>
@@ -255,8 +204,8 @@ because of Port conflicts.</li>
 <p>Keep in mind that Arch’s security posture is ultimately constrained by the
 broader limitations of Linux security mechanisms, upstream tooling, and ongoing
 development priorities.</p>
-<p>I will assume that you're using a UKI with Secure Boot enabled with systemd-boot
-for this section. If you don't and want to, you can follow the
+<p>I will assume that you’re using a UKI with Secure Boot enabled with systemd-boot
+for this section. If you don’t and want to, you can follow the
 <a href="https://mako088.github.io/arch/enc_install.html">Guide</a> that I wrote or more
 obviously, the Wiki.</p>
 <h2 id="the-basics"><a class="header" href="#the-basics">The Basics</a></h2>
@@ -265,7 +214,7 @@ information about known vulnerabilities affecting Arch packages. It lists CVEs
 (Common Vulnerabilities and Exposures) affecting packages, the severity, the
 fixed versions, and advisory details.</p>
 <p>Backup your system regularly, many guides consider the data already lost if it
-isn't backed up because without a backup, any data loss event (hardware failure,
+isn’t backed up because without a backup, any data loss event (hardware failure,
 ransomware attack, accidental deletion, natural disaster) becomes irreversible.
 Backups act as a critical safety net that enables recovery. Without them, once
 data is corrupted, deleted, or encrypted, there is no reliable way to restore
@@ -290,12 +239,12 @@ it, effectively making it lost permanently.</p>
 <p>Encryption is the process of using an algorithm to scramble plaintext data into
 ciphertext, making it unreadable except to a person who has the key to decrypt
 it.</p>
-<p><strong>Data at rest</strong> is data in storage, such as a computer's or a servers hard
+<p><strong>Data at rest</strong> is data in storage, such as a computer’s or a servers hard
 disk.</p>
 <p><strong>Data at rest encryption</strong> (typically hard disk encryption), secures the
 documents, directories, and files behind an encryption key. Encrypting your data
 at rest prevents data leakage, physical theft, unauthorized access, and more as
-long as the key management scheme isn't compromised.</p>
+long as the key management scheme isn’t compromised.</p>
 <p>Enable a UEFI password or Administrator password where it requires
 authentication in order to access the UEFI/BIOS.</p>
 <p>Use a different password/passphrase for encryption and userspace.(i.e., user
@@ -304,7 +253,7 @@ passwd)</p>
 increase security; I may add a section in the future.</p>
 <p>When Secure Boot is used with a Unified Kernel Image, it provides enhanced
 protection compared to traditional boot methods because when Secure Boot
-verifies the UKI's signature, it ensures the integrity and authenticity of:</p>
+verifies the UKI’s signature, it ensures the integrity and authenticity of:</p>
 <ul>
 <li>
 <p>The kernel itself,</p>
@@ -320,7 +269,7 @@ verifies the UKI's signature, it ensures the integrity and authenticity of:</p>
 verifies the UKI signature before execution).</p>
 </li>
 <li>
-<p>Secure boot doesn't protect against runtime kernel exploits.</p>
+<p>Secure boot doesn’t protect against runtime kernel exploits.</p>
 </li>
 </ul>
 <p>This means that any tampering with these components, such as injecting malware
@@ -339,12 +288,12 @@ for hardened systems.</p>
 <p><a href="https://0pointer.net/blog/authenticated-boot-and-disk-encryption-on-linux.html">The Strange State of Authenticated Boot and Encryption</a></p>
 </li>
 <li>
-<p>When using a UKI with Secure Boot, the initrd is authenticated because it's a
+<p>When using a UKI with Secure Boot, the initrd is authenticated because it’s a
 sealed component of the single signed image.</p>
 </li>
 </ul>
 </details>
-<hr />
+<hr>
 <h3 id="best-practices-and-standards"><a class="header" href="#best-practices-and-standards">Best Practices and Standards</a></h3>
 <p>It’s crucial to <strong>document every system change</strong> meticulously. Since Arch Linux
 typically relies on manual configuration and does not use full declarative
@@ -368,7 +317,7 @@ of modifications.</p>
 </li>
 </ul>
 <p>Using these tools enhances your ability to maintain clear, version-controlled
-records of system changes. Consider making your dotfiles repo private if you're
+records of system changes. Consider making your dotfiles repo private if you’re
 unsure what you need to protect.</p>
 <p>By breaking changes into smaller, manageable tasks and documenting them with
 descriptive messages, you create a clear history of modifications. This makes it
@@ -397,13 +346,13 @@ requires elevation, rather than using sudo to open an entire root shell:</p>
 <code>doas</code>, <code>sudo-rs</code>, or <code>run0</code> instead of standard <code>sudo</code>.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <h3 id="user-and-group-management--strong-passwords"><a class="header" href="#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></h3>
 <ul>
 <li>
 <p>Users and groups are used as a form of
 <a href="https://en.wikipedia.org/wiki/access_control#Computer_security">access control</a>.
-They control access to the system's files, directories, and peripherals. This
+They control access to the system’s files, directories, and peripherals. This
 is a security feature that limits access in certain specific ways.</p>
 <ul>
 <li>When granting access to a resource, create a specific group and add only the
@@ -482,7 +431,7 @@ comprehensive than <code>/etc/pam.d/passwd</code>.</p>
 checks to prevent weak or related passwords.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <p><strong>Package Management and System Minimalism</strong></p>
 <ul>
 <li>
@@ -506,7 +455,7 @@ and limit potential entry points.</p>
 said vulnerabilities.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <p><strong>Network and Privacy Best Practices</strong></p>
 <p>On a hardened Linux system, the browser is most often the weakest link exposed
 to the internet, and so security, privacy, and anti-tracking features of
@@ -540,7 +489,7 @@ enforcing public-key authentication to prevent brute-force and unauthorized
 access attempts.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <p><strong>Cryptography and Future-Proofing</strong></p>
 <ul>
 <li>
@@ -576,12 +525,12 @@ and implement recommendations as soon as practical.</p>
 public-key cryptography, as recommended by NIST and security agencies.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <h2 id="hardeningsandboxing-systemd"><a class="header" href="#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Systemd/Sandboxing">Arch Wiki systemd/sandboxing</a></li>
 </ul>
-<p><code>systemd</code> is the core "init system" and service manager that controls how
+<p><code>systemd</code> is the core “init system” and service manager that controls how
 services, daemons, and basic system processes are started, stopped and
 supervised on modern Linux distributions, including Arch. It provides a suite of
 basic building blocks for a Linux system as well as a system and service manager
@@ -659,10 +608,10 @@ choose.</p>
 </li>
 </ul>
 </details>
-<hr />
+<hr>
 <h2 id="lynis-and-other-tools"><a class="header" href="#lynis-and-other-tools">Lynis and other tools</a></h2>
 <p>Lynis is a security auditing tool for systems based on UNIX like Linux, macOS,
-BSD, and others.--<a href="https://github.com/CISOfy/lynis">lynis repo</a></p>
+BSD, and others.–<a href="https://github.com/CISOfy/lynis">lynis repo</a></p>
 <pre><code class="language-bash">sudo pacman -S lynis
 </code></pre>
 <p>List commands:</p>
@@ -685,7 +634,7 @@ lynis upload-only
 </code></pre>
 <ul>
 <li>
-<p>The "Lynis hardening index" is an overall impression on how well a system is
+<p>The “Lynis hardening index” is an overall impression on how well a system is
 hardened. However, this is just an indicator on measures taken - not a
 percentage of how safe a system might be. A score over 75 typically indicates
 a system with more than average safety measures implemented.</p>
@@ -694,7 +643,7 @@ a system with more than average safety measures implemented.</p>
 <p>Lynis will give you more recommendations for securing your system as well.</p>
 </li>
 </ul>
-<hr />
+<hr>
 <p><strong>rkhunter</strong> (Rootkit Hunter):</p>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Rkhunter">Arch Wiki RKhunter</a></li>
@@ -722,12 +671,12 @@ SCRIPTWHITELIST=/usr/bin/vendor_perl/GET
 <p>Run a config check:</p>
 <pre><code class="language-bash">sudo rkhunter --config-check
 </code></pre>
-<hr />
+<hr>
 <p><strong>ClamAV</strong></p>
 <ul>
 <li>
 <p>Malware stands for malicious software. A computer virus is an undesirable
-program running on the user's computer often without their consent or even
+program running on the user’s computer often without their consent or even
 without their knowledge.</p>
 </li>
 <li>
@@ -759,14 +708,14 @@ for this to prevent your system going to sleep while the scan completes.</p>
 </blockquote>
 <pre><code class="language-bash">paru -S caffeine-ng
 </code></pre>
-<p>This creates a coffee cup icon in your bar config on next reboot. If you're in
-the middle of something and don't want to reboot run:</p>
+<p>This creates a coffee cup icon in your bar config on next reboot. If you’re in
+the middle of something and don’t want to reboot run:</p>
 <pre><code class="language-bash">caffeine &amp;
 </code></pre>
 <p>Click the icon and <code>Enable Caffeine</code> to prevent sleep.</p>
-<hr />
+<hr>
 <h2 id="hardening-the-kernel"><a class="header" href="#hardening-the-kernel">Hardening the Kernel</a></h2>
-<p>Given the kernel's central role, it's a frequent target for malicious actors,
+<p>Given the kernel’s central role, it’s a frequent target for malicious actors,
 making robust hardening essential.</p>
 <p>You can use the <code>linux-hardened</code> kernel to have a kernel that prioritizes
 security over anything else:</p>
@@ -810,9 +759,9 @@ fallback_options="-S autodetect"
 </code></pre>
 <p>Reboot and <code>linux-hardened</code> should be chosen by default. You can also choose
 additional kernels if needed.</p>
-<hr />
+<hr>
 <h2 id="hardening-your-current-kernel"><a class="header" href="#hardening-your-current-kernel">Hardening your current Kernel</a></h2>
-<p>Sometimes <code>linux-hardened</code> just won't work on your system without some serious
+<p>Sometimes <code>linux-hardened</code> just won’t work on your system without some serious
 digging. You can harden your current kernel, or even better would be to harden
 the Long-Term Support (LTS) kernel.</p>
 <p>The Linux kernel is typically released under two forms: stable and long-term
@@ -821,7 +770,7 @@ support (LTS). Choosing either has consequences, do your research.
 <ul>
 <li><a href="https://www.kernel.org/category/releases.html">The Linux Kernel Archives Active kernel releases</a></li>
 </ul>
-<p>See which kernel you're currently using with:</p>
+<p>See which kernel you’re currently using with:</p>
 <pre><code class="language-bash"># show the kernel release
 uname -r
 # show kernel version, hostname, and architecture
@@ -1134,7 +1083,7 @@ blacklist udf
 <p>Check which modules were included in the initramfs (Long Output):</p>
 <pre><code class="language-bash">mkinitcpio -v &gt; /tmp/mk.txt
 </code></pre>
-<p>Then search through the file and ensure they weren't loaded.</p>
+<p>Then search through the file and ensure they weren’t loaded.</p>
 <blockquote>
 <p>❗️ Note: This may break some networking and virtualization tools.</p>
 </blockquote>
@@ -1170,7 +1119,7 @@ containers are not required.</p>
 </ul>
 </li>
 </ul>
-<hr />
+<hr>
 <h2 id="firewall"><a class="header" href="#firewall">Firewall</a></h2>
 <p><strong>nftables</strong> is designed to replace <strong>iptables</strong> by providing a modern,
 simplified, and unified packet filtering and classification framework in the
@@ -1299,12 +1248,12 @@ sudo systemctl start nftables.service
 <pre><code class="language-bash">sudo nft -f /etc/nftables.conf
 </code></pre>
 <blockquote>
-<p>❗️ If you don't use SSH or host a web server or any service, don't allow SSH
+<p>❗️ If you don’t use SSH or host a web server or any service, don’t allow SSH
 and HTTP/HTTPS.</p>
 </blockquote>
 <pre><code class="language-bash">sudo nft list ruleset
 </code></pre>
-<hr />
+<hr>
 <h2 id="ssh--gpg-key-generation-and-safety"><a class="header" href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a></h2>
 <h3 id="ssh-keygen"><a class="header" href="#ssh-keygen">ssh-keygen</a></h3>
 <p>The <code>ed25519</code> algorithm is significantly faster and more secure when compared to
@@ -1328,7 +1277,7 @@ adding extra rounds can make it harder to brute-force.</p>
 <p><code>-f</code> is for filename</p>
 </li>
 </ul>
-<hr />
+<hr>
 <h3 id="gnupg-and-gpg-agent"><a class="header" href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></h3>
 <details>
 <summary> ✔️ Click to Expand GnuPG section </summary>
@@ -1372,7 +1321,7 @@ chmod 600 ~/.gnupg/*
 ls -l ~/.gnupg
 # Files should show: -rw-------
 </code></pre>
-<hr />
+<hr>
 <h3 id="generate-a-revocation-certificate"><a class="header" href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></h3>
 <p><code>mykey</code> must be a key specifier, either the keyID of the primary keypair or any
 part of the user ID that identifies the keypair:</p>
@@ -1391,15 +1340,15 @@ Your decision?
 </code></pre>
 <p>The certificate will be output to a file <code>revoke.asc</code>. If the <code>--output</code> is
 ommitted, the result will be placed on stdout.</p>
-<p>Since it's a short certificate, you can print a hardcopy and store it somewhere
-safe. The cert shouldn't be somewhere that others can access it since anyone
+<p>Since it’s a short certificate, you can print a hardcopy and store it somewhere
+safe. The cert shouldn’t be somewhere that others can access it since anyone
 could publish the revoke cert and render the corresponding public key useless.</p>
 <p>To apply the revoke cert, import it:</p>
 <pre><code class="language-bash">gpg --import revoke.asc
 # And optionally push the revoked key to public keyservers to notify others:
 gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEYID
 </code></pre>
-<hr />
+<hr>
 <h3 id="generate-gpg-subkeys"><a class="header" href="#generate-gpg-subkeys">Generate Gpg Subkeys</a></h3>
 <pre><code class="language-bash"># Take note of your public key
 gpg --list-keys --with-fingerprint
@@ -1432,10 +1381,10 @@ Create another key while still in the menu with only encrypt capabilities.</p>
 ssh-ed25519 AABCC3NzaC1lZDI1NTE5ABBAIHyujgyCjjBTqIuFM3EMUSo6RGklmOXQW3uWRhWdJ1Mm (none)
 </code></pre>
 <ul>
-<li>By itself, a keygrip cannot be used to reconstruct your private key. It's
-derived from the public key material, not from the secret key itself so it's
-safe to version control. Don't put your keygrip in a public repo if you don't
-want people to know you use that key for signing/authentication. It's not a
+<li>By itself, a keygrip cannot be used to reconstruct your private key. It’s
+derived from the public key material, not from the secret key itself so it’s
+safe to version control. Don’t put your keygrip in a public repo if you don’t
+want people to know you use that key for signing/authentication. It’s not a
 security risk, but it leaks a tiny bit of metadata.</li>
 </ul>
 <p>The following article mentions the keygrip being computed from public elements
@@ -1572,7 +1521,7 @@ you from losing access to your keys in the case of disk failure or accidents.</p
 <pre><code class="language-bash">gpg --export --armor --output my-public-keys.gpg
 </code></pre>
 <p>Now if your keys ever get lost or corrupted, you can import these backups.</p>
-<hr />
+<hr>
 <h3 id="remove-and-store-your-primary-key-offline"><a class="header" href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></h3>
 <blockquote>
 <p>❗ NOTE: After you remove your primary key, you will no longer be able to
@@ -1615,7 +1564,7 @@ sec#  ed25519/0x
 <p>The above set of commands are from the
 <a href="https://riseup.net/ru/security/message-security/openpgp/gpg-best-practices#keep-your-primary-key-entirely-offline">RiseUp Keep your primary key offline</a></p>
 </details>
-<hr />
+<hr>
 <h2 id="hardening-openssh"><a class="header" href="#hardening-openssh">Hardening OpenSSH</a></h2>
 <p>OpenSSH is a tool that allows you to remotely connect to your machine with the
 SSH protocol. It encrypts all traffic to prevent eavesdropping, connection
@@ -1692,12 +1641,12 @@ ssh jr@archlinux
 # Specify the port
 ssh -p 22 user@hostname
 </code></pre>
-<hr />
+<hr>
 <h4 id="tip-change-the-default-port"><a class="header" href="#tip-change-the-default-port">Tip Change the Default Port</a></h4>
 <blockquote>
 <p>⚠️ Critical Warning: Do not close your existing SSH session until you
 successfully connect using the new port. If you make a mistake and get locked
-out, you'll need console access to your server to fix it</p>
+out, you’ll need console access to your server to fix it</p>
 </blockquote>
 <p>Edit <code>/etc/ssh/sshd_config</code> to add the line:</p>
 <pre><code class="language-config">Port 2222
@@ -1720,12 +1669,12 @@ SSH, ensuring remote access will work through the firewall.</p>
 <p>Finally, text a connection:</p>
 <pre><code class="language-bash">ssh -p 2222 user@hostname
 </code></pre>
-<hr />
+<hr>
 <h2 id="usb-port-protection"><a class="header" href="#usb-port-protection">USB Port Protection</a></h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/USBGuard">Arch Wiki USBGuard</a></li>
 </ul>
-<p>It's important to protect your USB ports to prevent BadUSB attacks, data
+<p>It’s important to protect your USB ports to prevent BadUSB attacks, data
 exfiltration, unauthorized device access, malware injection, etc.</p>
 <p>To get a list of your connected USB devices you can use <code>lsusb</code> from the
 <code>usbutils</code> package.</p>
@@ -1750,8 +1699,8 @@ sudo usermod -aG usbguard username
 <h3 id="usbguard-daemon"><a class="header" href="#usbguard-daemon">USBGuard Daemon</a></h3>
 <blockquote>
 <p>❗️ If practicing zero-trust, you would want to change your default policy to
-<code>apply-policy</code>. This way any device that isn't explicitly allowed will be
-blocked. It's easy to lock yourself out if done incorrectly.</p>
+<code>apply-policy</code>. This way any device that isn’t explicitly allowed will be
+blocked. It’s easy to lock yourself out if done incorrectly.</p>
 </blockquote>
 <p>Edit <code>/etc/usbguard/usbguard-daemon.conf</code> to set the policy to allow devices
 that are already connected for members of the <code>usbguard</code> group:</p>
@@ -1793,14 +1742,14 @@ interface class <code>03:*:*</code>) implicitly not allowed.(commented out)</p>
 USB drive that implements a keyboard or a network interface is very suspicious,
 these reject rules prevent that.</p>
 <p>The <code>presentDevicePolicy = "allow"</code> allows any device that is present at daemon
-start up even if they're not explicitly allowed. However, newly plugged in
+start up even if they’re not explicitly allowed. However, newly plugged in
 devices must match an allow rule or get denied implicitly.</p>
 <p>Enable/Start <code>usbguard.service</code>:</p>
 <pre><code class="language-bash">sudo systemctl enable usbguard
 sudo systemctl start usbguard --now
 </code></pre>
 <ul>
-<li>Sometimes a reboot is required. If your keyboard doesn't work, after entering
+<li>Sometimes a reboot is required. If your keyboard doesn’t work, after entering
 your encryption passphrase, enter the TTY with <code>Alt+Ctrl+F2</code> and ensure the
 <code>usbguard</code> group exists and your user is a member.</li>
 </ul>
@@ -1811,23 +1760,23 @@ your encryption passphrase, enter the TTY with <code>Alt+Ctrl+F2</code> and ensu
 </code></pre>
 <ul>
 <li>
-<p>If you plug something new in and it doesn't work, this is why. Remember this!</p>
+<p>If you plug something new in and it doesn’t work, this is why. Remember this!</p>
 </li>
 <li>
 <p><a href="https://docs.kernel.org/usb/authorization.html">Authorizing (or not) USB devices</a></p>
 </li>
 </ul>
-<hr />
+<hr>
 <h3 id="firejail"><a class="header" href="#firejail">Firejail</a></h3>
 <blockquote>
 <p>❗️ Critics such as madaidan say that Firejail worsens security by acting as a
 privilege escalation hole. Firejail requires the executable to be setuid,
 meaning it runs with root privileges. Experienced users are encouraged to use
-bubblewrap for it's minimal design and specificity of its purpose.</p>
+bubblewrap for it’s minimal design and specificity of its purpose.</p>
 </blockquote>
 <p>A <strong>setuid binary</strong> is an executable file with a special permission bit set
-called "set user ID" (setuid). When a user runs a setuid binary, the program
-executes with the permissions of the binary's owner, rather than the permissions
+called “set user ID” (setuid). When a user runs a setuid binary, the program
+executes with the permissions of the binary’s owner, rather than the permissions
 of the user running it.</p>
 <p>There are mitigations for the above risks I will share further down.</p>
 <p>Another option here is <a href="https://wiki.archlinux.org/title/Bubblewrap">Bubblewrap</a></p>
@@ -1868,7 +1817,7 @@ the firejail group reducing the attack surface.</li>
 </li>
 </ul>
 <blockquote>
-<p>❗️ This breaks some apps such as VirtualBox which I don't recommend and if
+<p>❗️ This breaks some apps such as VirtualBox which I don’t recommend and if
 using the hardened kernel, Wireshark and Chromium-based browsers are also
 affected.</p>
 </blockquote>
@@ -1895,7 +1844,7 @@ Description = Setting /usr/bin/firejail owner to "root:firejail" and mode "4750"
 <p>and add your user to it:</p>
 <pre><code class="language-bash">sudo gpasswd -a $USER firejail
 </code></pre>
-<p><strong>Verify Firejail's being used</strong>:</p>
+<p><strong>Verify Firejail’s being used</strong>:</p>
 <p>Launch the program that you want to ensure is running sandboxed and run:</p>
 <pre><code class="language-bash">firejail --list
 # or more comprehensive
@@ -1959,13 +1908,13 @@ it from being added if you run <code>firecfg</code> again.</p>
 </li>
 </ul>
 </details>
-<hr />
+<hr>
 <h2 id="apparmor"><a class="header" href="#apparmor">AppArmor</a></h2>
 <p><a href="https://apparmor.net/">AppArmor</a> is a
 <a href="https://wiki.archlinux.org/title/Mandatory_Access_Control">Mandatory Access Control</a>
 (MAC) system, implemented upon the
 <a href="https://en.wikipedia.org/wiki/Linux_Security_Modules">Linux Security Modules</a>(LSM)
--- Arch Wiki</p>
+– Arch Wiki</p>
 <p>MAC systems generally block all access by default, only permitting actions that
 are explicitly defined as allowed in their security policy or access profiles.</p>
 <p>This is why, if you read about creating your own policy that they recommend
@@ -1975,9 +1924,9 @@ is default-deny so any action not covered in the above steps will be blocked by
 default.</p>
 <blockquote>
 <p>❗️ The AppArmor policy con only be considered default deny if it is deployed
-as a complete system policy which we don't do here. The apps and parts of the
-system that don't have pre-defined policies aren't covered by AppArmor so are
-therefore default allow. You can get there in time but it's beyond the scope
+as a complete system policy which we don’t do here. The apps and parts of the
+system that don’t have pre-defined policies aren’t covered by AppArmor so are
+therefore default allow. You can get there in time but it’s beyond the scope
 of this section.</p>
 </blockquote>
 <p>Install:</p>
@@ -2025,7 +1974,7 @@ the event is logged.</p>
 <p><a href="https://wiki.archlinux.org/title/AppArmor">Arch Wiki AppArmor</a></p>
 </li>
 </ul>
-<h2 id="creating-or-adding-profiles-that-arent-pre-configured"><a class="header" href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren't pre-configured</a></h2>
+<h2 id="creating-or-adding-profiles-that-arent-pre-configured"><a class="header" href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren’t pre-configured</a></h2>
 <p>For example, thunderbird came with a profile that just allowed everything.
 Rather than creating my own profile I cloned the <code>apparmor-profiles</code> repo and
 got it from there.</p>
@@ -2042,7 +1991,7 @@ sudo touch /etc/apparmor.d/local/usr.bin.thunderbird
 <p>Set the new profile to enforce mode:</p>
 <pre><code class="language-bash">sudo aa-enforce /etc/apparmor.d/usr.bin.thunderbird
 </code></pre>
-<hr />
+<hr>
 <p><strong>Creating a new profile</strong></p>
 <ul>
 <li><a href="https://gitlab.com/apparmor/apparmor/-/wikis/Profiling_with_tools">Profiling_with_tools</a></li>
@@ -2107,7 +2056,7 @@ include &lt;tunables/global&gt;
 </code></pre>
 <h3 id="auditd"><a class="header" href="#auditd">Auditd</a></h3>
 <p>Linux audit makes your system more secure by providing you the means to analyze
-what's going on in your system in great detail. It does not provide any security
+what’s going on in your system in great detail. It does not provide any security
 itself, but instead is useful for tracking these issues and helps you take
 additional security measures to prevent them.</p>
 <p>Install with:</p>
@@ -2170,7 +2119,7 @@ the rules we just set:</p>
 <p>Ensure <code>auditd</code> is running:</p>
 <pre><code class="language-bash">sudo systemctl status auditd
 </code></pre>
-<p>Since we set a watch rule for sudo let's run an update and check the auditd
+<p>Since we set a watch rule for sudo let’s run an update and check the auditd
 logs:</p>
 <pre><code class="language-bash">sudo pacman -Syu
 </code></pre>
@@ -2185,18 +2134,18 @@ man aureport
 <p>Verify the rules are loaded:</p>
 <pre><code class="language-bash">sudo auditctl -l
 </code></pre>
-<p>Be careful here, if you enable <code>auditd</code> and don't iron out the kinks I've found
+<p>Be careful here, if you enable <code>auditd</code> and don’t iron out the kinks I’ve found
 that it freezes after you enter your cryptroot passphrase. If this happens to
 you, follow the chroot steps but skip the <code>arch-chroot /mnt</code> step and instead
 run:</p>
 <pre><code class="language-bash">systemctl --root=/mnt disable auditd
 </code></pre>
 <p>Unmount the partitions, close cryptroot, and Reboot.</p>
-<hr />
+<hr>
 <h3 id="doas-over-sudo"><a class="header" href="#doas-over-sudo">Doas over sudo</a></h3>
 <blockquote>
 <p>❗️ Removing sudo may cause compatibility issues with some scripts/tools that
-expect it, I haven't had many issues but you should test before completely
+expect it, I haven’t had many issues but you should test before completely
 removing it.</p>
 </blockquote>
 <p>For a more minimalist version of <code>sudo</code> with a smaller codebase and attack
@@ -2213,14 +2162,14 @@ surface, consider <code>doas</code>:</p>
 <pre><code class="language-conf">permit setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :doas
 </code></pre>
 <p>You can add a line below that one like <code>permit nopass your-username as root:</code>
-Enabling your user passwordless usage, it's much less secure but an option.</p>
+Enabling your user passwordless usage, it’s much less secure but an option.</p>
 <p>Alternatively, you can setup the doas persist feature with the following:</p>
 <pre><code class="language-conf">permit persist setenv {PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin} :doas
 </code></pre>
 <ul>
 <li>
-<p>With the above setting, after you successfully authenticate. You won't be
-asked for your password for the next 5 minutes. It's disabled by default
+<p>With the above setting, after you successfully authenticate. You won’t be
+asked for your password for the next 5 minutes. It’s disabled by default
 because it can be dangerous if used in the wrong environment.</p>
 </li>
 <li>
@@ -2246,7 +2195,7 @@ doas chmod -c 0400 /etc/doas.conf
 </code></pre>
 <pre><code class="language-bash">doas pacman -Syu
 </code></pre>
-<p>Test and ensure most commands that you use work before removing sudo so you're
+<p>Test and ensure most commands that you use work before removing sudo so you’re
 aware of potential issues. To benefit from the smaller codebase and attack
 surface, you have to remove sudo.</p>
 <pre><code class="language-bash">doas pacman -R sudo base-devel
@@ -2259,7 +2208,7 @@ issues with this method but not super common.</p>
 <h2 id="intrusion-detection"><a class="header" href="#intrusion-detection">Intrusion Detection</a></h2>
 <details>
 <summary> ✔️ Click to Expand AIDE Example </summary>
-<p>From what I've seen, this would work best if you're running a server or self
+<p>From what I’ve seen, this would work best if you’re running a server or self
 hosting where your system will be running without you there tweaking settings
 and AIDE will alert you if anything changes in the meantime.</p>
 <pre><code class="language-bash">paru -S aide
@@ -2306,7 +2255,7 @@ their checksums in the AIDE database:</li>
 </ol>
 <pre><code class="language-bash">sudo aide -u
 </code></pre>
-<p>Unfortunately, AIDE doesn't automatically replace the old database so you have
+<p>Unfortunately, AIDE doesn’t automatically replace the old database so you have
 to rename the new one again:</p>
 <pre><code class="language-bash">sudo mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
 </code></pre>
@@ -2318,7 +2267,7 @@ AIDE found NO differences between database and filesystem. Looks okay!!
 <ul>
 <li>
 <p>The default settings are fairly strict, I kept getting reports of changes
-detected because the mtime and ctime of a directory changed. It's fairly easy
+detected because the mtime and ctime of a directory changed. It’s fairly easy
 to set ignore rules by adding a <code>!</code> in front of the path.</p>
 </li>
 <li>
@@ -2418,11 +2367,11 @@ hardening.There are recommendations for hardening all kinds of software in the
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                             <a rel="prev" href="../arch/hardening_firefox.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
                             <a rel="next prefetch" href="../arch/hardening_networking.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
                         <div style="clear: both"></div>
@@ -2432,16 +2381,21 @@ hardening.There are recommendations for hardening all kinds of software in the
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                     <a rel="prev" href="../arch/hardening_firefox.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
                     <a rel="next prefetch" href="../arch/hardening_networking.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
 
         </div>
 
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
 
 
 
@@ -2450,15 +2404,16 @@ hardening.There are recommendations for hardening all kinds of software in the
         </script>
 
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
 
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+
 
 
     </div>
