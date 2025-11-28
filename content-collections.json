@@ -3,6 +3,28 @@
     {
       "author": null,
       "collection": null,
+      "date": "2025-11-28T18:31:31.780645938+00:00",
+      "description": "\n",
+      "draft": false,
+      "path": "README.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "README"
+    },
+    {
+      "author": null,
+      "collection": null,
+      "date": "2025-11-28T18:30:57.337587203+00:00",
+      "description": "\n",
+      "draft": false,
+      "path": "intro.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "intro"
+    },
+    {
+      "author": null,
+      "collection": null,
       "date": "2025-11-27T15:10:37.972909998+00:00",
       "description": "\n",
       "draft": false,
@@ -87,17 +109,6 @@
       "preview_html": "<p>Add this to <code>/etc/sysctl.d/40-ipv6.conf</code>:</p><pre><code class=\"language-conf\"># Enable IPv6 Privacy Extensions\nnet.ipv6.conf.all.use_tempaddr = 2\nnet.ipv6.conf.default.use_tempaddr = 2\nnet.ipv6.conf.nic.use_tempaddr = 2\n</code></pre>\n<pre><code class=\"language-bash\"># find nic\nip link\nnet.ipv6.conf.wlp3s0.use_tempaddr = 2\n</code></pre>\n<pre><code class=\"language-bash\">sudo sysctl --system\n</code></pre>\n<p><code>/etc/NetworkManager/conf.d/ip6-privacy.conf</code>:</p>",
       "tags": [],
       "title": "enc_dns"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-10-27T11:33:55.869216958+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "README.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "README"
     }
   ]
 }
