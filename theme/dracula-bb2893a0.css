@@ -1,0 +1,49 @@
+/* theme/dracula.css */
+
+/* Dark variants (coal/navy) use classic Dracula colors */
+html.coal,
+html.navy {
+  --bg: #282a36;       /* Dracula background */
+  --bg-alt: #44475a;   /* current line */
+  --fg: #f8f8f2;       /* foreground */
+  --fg-light: #cfcfd9; /* slightly dimmer foreground */
+
+  --wave-1: #282a36;
+  --wave-2: #343746;   /* UI background lighter */
+  --wave-3: #44475a;
+
+  --accent: #bd93f9;   /* purple */
+  --red: #ff5555;
+  --blue: #8be9fd;     /* cyan */
+}
+
+/* Light variants can be a softer “inverted Dracula” feel */
+html.light,
+html.rust {
+  --bg: #f8f8f2;
+  --bg-alt: #e6e6df;
+  --fg: #282a36;
+  --fg-light: #44475a;
+
+  --wave-1: #f0efe6;
+  --wave-2: #e6e5dc;
+  --wave-3: #dcdad3;
+
+  --accent: #6272a4;   /* comment/secondary tone */
+  --red: #ff5555;
+  --blue: #8be9fd;
+}
+
+/* Optional: tighten how links and cards look under Dracula */
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.card {
+  box-shadow: 0 0 22px rgba(0, 0, 0, 0.4);
+}
+
