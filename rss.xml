@@ -1,35 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>An mdBook-generated site</description><generator>mdbook-rss-feed 0.1.0</generator><item><title>android_privacy</title><link>https://mako088.github.io/android/android_privacy.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/android/android_privacy.html</guid><pubDate>Thu, 27 Nov 2025 15:10:37 +0000</pubDate></item><item><title>RethinkDNS_Guide</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<p>I was surprised to see that GrapheneOS recommends that people use their own
-“network provided DNS servers for general purpose usage” (i.e., Your ISPs DNS).
-They say that “using the network-provided DNS servers is the best way to blend
-in with other users”. Network and web sites can fingerprint and track users
-based on non-default DNS configurations.
-–<a href="https://grapheneos.org/faq#default-dns">grapheneos default-dns</a></p><p>Given that it is a fact that many ISPs are known to share this data and do other
-privacy disrespecting things, I would personally rather make it harder for them.
-I included this because they are the experts and the choice is yours, I use a
-custom DNS myself. I guess since so many people virtue-signal saying that they
-“have nothing to hide”(a reckless, privileg]]></description><guid>https://mako088.github.io/android/RethinkDNS_Guide.html</guid><pubDate>Thu, 27 Nov 2025 14:44:41 +0000</pubDate></item><item><title>enc_install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
-both HTTP and HTTPS are used.</p><p>NOTE: This can take a bit and you can expect some failures..</p><p>Default keymap is US, if you need something different:</p>]]></description><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Wed, 26 Nov 2025 14:55:13 +0000</pubDate></item><item><title>fingerprinting</title><link>https://mako088.github.io/browsers/fingerprinting.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/browsers/fingerprinting.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item><item><title>hardening_networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item><item><title>hardening_firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<p>DNS (Domain Name System) resolution is the process of translating a website’s
-domain name into its corresponding IP address. By default, this traffic isn’t
-encrypted, which means anyone on the network, from your ISP to potential
-hackers, can see the websites you’re trying to visit. <strong>Encrypted DNS</strong> uses
-protocols to scramble this information, protecting your queries and responses
-from being intercepted and viewed by others.</p><p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>An mdBook-generated site</description><generator>mdbook-rss-feed 0.1.0</generator><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Fri, 28 Nov 2025 20:07:52 +0000</pubDate></item><item><title>README</title><link>https://mako088.github.io/README.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/README.html</guid><pubDate>Fri, 28 Nov 2025 18:31:31 +0000</pubDate></item><item><title>intro</title><link>https://mako088.github.io/intro.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/intro.html</guid><pubDate>Fri, 28 Nov 2025 18:30:57 +0000</pubDate></item><item><title>Encrypted DNS on Arch</title><link>https://mako088.github.io/arch/enc_dns.html</link><description><![CDATA[<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
 what domain you looked up via DNS that it’s effectiveness is questionable
 without also using Tor or a VPN. Encrypted DNS will not help you hide any of
-your browsing activity.</p><p>There are 3 main types of DNS protection:</p>]]></description><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item><item><title>hardening_arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<p>Users and groups are used as a form of
-<a href="https://en.wikipedia.org/wiki/access_control#Computer_security">access control</a>.
-They control access to the system’s files, directories, and peripherals. This
-is a security feature that limits access in certain specific ways.</p><p>Apply the principle of least privilege by assigning users only the permissions
-they actually need.</p><p>Avoid running services or applications as root; use dedicated service accounts
-where possible.</p>]]></description><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item><item><title>enc_dns</title><link>https://mako088.github.io/arch/enc_dns.html</link><description><![CDATA[<p>Add this to <code>/etc/sysctl.d/40-ipv6.conf</code>:</p><pre><code class="language-conf"># Enable IPv6 Privacy Extensions
-net.ipv6.conf.all.use_tempaddr = 2
-net.ipv6.conf.default.use_tempaddr = 2
-net.ipv6.conf.nic.use_tempaddr = 2
+your browsing activity.</p><pre><code class="language-bash">sudo pacman -S dnscrypt-proxy
 </code></pre>
-<pre><code class="language-bash"># find nic
-ip link
-net.ipv6.conf.wlp3s0.use_tempaddr = 2
+<blockquote>
+<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when
+configuring your servers if your output chain is a default drop.</p><p><a href="https://wiki.archlinux.org/title/Dnscrypt-proxy">Arch Wiki dnscrypt-proxy</a></p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_dns.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<p>⚠️ Warning: I am not a security expert. This guide presents various options
+for hardening Arch Linux, but it is your responsibility to evaluate whether
+each adjustment suits your specific needs and environment. Security hardening
+and process isolation can introduce stability challenges, compatibility
+issues, or unexpected behavior. Additionally, these protections often come
+with performance tradeoffs. Always conduct thorough research, there are no
+plug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known
+<a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">Linux Hardening Guide</a>
+by Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity
+truly matters, use Whonix o]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
+by disabling or restricting features like JavaScript, cookies, telemetry, and
+third-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser
+indistinguishable from others. Instead of just blocking data collection, it
+ensures that your browser’s configuration; screen size, fonts, user agent,
+etc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are
+dedicated to distinct online activities to isolate cookies, trackers, and
+browsing data. For example, Mullvad Browser can be used solely for activities
+where fingerprinting resistance is critical, such as anonymou]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted Arch Install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<p>The ultimate installation resource is always goint to be the:</p><p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p><p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
+directory is just the same directory where your Arch Linux ISO file is stored.</p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
+Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class="language-bash">sudo nmcli general reload
 </code></pre>
-<pre><code class="language-bash">sudo sysctl --system
+<pre><code class="language-bash">sudo usermod -aG network $USER
 </code></pre>
-<p><code>/etc/NetworkManager/conf.d/ip6-privacy.conf</code>:</p>]]></description><guid>https://mako088.github.io/arch/enc_dns.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item><item><title>README</title><link>https://mako088.github.io/README.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/README.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item></channel></rss>
+<h2>Investigate sockets</h2>
+<p>Display all TCP Sockets with service names:</p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>RethinkDNS</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<p><img src="../images/rethinkdns.cleaned.png" alt="RethinkDNS Logo" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and
+privacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web
+browsers and servers to transfer web pages and related resources over the
+internet.</p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/android/RethinkDNS_Guide.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>android_privacy</title><link>https://mako088.github.io/android/android_privacy.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/android/android_privacy.html</guid><pubDate>Thu, 27 Nov 2025 15:10:37 +0000</pubDate></item><item><title>fingerprinting</title><link>https://mako088.github.io/browsers/fingerprinting.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/browsers/fingerprinting.html</guid><pubDate>Mon, 27 Oct 2025 11:33:55 +0000</pubDate></item></channel></rss>
