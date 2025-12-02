@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>An mdBook-generated site</description><generator>mdbook-rss-feed 0.1.0</generator><item><title>Hardening Arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<p>⚠️ Warning: I am not a security expert. This guide presents various options
+for hardening Arch Linux, but it is your responsibility to evaluate whether
+each adjustment suits your specific needs and environment. Security hardening
+and process isolation can introduce stability challenges, compatibility
+issues, or unexpected behavior. Additionally, these protections often come
+with performance tradeoffs. Always conduct thorough research, there are no
+plug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known
+<a href="https://madaidans-insecurities.github.io/guides/linux-hardening.html">Linux Hardening Guide</a>
+by Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity
+truly matters, use Whonix o]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
+by disabling or restricting features like JavaScript, cookies, telemetry, and
+third-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser
+indistinguishable from others. Instead of just blocking data collection, it
+ensures that your browser’s configuration; screen size, fonts, user agent,
+etc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are
+dedicated to distinct online activities to isolate cookies, trackers, and
+browsing data. For example, Mullvad Browser can be used solely for activities
+where fingerprinting resistance is critical, such as anonymou]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted Arch Install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<p>The ultimate installation resource is always goint to be the:</p><p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p><p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
+directory is just the same directory where your Arch Linux ISO file is stored.</p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
+Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class="language-bash">sudo nmcli general reload
+</code></pre>
+<pre><code class="language-bash">sudo usermod -aG network $USER
+</code></pre>
+<h2>Investigate sockets</h2>
+<p>Display all TCP Sockets with service names:</p>]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item></channel></rss>
