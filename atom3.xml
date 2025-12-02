@@ -1,0 +1,1837 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>privacy-book</title><id>https://mako088.github.io/atom3.xml</id><updated>1970-01-01T00:00:00+00:00</updated><link href="https://mako088.github.io/atom3.xml" rel="self"/><link href="https://mako088.github.io/atom2.xml" rel="prev"/><subtitle>An mdBook-generated site</subtitle><entry><title>Hardening Networking</title><id>https://mako088.github.io/arch/hardening_networking.html</id><updated>2025-11-28T00:00:00+00:00</updated><link href="https://mako088.github.io/arch/hardening_networking.html" rel="alternate"/><content type="html">&lt;h1&gt;Hardening Networking&lt;/h1&gt;
+&lt;p&gt;NetworkManagers global config is &lt;code&gt;/etc/NetworkManager/NetworkManager.conf&lt;/code&gt;.
+Additional config files can be placed in &lt;code&gt;/etc/NetworkManager/conf.d&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;After editing a config file, apply the changes with:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo nmcli general reload
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo usermod -aG network $USER
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Investigate sockets&lt;/h2&gt;
+&lt;p&gt;Display all TCP Sockets with service names:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;ss -at
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Display all TCP Sockets with port numbers:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;ss -atn
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Display all UDP Sockets:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;ss -au
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Configure NetworkManager to use Quad9s DoT&lt;/h2&gt;
+&lt;p&gt;Create &lt;code&gt;/etc/NetworkManager/system-connections/Wi-Fi.nmconnection&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-.nmconnection&quot;&gt;[connection]
+dns-over-tls=2
+
+[ipv4]
+dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
+ignore-auto-dns=true
+
+[ipv6]
+dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
+ignore-auto-dns=true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo systemctl restart NetworkManager
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Wi-Fi MAC randomization&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Add the following to &lt;code&gt;/etc/NetworkManager/conf.d/wifi_rand_mac.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-conf&quot;&gt;[device-mac-randomization]
+# &quot;yes&quot; is already the default for scanning
+wifi.scan-rand-mac-address=yes
+
+[connection-mac-randomization]
+# Randomize MAC for every ethernet connection
+ethernet.cloned-mac-address=random
+# Generate a random MAC every time you connect to a wifi network
+wifi.cloned-mac-address=random
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Unique DUID per connection&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Create &lt;code&gt;/etc/NetworkManager/conf.d/duid.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-conf&quot;&gt;[connection]
+ipv6.dhcp-duid=stable-uuid
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;MAC Address spoofing&lt;/h2&gt;
+&lt;p&gt;This section demonstrates how to spoof your Media Access Control (MAC) address.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Manual MAC randomization with macchanger&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Find your device interface and check your current MAC address:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# find interface
+ip add
+sudo iplink show wlp3s0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The address following &lt;code&gt;&quot;link/ether&quot;&lt;/code&gt; is your MAC, bring it down so we can change
+it:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo ip link set dev wlp3s0 down
+# or
+# sudo ifconfig wlp3s0 down
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Install the &lt;code&gt;macchanger&lt;/code&gt; package and run:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo macchanger -a wlp3s0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;-a&lt;/code&gt;, &lt;code&gt;--another&lt;/code&gt;: Set random vendor MAC of the same kind.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;-r&lt;/code&gt;, &lt;code&gt;--random&lt;/code&gt;: Set fully random MAC.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Automatically with systemd &amp;amp; macchanger&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;systemd unit setting a random address while preserving the original NIC vendor
+bytes.&lt;/p&gt;
+&lt;p&gt;Create &lt;code&gt;/etc/systemd/system/macspoof@.service&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-macspoof@.service&quot;&gt;[Unit]
+Description=macchanger on %I
+Wants=network-pre.target
+Before=network-pre.target
+BindsTo=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+ExecStart=/usr/bin/macchanger -e %I
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You can use &lt;code&gt;-r&lt;/code&gt; to randomize everything but it’s important that the vendor
+bytes actually match something and aren’t just random numbers so it’s less
+recommended.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;code&gt;@.service&lt;/code&gt; pattern allows per-interface instantiation like
+&lt;code&gt;macspoof@wlp3s0.service&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;code&gt;%I&lt;/code&gt; variable automatically resolves to your interface name.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You only need to append your interface name when enabling the service.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo systemctl enable macspoof@wlp3s0.service
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.kicksecure.com/wiki/MAC_Address&quot;&gt;KickSecure MAC_address&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://wiki.archlinux.org/title/MAC_address_spoofing&quot;&gt;Arch Wiki MAC address spoofing&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://tldp.org/LDP/nag2/index.html&quot;&gt;Linux Network Admin Guide&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://wiki.archlinux.org/title/NetworkManager&quot;&gt;Arch Wiki NetworkManager&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</content></entry><entry><title>RethinkDNS</title><id>https://mako088.github.io/android/RethinkDNS_Guide.html</id><updated>2025-11-28T00:00:00+00:00</updated><link href="https://mako088.github.io/android/RethinkDNS_Guide.html" rel="alternate"/><content type="html">&lt;h1&gt;RethinkDNS&lt;/h1&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand Table of Contents&lt;/summary&gt;
+&lt;!-- toc --&gt;
+&lt;/details&gt;
+&lt;p&gt;&lt;img src=&quot;../images/rethinkdns.cleaned.png&quot; alt=&quot;RethinkDNS Logo&quot; /&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I’m not affiliated with RethinkDNS in any way, I’m just a technologist and
+privacy advocate.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;🔑 Key Terms&lt;/h3&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand Key Terms &lt;/summary&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;HTTP&lt;/strong&gt; (HyperText Transfer Protocol): The standard protocol used by web
+browsers and servers to transfer web pages and related resources over the
+internet.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;HTTPS&lt;/strong&gt;: HTTP encrypted using TLS is often referred to as HTTPS.
+TLS-encrypted web traffic is by convention exchanged on port 443 by default,
+while unencrypted HTTP uses port 80 by default.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;TLS&lt;/strong&gt; (Transport Layer Security) is an encryption protocol and is the
+standard for enabling two networked applications or devices to exchange
+information privately and robustly.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Mixed content&lt;/strong&gt;: is when an otherwise secure website uses resources fetched
+via HTTP or other insecure protocols.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;IP&lt;/strong&gt; (Internet Protocol): The address system of the internet that routes
+data packets from source to destination devices. IP operates at the network
+layer and does not guarantee delivery order or error checking, which is
+handled by TCP.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;IP Address&lt;/strong&gt; (Internet Protocol Address): A unique numeric label assigned to
+each device on a network, used to identify and locate the device for
+communication.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Subnet&lt;/strong&gt; (Subnet Range): represents a block of IP addresses grouped together
+under a single rule. Instead of allowing or blocking individual IP addresses
+one by one, you define a subnet to include a wide range of IPs within that
+block.(Useful for apps that you &lt;code&gt;Isolate&lt;/code&gt;).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Host&lt;/strong&gt;: Any device connected to a network with an IP address, capable of
+sending and receiving data, including computers, phones, or servers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Client&lt;/strong&gt;: A device or software (often your computer or phone) that initiates
+requests to servers to access resources or services, forming the client-server
+model of communication.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Port&lt;/strong&gt;: A port in networking is a virtual communication endpoint managed by
+a computer’s operating system that helps direct network traffic to specific
+apps or services. While an IP address identifies a device on a network, ports
+allow the system to know exactly which app or service should handle the
+incoming or outgoing data. Web traffic commonly uses port 80 (HTTP) or 443
+(HTTPS), so when data arrives for those ports, it’s routed to the web server
+application on the device. When we block port 80, we block insecure HTTP
+connections.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;TCP&lt;/strong&gt; (Transmission Control Protocol) is responsible for maintaining a
+connection through a handshake and putting the packets in the correct order.
+TCP will also ask for missing pieces and is known as a reliable but slow
+protocol.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;UDP&lt;/strong&gt; (User Datagram Protocol) (UDP/IP): is a fast protocol used across the
+internet for time-sensitive transmissions such as DNS lookups or VoIP. UDP
+allows a computer to send data straight to another without requiring a
+handshake.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;DNS&lt;/strong&gt; (Domain Name System): stores domain information in a distributed
+database and translates domain names into IP addresses and vice versa. This
+enables us to only have to remember simple domain names rather than complex IP
+addresses.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Domain Name&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;ssd.eff.org
+ |   |   |
+ |   |  top-level domain
+ |   |
+ |   second-level domain
+ |
+subdomain
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;☝️ The hierarchy is read from right to left, the TLD is the highest-level
+domain (&lt;code&gt;.org&lt;/code&gt; here), the second-level domain (&lt;code&gt;eff&lt;/code&gt;) is directly to the left
+of the TLD, and anything further left (like &lt;code&gt;ssd&lt;/code&gt;) is a subdomain under that
+second-level domain.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;DNS Server&lt;/strong&gt;: When you search for a domain name (rethinkdns.com) it triggers
+a DNS lookup. Several different types of DNS servers typically work together
+to complete a single DNS lookup.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;DNS Resolver&lt;/strong&gt;: is a server or software component that translates domain
+names into IP addresses that devices use to communicate.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Unicast DNS&lt;/strong&gt;: The traditional DNS setup where each DNS server is assigned a
+unique, single IP address. DNS queries from clients are directed to this
+specific server regardless of the clients location.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Anycast DNS&lt;/strong&gt;: Anycast allows a single IP address to be used by multiple
+servers. In Anycast DNS, a DNS query can be answered by any one of several DNS
+servers, usually the one closest to the user by geographic or network
+proximity. This setup reduces latency, increases the availability of DNS
+resolution services, and offers protection against DNS flood DDoS attacks by
+distributing traffic across multiple servers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Recursive resolver&lt;/strong&gt; (DNS recursor): is typically the first stop in the
+series of the above servers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Iterative resolver&lt;/strong&gt;: In an iterative DNS query, each DNS server responds
+directly to the client with a referral to another server, and the client
+continues querying successive servers until it receives the IP address for the
+requested domain.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Proxy&lt;/strong&gt;: A proxy, in relation to Orbot with Rethink, is an intermediary
+service that routes internet traffic from your device through the Tor network
+to provide privacy and anonymity.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;HTTP(S) Proxy&lt;/strong&gt;: An HTTP proxy is an intermediary server that forwards
+HTTP/HTTPS web traffic from a client (e.g., a browser or app) to destination
+servers, allowing for privacy, filtering, or routing control while masking the
+user’s IP. HTTP proxies only work with web traffic (HTTP/HTTPS).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SOCKS5&lt;/strong&gt; (Socket Secure 5): Is an internet proxy protocol that transfers
+info from one server to another while redirecting the user’s IP address. It
+supports both UDP and TCP and can actually improve speed in some cases.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/pi-hole/pi-hole&quot;&gt;pi-hole&lt;/a&gt;: a DNS sinkhole that protects
+your devices content without installing any client-side software.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/evilsocket/opensnitch&quot;&gt;OpenSnitch&lt;/a&gt;: is a GNU/Linux
+application firewall.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;proxifier&lt;/em&gt;: a proxifier acts as a proxy client, routing specific application
+traffic through proxy servers without encrypting data or providing global IP
+masking.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;VPN&lt;/em&gt; (Virtual Private Network): a VPN creates an encrypted tunnel that routes
+all network traffic from your device through a remote server, masking your IP
+address and securing your entire connection.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;WireGuard: a modern VPN encryption protocol, its fast and has gained
+widespread adoption among VPN providers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;OpenVPN: an older, more mature VPN protocol that uses SSL/TLS for encryption.
+It’s known for being very reliable and highly configurable but tends to be
+slower and more complex than WireGuard. Good VPNs often give you the choice
+between protocols.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Bypass DNS and Firewall&lt;/code&gt;: Bypass the DNS and Firewall for this app, &lt;strong&gt;this
+only works with Rethink’s DNS&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Bypass Universal&lt;/code&gt;: Bypass the Universal firewall for this app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Exclude&lt;/code&gt;: The app is excluded from the dns and firewall, Rethink is unaware
+of this app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Isolate&lt;/code&gt;: When an app is isolated, only trusted IPs are allowed. (i.e., IPs
+or domains you explicitly set trust rules for).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;📶 (Metered mobile): Mobile data settings, either blocked or allowed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/details&gt;
+&lt;hr /&gt;
+&lt;h2&gt;&lt;a href=&quot;#rethinkdns-overview&quot;&gt;RethinkDNS Overview&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Bypass DNS and Firewall&lt;/code&gt;: Bypass the DNS and Firewall for this app, &lt;strong&gt;this
+only works with Rethink’s DNS&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Bypass Universal&lt;/code&gt;: Bypass the Universal firewall for this app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Exclude&lt;/code&gt;: The app is excluded from the dns and firewall, Rethink is unaware
+of this app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Isolate&lt;/code&gt;: When an app is isolated, only trusted IPs are allowed. (i.e., IPs
+or domains you explicitly set trust rules for).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;🛜(Unmetered Wi-Fi): Wi-Fi settings, either blocked or allowed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;📶 (Metered mobile): Mobile data settings, either blocked or allowed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The DNS mode routes all DNS traffic generated by all apps to &lt;strong&gt;any&lt;/strong&gt; user chosen
+DNS-over-HTTPS, DNS-over-TLS, DNSCrypt, or Oblivious DNS-over-HTTPS resolver.&lt;/p&gt;
+&lt;p&gt;Firewalls like Rethink that block both UDP and TCP connections are usually
+sufficient because nearly all applications rely on these two protocols for their
+networking and communication. Almost every app communicates over TCP or UDP, so
+blocking these protocols effectively restricts most network traffic from and to
+apps, preventing them from connecting without permission.&lt;/p&gt;
+&lt;p&gt;I will share how I use RethinkDNS, obviously feel free to make changes based on
+your threat model and needs.&lt;/p&gt;
+&lt;p&gt;Different versions of the RethinkDNS have different features and capabilities.
+The best version in my opinion is the F-Droid version.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://f-droid.org/en/&quot;&gt;F-Droid Download&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h2&gt;Getting Started&lt;/h2&gt;
+&lt;h3&gt;DNS&lt;/h3&gt;
+&lt;p&gt;I was surprised to see that GrapheneOS recommends that people use their own
+“network provided DNS servers for general purpose usage” (i.e., Your ISPs DNS).
+They say that “using the network-provided DNS servers is the best way to blend
+in with other users”. Network and web sites can fingerprint and track users
+based on non-default DNS configurations.
+–&lt;a href=&quot;https://grapheneos.org/faq#default-dns&quot;&gt;grapheneos default-dns&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Given that it is a fact that many ISPs are known to share this data and do other
+privacy disrespecting things, I would personally rather make it harder for them.
+I included this because they are the experts and the choice is yours, I use a
+custom DNS myself. I guess since so many people virtue-signal saying that they
+“have nothing to hide”(a reckless, privileged notion) that not many people truly
+care about privacy and are likely using the default. The more people that we can
+convince to use privacy respecting tools, the better it is for everybody.&lt;/p&gt;
+&lt;p&gt;Recommended Resolvers:&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand recommended resolvers &lt;/summary&gt;
+&lt;p&gt;These are just the providers I’ve researched personally and not in a specific
+order. It’s recommended to regularly test and switch between DNS providers as
+location and network conditions play a factor. There are DNS benchmarking tools
+available to either download or use in-browser.&lt;/p&gt;
+&lt;p&gt;A few examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://dnsspeedtest.online/&quot;&gt;https://dnsspeedtest.online/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.grc.com/dns/benchmark.htm&quot;&gt;https://www.grc.com/dns/benchmark.htm&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Quad9&lt;/strong&gt; is known to enforce strong standards in cryptography and was the
+first to use DNSSEC cryptographic validation.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://quad9.net/privacy/policy/&quot;&gt;Quad9 privacy policy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Mullvad DNS&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://mullvad.net/en/help/privacy-policy&quot;&gt;Mullvad privacy policy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NextDNS&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://nextdns.io/privacy&quot;&gt;NextDNS privacy policy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Cloudflare publishes regular transparency reports and undergoes independent
+audits and have a great blog explaining the technology which is a major plus.
+GrapheneOS sets Cloudflare as the fallback due to their good privacy policy,
+and widespread usage.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.cloudflare.com/privacypolicy/&quot;&gt;Cloudflare Privacy Policy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;RethinkDNS: Their DNS code is open source so anyone can audit it themselves.
+They do not collect PII nor seek to profile its users, transparency is great.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://rethinkdns.com/privacy&quot;&gt;DNS Privacy Policy for stub resolvers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://fly.io/legal/privacy-policy/&quot;&gt;Fly.io privacy policy for the recursive resolver&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/en/dns/&quot;&gt;PrivacyGuides DNS Recommendations&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/details&gt;
+&lt;p&gt;Throughout this article, I’ll be discussing the &lt;strong&gt;RethinkDNS Android App&lt;/strong&gt;.
+We’ll later reference the &lt;strong&gt;DNS Blocklist configuring website&lt;/strong&gt;, which is
+available at &lt;a href=&quot;https://rethinkdns.com/configure&quot;&gt;rethinkdns.com/configure&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;❗ NOTE: When you switch to an encrypted DNS resolver, you are shifting your
+trust from your ISP’s DNS servers to the third-party DNS provider you choose.
+Encryption protects your DNS queries from being seen or intercepted by
+outsiders, like your ISP or network eavesdroppers, which improves privacy.
+However, the DNS resolver itself still sees all your queries and could
+potentially log, analyze, or misuse that data.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;That said, it’s quite common for ISPs to engage in practices that compromise
+user privacy. Do some research, whats their business model, privacy policy, etc.
+Unfortunately, with a VPN you are also just shifting the trust. Don’t blindly
+choose a VPN either.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://cyberinsider.com/internet-service-providers-isp-privacy-data-collection/&quot;&gt;ISP data-collection&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Other DNS&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Choose the type of resolver you want, I use DNSCrypt. Once you click you can
+choose the specific resolver you want such as Quad9. You may notice that it
+says &lt;code&gt;Failed: using fallback DNS&lt;/code&gt;. This is only because we haven’t turned it
+on yet, we will recheck this once we turn it on.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you want a relay in a specific country, you can click the &lt;code&gt;Relays&lt;/code&gt; tab. For
+DNSCrypt you are given the choice between the Netherlands, France, Sweden, Los
+Angeles, and Singapore. You might do this if you were trying to circumvent
+censorship.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Rules&lt;/strong&gt; set the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Advanced DNS filtering (experimental)&lt;/code&gt;: Assign unique IP per DNS request.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Prompt on blocklist updates&lt;/code&gt;: This is for if you use Rethink’s custom
+blocklists.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Prevent DNS leaks&lt;/code&gt;: When enabled, Rethink captures all packets on port 53 and
+forwards it to a user-set DNS endpoint.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Leave all the &lt;code&gt;Advanced&lt;/code&gt; defaults unless you plan on setting up a SOCKS5 proxy,
+in which case you will want to enable &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Never proxy DNS&lt;/code&gt;.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;F-Droid Specific:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Split DNS (experimental)&lt;/code&gt;: Forward DNS queries from proxied apps to the
+proxy’s DNS servers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Treat DNS rules as firewall rules (experimental)&lt;/code&gt;: DNS blocking will be
+bypassed during resolution; the decision will be made at connection time.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set &lt;code&gt;Use fallback DNS as bypass&lt;/code&gt;: where it always uses your fallback DNS for
+bypassed apps, domains and IPs.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can also set &lt;code&gt;Use System DNS for undelgated domains&lt;/code&gt; which is generally
+safe to enable and useful if access to local network devices or custom
+internal domains is needed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Blocklists&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;This is a cool feature, similar to NextDNS if I understand correctly. Since it’s
+a system-wide DNS filter it applys to any app that is run through Rethink, not
+only your browser, &lt;strong&gt;every app&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Blocklists are available when you use Rethink’s DNS.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Rethink DNS&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Choose between &lt;code&gt;Sky&lt;/code&gt; with higher uptime and a stub resolver at cloudflare.com,
+OR &lt;code&gt;Max&lt;/code&gt; which is more private and has its recursive resolver at fly.io.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Choose between the preconfigured blocklists, OR Click &lt;code&gt;RDNS Plus&lt;/code&gt;, &lt;code&gt;EDIT&lt;/code&gt;,
+&lt;code&gt;ADVANCED&lt;/code&gt;, Search blocklists: &lt;code&gt;hagezi&lt;/code&gt;, &lt;code&gt;Multi Pro++ (HaGeZi)&lt;/code&gt;,
+&lt;code&gt;APPLY (RDNS PLUS)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can manually Check for an update to the blocklists, which you should
+because they are updated regularly with new identified threats. You can also
+enable &lt;code&gt;Prompt on blocklist update&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/hagezi/dns-blocklists/wiki/FAQ#sources&quot;&gt;hagezi which version should I use?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://oisd.nl/&quot;&gt;oisd&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;F-Droid &amp;amp; Github Versions&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When on the F-Droid and GitHub versions of the Rethink, you can download
+blocklists from &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; On-device blocklists&lt;/code&gt;, and have them setup
+for &lt;strong&gt;any&lt;/strong&gt; DNS upstream.&lt;/p&gt;
+&lt;p&gt;There is a known bug where it sometimes when you click &lt;code&gt;DOWNLOAD BLOCKLISTS&lt;/code&gt; it
+just keeps listening and never receives anything. The GitHub &lt;code&gt;v05.5n&lt;/code&gt; was
+affected by this.&lt;/p&gt;
+&lt;p&gt;This &lt;strong&gt;does work&lt;/strong&gt; on the F-Droid version.&lt;/p&gt;
+&lt;p&gt;For example, if you want to use ODoH with the HAGEZI Blocklist you could:&lt;/p&gt;
+&lt;p&gt;Go to &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Other DNS&lt;/code&gt;, Choose &lt;code&gt;ODoH&lt;/code&gt; with &lt;code&gt;Cloudflare&lt;/code&gt;. Start
+it.&lt;/p&gt;
+&lt;p&gt;Now in &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; RULES&lt;/code&gt;, tap &lt;code&gt;On-device blocklists&lt;/code&gt;, and click the
+disabled logo, then click &lt;code&gt;DOWNLOAD BLOCKLISTS&lt;/code&gt;. Once the download is complete,
+you can select &lt;code&gt;Configure&lt;/code&gt; and select &lt;code&gt;ADVANCED&lt;/code&gt; and search for HAGEZI, choose
+MULTI PRO++ and maybe oisd small, then press &lt;code&gt;APPLY (ON-DEVICE)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now any app that doesn’t bypass Rethink will use your chosen blocklists, denying
+access to malicious URLs.&lt;/p&gt;
+&lt;p&gt;The HAGEZI blocklists are respected for being updated frequently. There are
+different levels with MULTI PRO++ (HAGEZI) being the highest and 4 other lest
+strict levels.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h3&gt;Network&lt;/h3&gt;
+&lt;p&gt;Settings explained:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Loopback proxy forwarder apps&lt;/strong&gt;: Enable when you want all of your devices
+proxy-related traffic to also flow through Rethinks encrypted tunnel. It
+ensures apps that proxy DNS/HTTP/SOCKS traffic don’t leak outside the VPN.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Do not route Private IPs&lt;/strong&gt;: Prevents routing traffic destined for private IP
+address ranges (like 192.168.x.x, 10.x.x.x) through the tunnel. Instead, this
+traffic goes directly over the local network or system default route. Most
+useful when you want devices on your local network (NAS, printers, etc.) to be
+reachable by apps on your phone without routing the traffic through Rethinks
+tunnel, improving performance and reliability of local connections but
+possibly reducing privacy.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Loopback (experimental)&lt;/strong&gt;: When enabled, this routes RethinkDNS’s own
+internal traffic, such as blocklist downloads, connectivity checks, and DNS
+queries made by the app itself, back into the encrypted tunnel through the
+loopback device.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Setting&lt;/th&gt;&lt;th&gt;Function&lt;/th&gt;&lt;th&gt;When to Use&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Loopback Proxy Forwarder Apps&lt;/td&gt;&lt;td&gt;Route proxy-forwarder app traffic back into Rethink VPN tunnel&lt;/td&gt;&lt;td&gt;When you want consistent VPN/privacy coverage for proxies&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Do Not Route Private IPs&lt;/td&gt;&lt;td&gt;Avoid routing local network/private IP traffic through VPN (send directly)&lt;/td&gt;&lt;td&gt;To access local devices without VPN bottlenecks&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Loopback (Experimental)&lt;/td&gt;&lt;td&gt;Route Rethink’s own app traffic (updates/checks) back through VPN tunnel&lt;/td&gt;&lt;td&gt;To fully protect app’s own DNS/blocklist traffic&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;NOTE: The above settings are disabled by default because some are experimental
+and can easily break functionality. I have found that the settings below give
+the most functionality without breakage 👇️:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Configure -&amp;gt; Network&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Set &lt;code&gt;Use all available networks&lt;/code&gt; to ON. This enables Wifi and mobile data to
+be used at the same time by Rethink. (Optional, may use more battery)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Set your IP version&lt;/strong&gt;: The default is &lt;code&gt;IPv4&lt;/code&gt;, you can choose between
+&lt;code&gt;IPv6 (experimental)&lt;/code&gt; and &lt;code&gt;Auto (experimental)&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Choose fallback DNS&lt;/strong&gt;: When your user-preferred DNS is not reachable,
+fallback DNS will used.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;With the F-Droid version in &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; ADVANCED&lt;/code&gt;. You can enable
+&lt;code&gt;Use fallback DNS as bypass&lt;/code&gt;, which always uses fallback DNS for bypassed
+apps, domains, and IPs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I personally disable &lt;code&gt;Enable network visibility&lt;/code&gt;, just keep in mind that some
+apps may break.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;“Shutting this off prevents apps from accessing all available networks,
+stopping them from bypassing Rethinks tunnel”. This caused issues with the
+browser when turned off.(Some audio/video conference apps like Zoom and Meet
+require this)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h3&gt;Firewall&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Configure -&amp;gt; Firewall -&amp;gt; Universal firewall rules&lt;/code&gt; and set the following to ON:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block all apps when device is locked&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block when DNS is bypassed&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block port 80 (insecure HTTP) traffic&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can get more restrictive from here, but it will take some manual
+intervention to get everything working correctly.&lt;/p&gt;
+&lt;p&gt;Keep your firewall rules in mind when you’re configuring per app settings. If
+the Universal firewall blocks all apps when the device is locked, do you want
+this app affected by this or do you want to let it Bypass the Universal
+firewall?&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;Turn ON DNS and Firewall&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;Home&lt;/code&gt; 🏠:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Click the big &lt;code&gt;Start&lt;/code&gt; button on the bottom of the screen and leave it set to
+the default &lt;code&gt;DNS and Firewall (default)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now that we’ve started the DNS and Firewall, we can go back to
+&lt;code&gt;Configure -&amp;gt; DNS&lt;/code&gt; and ensure the provider we chose started successfully. You
+can also experiment with different types of resolvers, make sure to wait for
+below the chosen resolver to say &lt;code&gt;Connected&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now, all apps on your device by default allow both Wi-Fi and mobile data access
+&lt;strong&gt;through the RethinkDNS encrypted tunnel&lt;/strong&gt;. Try some of your most used Apps to
+see if they function correctly.&lt;/p&gt;
+&lt;p&gt;RethinkDNS’s firewall blocks or restricts any network traffic that isn’t
+explicitly allowed. Although by default all apps are allowed network access,
+some apps require special permissions or bypasses due to their network behavior.
+Many apps rely on multiple external services, backend APIs, etc. that may be
+blocked by the firewall.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h3&gt;Apps that Don’t work&lt;/h3&gt;
+&lt;p&gt;I will use Reddit as an example, the process is the same for any app. Reddit’s
+app and website rely on multiple third-party services and external domains
+beyond just &lt;code&gt;reddit.com&lt;/code&gt; itself.&lt;/p&gt;
+&lt;p&gt;For apps that don’t work it’s important to ensure that your Android systems
+&lt;code&gt;Private DNS&lt;/code&gt; is set to &lt;code&gt;Automatic&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Home -&amp;gt; Apps&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Search for &lt;code&gt;Reddit&lt;/code&gt;, click on it and the Firewall Rules For Reddit will pop up.
+Since it is already allowed &lt;code&gt;Unmetered&lt;/code&gt; and &lt;code&gt;Metered&lt;/code&gt; connections and still
+doesn’t work, we can try one setting at a time until it does work and this is
+the same process for other Apps that aren’t working.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;First, you should check your logs and see why it’s being blocked. Look at the
+domains involved and set trust rules for said domains. (start by trusting
+reddit.com). Check the logs again, add any domains that were blocked related
+to reddit. If it is unclear why networking still isn’t working, you can:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Bypass Universal&lt;/code&gt;, this allows it to bypass any Universal Firewall rules you
+have set.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you’re using Rethink’s DNS, you can try allowing the app to
+&lt;code&gt;Bypass DNS &amp;amp; Firewall&lt;/code&gt;. Try the app again, does it work? If not:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can also &lt;code&gt;Isolate&lt;/code&gt; an App, you then have to set up &lt;em&gt;trust | allow&lt;/em&gt; rules
+for domains or IPs over a period of time which can take a while. You can go to
+&lt;code&gt;Apps&lt;/code&gt; and search for the app in question, click on it and at the bottom of
+the screen you’ll see &lt;code&gt;IP Logs&lt;/code&gt;, and &lt;code&gt;Domain Logs&lt;/code&gt; to help with this.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Exclude&lt;/code&gt; the app. This makes RethinkDNS completely unaware of the app and is
+often what is required for Reddit. It is my understanding that after you
+&lt;code&gt;Exclude&lt;/code&gt; Reddit for example, your systems Automatic Secure DNS will pick it
+up.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h3&gt;Other Methods&lt;/h3&gt;
+&lt;p&gt;Rather than watching the logs and setting trust rules over time, you could use
+tools like &lt;code&gt;nslookup&lt;/code&gt; and &lt;code&gt;dig&lt;/code&gt; to resolve said domain and reveal IP ranges
+used.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;nslookup reddit.com
+Server:         127.0.0.1
+Address:        127.0.0.1#53
+
+Non-authoritative answer:
+Name:   reddit.com
+Address: 151.101.129.140
+Name:   reddit.com
+Address: 151.101.193.140
+Name:   reddit.com
+Address: 151.101.1.140
+Name:   reddit.com
+Address: 151.101.65.140
+Name:   reddit.com
+Address: 2a04:4e42::396
+Name:   reddit.com
+Address: 2a04:4e42:600::396
+Name:   reddit.com
+Address: 2a04:4e42:200::396
+Name:   reddit.com
+Address: 2a04:4e42:400::396
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Resolving a domain (like &lt;code&gt;reddit.com&lt;/code&gt;) using tools like &lt;code&gt;nslookup&lt;/code&gt; or &lt;code&gt;dig&lt;/code&gt;
+reveals multiple IPs because large services use multiple servers across CDNs and
+networks for redundancy and performance.&lt;/p&gt;
+&lt;p&gt;You can then run &lt;code&gt;whois&lt;/code&gt; on one of those IPs (e.g., &lt;code&gt;whois 151.101.129.140&lt;/code&gt;) to
+identify the subnet ranges owned by Reddit’s CDN provider (Fastly in this case),
+which helps when setting up subnet range allow rules in Rethink.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand `whois` Example Output &lt;/summary&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;whois 151.101.129.140
+
+#
+# ARIN WHOIS data and services are subject to the Terms of Use
+# available at: https://www.arin.net/resources/registry/whois/tou/
+#
+# If you see inaccuracies in the results, please report at
+# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/
+#
+# Copyright 1997-2025, American Registry for Internet Numbers, Ltd.
+#
+
+
+NetRange:       151.101.0.0 - 151.101.255.255
+CIDR:           151.101.0.0/16
+NetName:        SKYCA-3
+NetHandle:      NET-151-101-0-0-1
+Parent:         RIPE-ERX-151 (NET-151-0-0-0-0)
+NetType:        Direct Allocation
+OriginAS:
+Organization:   Fastly, Inc. (SKYCA-3)
+RegDate:        2016-02-01
+Updated:        2021-12-14
+Ref:            https://rdap.arin.net/registry/ip/151.101.0.0
+
+
+OrgName:        Fastly, Inc.
+OrgId:          SKYCA-3
+Address:        PO Box 78266
+City:           San Francisco
+StateProv:      CA
+PostalCode:     94107
+Country:        US
+RegDate:        2011-09-16
+Updated:        2025-03-25
+Ref:            https://rdap.arin.net/registry/entity/SKYCA-3
+
+
+OrgNOCHandle: FNO19-ARIN
+OrgNOCName:   Fastly Network Operations
+OrgNOCPhone:  +1-415-404-9374
+OrgNOCEmail:  noc@fastly.com
+OrgNOCRef:    https://rdap.arin.net/registry/entity/FNO19-ARIN
+
+OrgTechHandle: FRA19-ARIN
+OrgTechName:   Fastly RIR Administrator
+OrgTechPhone:  +1-415-518-9103
+OrgTechEmail:  rir-admin@fastly.com
+OrgTechRef:    https://rdap.arin.net/registry/entity/FRA19-ARIN
+
+OrgAbuseHandle: ABUSE4771-ARIN
+OrgAbuseName:   Abuse Account
+OrgAbusePhone:  +1-415-496-9353
+OrgAbuseEmail:  abuse@fastly.com
+OrgAbuseRef:    https://rdap.arin.net/registry/entity/ABUSE4771-ARIN
+
+
+#
+# ARIN WHOIS data and services are subject to the Terms of Use
+# available at: https://www.arin.net/resources/registry/whois/tou/
+#
+# If you see inaccuracies in the results, please report at
+# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/
+#
+# Copyright 1997-2025, American Registry for Internet Numbers, Ltd.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;⚠️ Use caution when setting trust rules for subnet ranges, as this grants
+access to all services hosted within that range, potentially including
+services unrelated to the one you intend to access. Best practice is to first
+attempt to trust the specific domain name (e.g., reddit.com), which is
+generally the most granular and secure method. Only consider trusting broader
+subnet ranges (like 151.101.0.0/16) as a last resort if domain-based rules
+fail to resolve connectivity issues for the intended service.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;We can see that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The subnet range for that IP: &lt;code&gt;151.101.0.0 - 151.101.255.255&lt;/code&gt; (CIDR notation:
+&lt;code&gt;151.101.0.0/16&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So as a starting point to get Reddit working we could trust the following subnet
+range:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;IPv4: &lt;code&gt;151.101.0.0/16&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;This subnet covers the full range from &lt;code&gt;151.101.0.0&lt;/code&gt; to &lt;code&gt;151.101.255.255&lt;/code&gt;,
+which includes all related IPs Reddit uses via Fastly’s CDN.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The owning organization: &lt;code&gt;Fastly, Inc.&lt;/code&gt; &amp;amp; More…&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/details&gt;
+&lt;hr /&gt;
+&lt;h3&gt;Firefox Encrypted DNS through Rethink&lt;/h3&gt;
+&lt;p&gt;First, make sure you can visit a few sites in Firefox. If you can, then your
+browser traffic should be routed through the Rethink tunnel, we will check here.
+If you can’t, go to &lt;code&gt;Home -&amp;gt; Apps&lt;/code&gt; and search for Firefox, is networking
+enabled?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RethinkDNS Settings&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;For the best experience routing your browser traffic through your custom
+endpoint (e.g., DNSCrypt) on both Wi-Fi and mobile data ensure the following are
+set:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Do not turn on &lt;code&gt;Block any app not in use&lt;/code&gt; in the Universal firewall. After
+some Log digging, I found that this causes the browser to fail more often than
+not.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Configure -&amp;gt; Network -&amp;gt; Enable network visibility&lt;/code&gt; set to ON. I had
+experimented with turning this off and certain websites wouldn’t load when on
+Wi-Fi and none would load on mobile data. Turning it back on seemed to fix
+both with no leaks detected.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Double check that in Rethink’s &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Prevent DNS leaks&lt;/code&gt; is ON, as
+well as the Universal Firewalls &lt;code&gt;Block when DNS is bypassed&lt;/code&gt; ON.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Firefox Settings&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In Firefox, plug &lt;code&gt;about:config&lt;/code&gt; into the URL bar and scroll down to
+&lt;code&gt;network.trr.mode&lt;/code&gt; and change its value to &lt;code&gt;3&lt;/code&gt; to prevent leaking DNS queries
+to the System resolver. Also in &lt;code&gt;about:config&lt;/code&gt; scroll down to
+&lt;code&gt;media.peerconnection.enabled&lt;/code&gt;, double-click to set it to false to prevent
+WebRTC leaks.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;IronFox no longer lets you adjust the &lt;code&gt;network.trr.mode&lt;/code&gt; in &lt;code&gt;about:config&lt;/code&gt;, you
+adjust the &lt;code&gt;trr.mode&lt;/code&gt; through the DNS over HTTPS settings. Set it to
+&lt;code&gt;Default Protection&lt;/code&gt; or &lt;code&gt;OFF&lt;/code&gt; and check for dns leaks. Fennec also has issues
+with setting &lt;code&gt;network.trr.mode 3&lt;/code&gt; and falls back to insecure methods. I would
+suggest using the built in DNS over HTTPS for Fennec on max protection.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The trade-off is that disabling WebRTC also disables any websites or apps
+using WebRTC for real-time communication (like video calls or chat functions)
+from working correctly.
+&lt;a href=&quot;https://en.wikipedia.org/wiki/WebRTC&quot;&gt;Wikipedia WebRTC&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In Firefox &lt;code&gt;Settings -&amp;gt; Privacy &amp;amp; Security&lt;/code&gt;, set &lt;code&gt;DNS over HTTPS&lt;/code&gt; to
+&lt;code&gt;Default Protection&lt;/code&gt; or &lt;code&gt;OFF&lt;/code&gt;, this enables Firefox to use RethinkDNS’s DNSCrypt
+resolver or whatever you chose.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Checking for DNS Leaks&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Go to:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;https://dnsleaktest.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Also crosscheck with:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;https://ipleak.net
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;ipleak.net&lt;/code&gt; may show many more servers but as long as they are all related to
+your resolver (i.e., WoodyNet for Quad9) you are not leaking to your ISP or
+other third-parties.&lt;/p&gt;
+&lt;p&gt;For DNSCrypt with Quad9 Security, &lt;code&gt;dnsleaktest&lt;/code&gt; found 5 servers all with the ISP
+&lt;code&gt;WoodyNet&lt;/code&gt; indicating success through Quad9. Quad9 relies on Packet Clearing
+House, that’s where the &lt;code&gt;WoodyNet&lt;/code&gt; name comes from.&lt;/p&gt;
+&lt;p&gt;When on mobile data, when going to &lt;code&gt;https://dnsleaktest.com&lt;/code&gt; the results may
+show more servers. As long as they are all the same ISP you’re good.&lt;/p&gt;
+&lt;p&gt;A different solution could be to experiment with more strict RethinkDNS settings
+and just use the browsers built-in DNS over HTTPS on max protection. Having more
+strict defaults for Rethink with all of your apps and configuring your browser
+separate may be a better option, the choice is yours.&lt;/p&gt;
+&lt;p&gt;When hunting down a solution you can go to &lt;code&gt;Configure -&amp;gt; Logs&lt;/code&gt;, then try to
+visit the site that wouldn’t work while watching the logs. You should see
+&lt;code&gt;Firefox&lt;/code&gt; pop up, click it, in the top right of the pop up should be the reason
+it was blocked.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://privacytests.org/&quot;&gt;PrivacyTests.org&lt;/a&gt;, tests different browsers in
+different privacy categories.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#duckduckgo&quot;&gt;DuckDuckGo&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I also tested DuckDuckGo with its stock configuration and &lt;code&gt;dnsleaktest.com&lt;/code&gt;
+showed that DDGs traffic was successfully tunneled through Rethink to Quad9s’
+servers.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;dnsleaktest.com&lt;/code&gt; showed all &lt;code&gt;WoodyNet&lt;/code&gt; ISPs indicating success.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h4&gt;&lt;a href=&quot;#chromium-based-browsers-brave&quot;&gt;Chromium Based Browsers (Brave)&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;For Brave, if you want your DNS routed through Rethink you have to turn
+&lt;code&gt;Use secure DNS&lt;/code&gt; off.&lt;/p&gt;
+&lt;p&gt;I also had to set Brave to &lt;em&gt;Bypass Universal&lt;/em&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;NOTE: Brave has been known to have some spyware in the past, though most of it
+can be opted out of.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#more-fine-grained-control--enhanced-privacy&quot;&gt;More Fine Grained Control &amp;amp; Enhanced Privacy&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In this section we will switch from a default allow to a default deny; blocking
+network access to every app. We will then go through and only enable networking
+for the apps that we need and trust.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand Android Privacy Tips for the paranoid &lt;/summary&gt;
+&lt;p&gt;If you don’t like the idea of someone forcing you to unlock your phone so they
+can sift through your data:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;It’s often recommended to &lt;strong&gt;not&lt;/strong&gt; use biometrics as they can be forcibly be
+taken from you while a password typically can’t.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Cellebrite&quot;&gt;Cellebrite&lt;/a&gt; relies on your phone
+being in AFU mode which is After first unlock.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;BFU&lt;/strong&gt;: Before First Unlock. This refers to the state right after a device
+restarts. Since you haven’t entered your password yet, the system has not
+unlocked the phone’s storage, so its contents remain encrypted.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;AFU&lt;/strong&gt;: After First Unlock. In this state, the device has been unlocked at
+least once since it was powered on, even if it is currently locked. The
+encryption keys are loaded into RAM, making the device’s stored data more
+accessible and increasing the potential attack surface compared to the BFU
+state.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Set the Auto optimization (Auto Restart) to the shortest amount of time
+possible. When your phone first reboots it is in BFU mode which is Before
+first unlock mode. Biometrics are usually disabled in this mode and the
+encryption keys are &lt;strong&gt;not&lt;/strong&gt; saved in RAM making the attack surface much
+smaller.(i.e., they typically have to guess the password or brute-force it)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;That said, if someone gets your phone while it’s in AFU mode they will only
+have the amount of time until your next auto reboot to try to extract your
+data.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can also try to reduce the number of unlock attempts before the device
+wipes. The default is typically 20 attempts, I haven’t found a way to lower
+this.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can’t really trust Airplane mode on anything but GrapheneOS. If you are
+able to remove your battery, do that when it matters.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In your &lt;code&gt;About phone&lt;/code&gt; section, name your device something that doesn’t expose
+anything useful about yourself.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set a pin for your phones sim card to prevent sim swaps.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Consider something like mint mobile or visible, they often let you register
+with only a spoofed email address.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bluetooth is inherently insecure and broadcasts information about your device
+constantly. Walmart and other stores have started using Bluetooth to see hot
+zones to strategically place adds on the most traveled areas.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.edgescan.com/bluetooth-and-the-invisible-security-threat-youre-probably-not-listening-to/&quot;&gt;Bluetooth the invisible threat&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.forbes.com/sites/alexvakulov/2025/02/20/11-types-of-bluetooth-attacks-and-how-to-protect-your-devices/&quot;&gt;Types of bluetooth attacks&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Turn off Wi-Fi, Bluetooth, Location, Nearby device scanning, etc. when not in
+use or needed. Your weather app doesn’t need your location 24/7, find one that
+lets you manually enter your location and time zone.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use a password manager rather than using the one built into the browser, I
+like BitWarden for sync and KeepassDX for self storage. Since you don’t have
+to remember the passwords, have it generate long complex unique passwords for
+each app.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;You can use KeepassDX to store a complex password for Bitwarden that is kept
+100% offline so your synced passwords are better protected.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Google&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;Settings -&amp;gt; Google&lt;/code&gt; in
+&lt;code&gt;Google services -&amp;gt; All services -&amp;gt; Privacy &amp;amp; security&lt;/code&gt; Select &lt;code&gt;Ads&lt;/code&gt; and either
+Reset advertising ID every so often, or Delete advertising ID but know the
+consequences of the latter.&lt;/p&gt;
+&lt;p&gt;In the same &lt;code&gt;All services&lt;/code&gt; area, click &lt;code&gt;Usage &amp;amp; diagnostics&lt;/code&gt; to disable it.&lt;/p&gt;
+&lt;p&gt;Turn off &lt;code&gt;Improve Location Accuracy&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Go to your accounts &lt;code&gt;Manage your Google Account&lt;/code&gt;, &lt;code&gt;Data &amp;amp; privacy&lt;/code&gt; and disable
+all the Activity tracking (Pause it or turn it off).&lt;/p&gt;
+&lt;p&gt;If you rely on Google services, in the &lt;code&gt;Data &amp;amp; privacy&lt;/code&gt; section, it is helpful
+to run a &lt;code&gt;Privacy Checkup&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;When you’re done, always go to &lt;code&gt;Settings -&amp;gt; Accounts and backup&lt;/code&gt; and remove the
+Google account.&lt;/p&gt;
+&lt;p&gt;I recommended that you &lt;strong&gt;remove Android System SafetyCore&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.protectstar.com/en/blog/android-system-safetycore-hidden-installation-and-what-you-should-know&quot;&gt;What is SafetyCore and why you should delete it&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.kaspersky.com.au/blog/what-are-android-safetycore-and-key-verifier/34736/&quot;&gt;Google forcing Android System SafetyCore on users to scan for nudes&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;F-Droid&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;F-Droid is a free and open-source app store for Android that only distributes
+open-source software, without ads, proprietary code, or user tracking. All apps
+are vetted for privacy and transparency, making it a strong alternative to
+Google Play.&lt;/p&gt;
+&lt;p&gt;No registration or account is required, further protecting privacy.&lt;/p&gt;
+&lt;p&gt;Google restricts apps that remove Google services or modify their core features
+to disable their data collection strategies. This is why you won’t find many
+privacy by default browsers in Google Play. Browsers like IronFox and Cromite
+are solid options that disable telemetry and more that are available outside of
+the Play ecosystem.&lt;/p&gt;
+&lt;p&gt;I personally use IronFox as my default and have been happy with it so far. It
+comes with uBlock installed by default which I recommend that you learn how to
+get the most out of. With Firefox fingerprint protection, a few about:config
+tweaks, and uBlock you can accomplish what used to take 6 extensions to do. See:
+&lt;a href=&quot;#ublock-origin&quot;&gt;uBlock Origin&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;For more compartmentalization, Brave Browser now has an F-Droid repository that
+can be added.&lt;/p&gt;
+&lt;p&gt;Open F-Droid, in Settings click Repositories, click +, and for the Brave
+official repository add the following:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;NOTE: If you don’t want to add a repo, you can use the FFUpdater app to
+install privacy friendly browsers including brave.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;https://brave-browser-apk-release.s3.brave.com/fdroid/repo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or you can visit
+&lt;a href=&quot;https://brave-browser-apk-release.s3.brave.com/fdroid/repo/index.html&quot;&gt;https://brave-browser-apk-release.s3.brave.com/fdroid/repo/index.html&lt;/a&gt; and scan
+the QR code.&lt;/p&gt;
+&lt;p&gt;Another app that I recently discovered on F-Droid is the
+&lt;a href=&quot;https://f-droid.org/en/packages/de.marmaro.krt.ffupdater/&quot;&gt;FFUpdater&lt;/a&gt; app. It
+enables you to install and update different privacy friendly browsers as well as
+updating FairEmail, K-9 Mail/Thunderbird, and Orbot in a privacy respecting way.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;FairEmail is great, it has many privacy features including support for
+encryption,reformatting messages to prevent phishing, and more.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;To install apps through FFUpdater tap the phone logo with the down arrow on
+the top right of the screen.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Aurora Store is an open-source client for Google Play that respects user privacy
+and lets you download and update proprietary apps with an anonymous account. You
+can use F-Droid for open-source apps and Aurora for proprietary apps.&lt;/p&gt;
+&lt;p&gt;I would recommend against Obtainium, the dev is a piece of shit and you can do
+anything it can do easily without it. Discoverium is a fork run by someone else,
+might be an option.&lt;/p&gt;
+&lt;p&gt;Another option I came across that I haven’t tried yet is
+&lt;a href=&quot;https://zapstore.dev/&quot;&gt;Zapstore&lt;/a&gt; It’s a decentralized, permissionless app store
+that lets you support devs without PII.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.eff.org/deeplinks/2019/01/stop-tracking-my-emails&quot;&gt;EFF stop-tracking-my-emails&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Share Files and more anonymously&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://onionshare.org/&quot;&gt;OnionShare&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Sharing Images&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Clean metadata before sharing pics, I personally use
+&lt;a href=&quot;https://github.com/Crazy-Marvin/MetadataRemover&quot;&gt;Metadata Remover&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;SearXNG&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;While we’re on the topic of browsers, it’s worth considering a privacy-focused
+metasearch engine like SearXNG. SearXNG anonymizes your search queries and
+removes any identifying data before passing them along to Google or other search
+engines. This way, you can receive top-quality search results while keeping your
+privacy intact&lt;/p&gt;
+&lt;p&gt;To get started find a few &lt;a href=&quot;https://searx.space/&quot;&gt;local instances&lt;/a&gt; and
+&lt;a href=&quot;https://searx.neocities.org/nojs.html&quot;&gt;others&lt;/a&gt; and either bookmark them for
+quick access or do what I do and add them to use as your default search engine.&lt;/p&gt;
+&lt;p&gt;In Firefox go to &lt;code&gt;about:preferences#search&lt;/code&gt;, scroll to the bottom and click
+&lt;code&gt;Add&lt;/code&gt;. Name it whatever you want and for the URL add one of the local instances
+followed by &lt;code&gt;search?q=%s&lt;/code&gt; for example, for an instance in the US with A+
+ratings:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;https://searx.ankha.ac/search?q=%s
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then click &lt;code&gt;Add Engine&lt;/code&gt;, and back near the top of the page you can set one
+instance as your default search engine and another for private windows. I have
+had a good experience so far using SearXNG with the occasional problem that is
+solved by using a different instance.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;❗️ Note: When using a public SearXNG instance from someone you don’t know, you
+are trusting the operator since they can see the IP address making the
+searches and might keep logs. The site https://searx.space/ provides helpful
+details to choose instances based on trust and location. If you want the
+highest level of privacy and full control, running your own instance is the
+best option—though it requires more setup. Using public instances is a great
+way to get started and improve privacy compared to regular search engines.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Browser compartmentalization&lt;/strong&gt; is a technique where you use multiple browsers
+to separate different types of online activities. Instead of doing all browsing
+in a single browser, you dedicate specific browsers to distinct tasks, for
+example, one browser for email and banking, another for social media, and a
+third for casual web surfing. This separation makes it difficult for websites
+and trackers to link your activities across different contexts because cookies,
+trackers, and browsing data are isolated within each browser.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AI and social media Apps often require extensive permissions and deep access
+to your device data and can run background processes that you can’t easily
+monitor. If you avoid the apps and only access AI and social media in your
+browser you get the benefits of browser sandboxing, tracking prevention,
+cookie controls and more. You gain more benefits by using the
+compartmentalization technique explained above, possibly one for AI and one
+for social media.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;The following website lists the tracking protection mechanisms implemented by
+the major browsers and browser engines:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.cookiestatus.com/&quot;&gt;Cookie Status&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;details&gt;
+&lt;summary&gt; ✔️ Click to Expand uBlock Guide &lt;/summary&gt;
+&lt;h2&gt;uBlock Origin&lt;/h2&gt;
+&lt;p&gt;Arkenfox and Betterfox are JavaScript configuration files used to harden/control
+Firefox settings on a computer.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/yokoffing/BetterFox?tab=readme-ov-file&quot;&gt;BetterFox&lt;/a&gt; does a
+great job explaining how to use uBlock with solid recommendations.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/yokoffing/filterlists?tab=readme-ov-file#guidelines&quot;&gt;BetterFox uBlock filterlists&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you wanted to apply the
+&lt;a href=&quot;https://github.com/yokoffing/filterlists/blob/main/privacy_essentials.txt&quot;&gt;Privacy Essentials&lt;/a&gt;
+list you would click
+&lt;a href=&quot;https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt&amp;amp;title=Privacy%20Essentials&quot;&gt;subscribe&lt;/a&gt;,
+which launches the uBlock asset viewer where you can see all of the domains that
+will be blocked before clicking &lt;code&gt;Subscribe&lt;/code&gt; again to apply them.&lt;/p&gt;
+&lt;h3&gt;Adding other lists&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/hagezi/dns-blocklists&quot;&gt;Hagezi dns-blocklists&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/ppfeufer/adguard-filter-list&quot;&gt;adguard-filter-list&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Click the uBlock logo, Settings, Filter lists, scroll to the bottom and choose
+Import…, Paste the url of your chosen list, and click Apply changes.&lt;/p&gt;
+&lt;p&gt;For example, &lt;a href=&quot;https://github.com/arkenfox/user.js/&quot;&gt;Arkenfox&lt;/a&gt; suggests adding
+the Actually Legitimate URL Shortener Tool. Add
+&lt;a href=&quot;https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt&quot;&gt;https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt&lt;/a&gt;
+to the Import… section and click Apply changes. If you scroll up, you’ll see
+that it was added and chosen.&lt;/p&gt;
+&lt;p&gt;Setup your &lt;a href=&quot;https://github.com/gorhill/uBlock/wiki/Blocking-mode&quot;&gt;Blocking mode&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Many opt for
+&lt;a href=&quot;https://github.com/gorhill/uBlock/wiki/Blocking-mode:-medium-mode&quot;&gt;medium mode&lt;/a&gt;.
+To do so you need to:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Settings pane&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Open the dashboard, and choose I am an advanced user.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Filter lists pane&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;All of uBO’s filter lists: checked&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;EasyList: checked&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Peter Lowe’s Ad server list: checked&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;EasyPrivacy: checked&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Online Malicious URL Blocklist: checked&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;My rules pane (4th pane from the left)&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;Underneath Temporary rules add, you literally type this in:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Add &lt;code&gt;* * 3p-script block&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add &lt;code&gt;* * 3p-frame block&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click &lt;code&gt;Save&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click &lt;code&gt;&amp;lt;- Commit&lt;/code&gt; (Not required on phone)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Setting medium mode on your phone is likely overkill because it’s not super
+quick to switch broken sites to easy mode as it is on a computer.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Fallback to
+&lt;a href=&quot;https://github.com/gorhill/uBlock/wiki/Blocking-mode:-easy-mode&quot;&gt;easy mode&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Click the uBlock logo while on the site you want to use easy mode on. You’ll see
+the power button to the top right, the Global rules and the Local rules which
+start 3 boxes from the left. Click the box under the Local rules for 3rd-party
+scripts. The box will change colors, dark gray = NOOP (No Operation). This tells
+uBO to ignore the aggressive global block for this site, and let the normal
+filter lists handle the blocking.&lt;/p&gt;
+&lt;p&gt;Click the padlock to make the rules NOOP rules permanent.&lt;/p&gt;
+&lt;p&gt;You can also disable JavaScript in Settings as needed replacing the need for
+NoScript.&lt;/p&gt;
+&lt;/details&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/gorhill/uBlock/wiki&quot;&gt;uBlock Wiki&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://arstechnica.com/gadgets/2025/09/f-droid-calls-for-regulators-to-stop-googles-crackdown-on-sideloading/&quot;&gt;Ars Technica F-Droid &amp;amp; sideloading restrictions&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://f-droid.org/en/2025/09/29/google-developer-registration-decree.html&quot;&gt;F-Droid and Google’s Developer Registration Decree&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/details&gt;
+&lt;hr /&gt;
+&lt;h2&gt;Default Deny&lt;/h2&gt;
+&lt;p&gt;If you read the following GrapheneOS discussion forum written by an RDNS dev:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://discuss.grapheneos.org/d/12728-proton-apps-pinging-google-api-sending-reports-back-after-opting-out/54&quot;&gt;GrapheneOS Discussion Forum on Rethink&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The post suggests you go to &lt;code&gt;Home -&amp;gt; Apps&lt;/code&gt; and right under &lt;code&gt;Showing all apps&lt;/code&gt;
+click on the grayed out 🛜📶 to set a rule to &lt;strong&gt;block both Metered and Unmetered
+connections to all apps by default&lt;/strong&gt;. This will block both Wi-Fi and mobile data
+connections to &lt;strong&gt;all apps&lt;/strong&gt; on your device.&lt;/p&gt;
+&lt;p&gt;The point here is that not every App on your device needs network access all the
+time or at all in some cases.&lt;/p&gt;
+&lt;p&gt;Search for the apps you use/trust and:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;start by enabling Wi-Fi 🛜 and mobile-data 📶 as well as Bypass Universal so
+your required apps aren’t blocked right when the screen shuts off or affected
+by the firewall.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, check your logs and see why it’s being blocked. Look at the domains
+involved and set trust rules for said domains. If it is unclear why networking
+still isn’t working, you can:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you’re using Rethink’s DNS, you can try allowing the app to
+&lt;code&gt;Bypass DNS &amp;amp; Firewall&lt;/code&gt;. Try the app again, does it work? If not:&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can also &lt;code&gt;Isolate&lt;/code&gt; an App, you then have to set up &lt;em&gt;trust | allow&lt;/em&gt; rules
+for domains or IPs over a period of time which can take a while.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Exclude&lt;/code&gt; the app. This makes RethinkDNS completely unaware of the app and is
+often what is required for Reddit. It is my understanding that after you
+&lt;code&gt;Exclude&lt;/code&gt; an App, your systems Automatic Secure DNS will pick it up.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A few apps that typically need network access on Android:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Google Play services (&lt;code&gt;com.google.android.gms&lt;/code&gt;): push notifications, safety
+checks, etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Google Play Store (&lt;code&gt;com.android.vending&lt;/code&gt;) app updates and downloads&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Android System (usually UID 1000, often &lt;code&gt;android&lt;/code&gt; or &lt;code&gt;system&lt;/code&gt;): Core OS
+connectivity checks, NTP time sync, and network management. Blocking can cause
+“no internet” errors.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Android System WebView (&lt;code&gt;com.google.android.webview&lt;/code&gt;): Renders web contents in
+apps.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download Manager (&lt;code&gt;com.android.providers.downloads&lt;/code&gt;): Manages file downloads
+from apps/browser. Without it, downloads stall.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Media Storage&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Settings&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#tor&quot;&gt;Tor&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Tor itself is a network and software that anonymizes traffic by encrypting it
+and bouncing it though a series of volunteer-operated relays around the world
+before reaching the destination. Orbot uses this Tor network to encrypt and
+anonymize internet traffic for Android apps.&lt;/p&gt;
+&lt;p&gt;Orbot routes app traffic through Tor but doesn’t provide the same kind of
+traffic isolation and sandboxing that Tor browser offers on desktop. Be aware of
+the limitations and use Tor Browser on a hardened system or specialized software
+such as Tails or Whonix when anonymity truly matters.&lt;/p&gt;
+&lt;p&gt;If you want to learn how Tor works, I suggest reading the following in this
+order:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/&quot;&gt;PrivacyGuides In Praise of Tor&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/en/advanced/tor-overview/&quot;&gt;PrivacyGuides Tor Overview&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://ssd.eff.org/module/how-to-use-tor&quot;&gt;EFF How to: Use Tor&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Tor is at risk, and needs our help&lt;/strong&gt;. Despite its strength and history, Tor
+isn’t safe from the same attacks oppressive regimes and misinformed legislators
+direct at encryption and many other privacy-enhancing
+technologies.–&lt;a href=&quot;https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/#how-to-support-tor&quot;&gt;How to Support Tor&lt;/a&gt;&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;
+✔️ Click to Expand Tor Section
+&lt;/summary&gt;
+&lt;blockquote&gt;
+&lt;p&gt;❗️ WARNING: Tor gets much of its funding from the US government and is not
+immune to vulnerabilities or misconfigurations.Tor Browser is &lt;strong&gt;not&lt;/strong&gt; the most
+secure browser, anonymity and security can often be at odds with each other.
+Having the exact same browser as many other people isn’t the best security
+practice, but it is great for anonymity. Tor is also based on Firefox Esr,
+which only receives patches for vulnerabilities considered Critical or High
+which can be taken advantage of.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Tor Project has also done some sketchy/questionable things lately such as
+removing user agent spoofing which made every user appear as if they were using
+the same version of Windows. This decision reduces anonymity and is questionable
+at best, seems to me there ought to be a very good reason for doing this which I
+can’t find. Tor is still one of the best anonymity solutions, just stay informed
+and cautious.&lt;/p&gt;
+&lt;p&gt;The following is a summary of some of the Tor Overview, all credit goes to them.
+It is important to spread the word when you can!&lt;/p&gt;
+&lt;p&gt;If you are fortunate to live outside of oppressive regimes with extreme
+censorship, using Tor for every day, mundane activities is likely safe and won’t
+put you on any harmful “list.” Even if it did, you’d be in good company, these
+lists mostly contain great people working tirelessly to defend human rights and
+online privacy worldwide.&lt;/p&gt;
+&lt;p&gt;By using Tor regularly for ordinary browsing, you help strengthen the network,
+making it more robust and anonymous for everyone. This collective support makes
+staying private easier for activists, journalists, and anyone facing online
+surveillance or censorship. The writer of the PrivacyGuides article mentions
+using Tor when he needs to access Google Maps to protect his privacy&lt;/p&gt;
+&lt;p&gt;So, consider embracing Tor not only for sensitive browsing but also for daily
+routine tasks. Every user adds valuable noise to the network, helping protect
+privacy and freedom for all.&lt;/p&gt;
+&lt;/details&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#setting-up-orbot-with-a-tcp-only-proxy&quot;&gt;Setting up Orbot with a TCP-only Proxy&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;../images/orbot.png&quot; alt=&quot;Orbot Logo&quot; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Helpful guide, &lt;a href=&quot;https://thecyberexpress.com/what-is-orbot/&quot;&gt;What is Orbot?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;TCP-Only Proxies forward all TCP-level connections from selected apps to Orbot.&lt;/p&gt;
+&lt;p&gt;TCP-Only Proxies work best for Apps that use multiple TCP protocols beyond just
+basic web browsing (HTTP/HTTPS) like messaging apps (Signal), search apps (DDG),
+etc. Because it proxies all TCP traffic, it can cause some apps to slow down or
+break if they expect direct DNS or UDP.&lt;/p&gt;
+&lt;p&gt;First install Orbot, Open &lt;code&gt;Orbot -&amp;gt; More -&amp;gt; Orbot Settings&lt;/code&gt; and turn on
+&lt;code&gt;Power User Mode&lt;/code&gt;. &lt;strong&gt;This is important&lt;/strong&gt;, if you forget this Rethinks auto Orbot
+will not let you choose between SOCKS and HTTP proxies.&lt;/p&gt;
+&lt;p&gt;You should also check &lt;code&gt;Allow Background Starts&lt;/code&gt; ON.&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup Orbot&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Click &lt;code&gt;Add / Remove 0 apps&lt;/code&gt;, search for an app that you want to run through
+Orbot. For simple testing I chose DuckDuckGo with a TCP-only Proxy.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In &lt;code&gt;Home -&amp;gt; Apps&lt;/code&gt; search for &lt;code&gt;Orbot&lt;/code&gt; and set &lt;code&gt;Orbot -&amp;gt; Bypass Universal&lt;/code&gt; ON&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On the first time starting Orbot through Rethink, you’ll have to click the
+&lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup Orbot -&amp;gt; Orbot&amp;gt;&lt;/code&gt; to &lt;code&gt;Connect&lt;/code&gt; as well as grant
+initial permissions. After you start Orbot successfully, check out Rethinks
+&lt;code&gt;Home&lt;/code&gt; and below the STOP button should say &lt;code&gt;Protected With Tor&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Open DuckDuckGo and go to:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-text&quot;&gt;https://dnsleaktest.com
+# CrossCheck
+https://ipcheck.net
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;❗ You may see that ipleaktest initially shows a Tor exit relay location such
+as the Netherlands, once you complete a Standard Test, it still shows WoodyNet
+ISPs. Since I configured Rethink to use DNSCrypt with Quad9 this is completely
+expected. This confirms that my DNS traffic is not leaking to my ISP and is
+properly anonymized through Tor and Quad9. As long as you don’t see your
+actual ISP’s servers in the results, your setup is working as intended.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Now you can add more apps that would benefit from anonymity such as FairEmail,
+RSS feeds, and crypto wallets. I believe for Signal, it requires that you to set
+up the SOCKS5 proxy to work correctly which is pretty straightforward.&lt;/p&gt;
+&lt;p&gt;Look into an RSS Feed, they give you complete control of the content you
+consume, no algorithm involved!&lt;/p&gt;
+&lt;p&gt;This can also be useful on public Wi-Fi or other insecure networks.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You can also open Orbot and &lt;code&gt;Choose How to Connect&lt;/code&gt;, if you want to hide Tor
+use.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you live in an area where Tor use isn’t discriminated against, consider
+Activating your Orbot &lt;code&gt;Kindness&lt;/code&gt; tab so others that are in oppressive regimes
+can use your device as a bridge. This is a great way to give back!&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h2&gt;&lt;a href=&quot;#setting-up-a-socks5-proxy&quot;&gt;Setting up a SOCKS5 Proxy&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;If you have Orbot set up through auto mode, you’ll have to disable it.&lt;/p&gt;
+&lt;p&gt;Open &lt;code&gt;Orbot -&amp;gt; More&lt;/code&gt;: Near the bottom of the screen you’ll see &lt;code&gt;HTTP: 8118&lt;/code&gt;, and
+&lt;code&gt;SOCKS: 9050&lt;/code&gt;, these are the Port numbers. We will compare these to Rethinks
+defaults. (They match).&lt;/p&gt;
+&lt;p&gt;Back in Rethink, &lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup SOCKS5 Proxy&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In the App dropdown choose &lt;code&gt;Orbot&lt;/code&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Hostname: &lt;code&gt;127.0.0.1&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Port Number: &lt;code&gt;9050&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Leave the rest of the defaults and Hit &lt;code&gt;Set&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Go &lt;code&gt;Home&lt;/code&gt;, below the STOP button you should see &lt;code&gt;Protected With SOCKS Proxy&lt;/code&gt;.
+Now all of your devices traffic that doesn’t bypass Rethink is routed through
+the SOCKS5 proxy.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In &lt;code&gt;Configure -&amp;gt; DNS&lt;/code&gt; and turn &lt;code&gt;Never proxy DNS&lt;/code&gt; ON&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Open your browser and visit &lt;code&gt;https://dnsleaktest.com&lt;/code&gt;, your public IP should
+no longer be your ISPs.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SOCKS5 alone doesn’t encrypt the traffic; it only proxies or routes it. Orbot
+uses SOCKS5 to let apps route traffic into the Tor network. Once inside the
+Tor network, the traffic is encrypted in layers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;There is a misconception that Orbot is a “free VPN”. It’s actually part of an
+anonymity network designed to hide your identity by sending your traffic
+through multiple servers. And the SOCKS5 proxy that Orbot uses isn’t a VPN
+either, it simply directs certain app traffic through a proxy server without
+creating a full encrypted tunnel from your device like a VPN does.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h2&gt;WireGuard/VPN&lt;/h2&gt;
+&lt;p&gt;Keep your goals in mind before paying for a VPN, some allow you to pay with cash
+anonymously such as Mullvad VPN and a few others. Remember that you are
+transferring trust, from your ISP to the VPN provider.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup WireGuard -&amp;gt; +&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;With the WireGuard protocol, the provider usually gives you either a QR Code, or
+a configuration file (e.g., &lt;code&gt;.conf&lt;/code&gt; file) which is a plaintext file that
+contains what is needed. You download that file and Click &lt;code&gt;IMPORT&lt;/code&gt; which brings
+up your phones filesystem.&lt;/p&gt;
+&lt;p&gt;Alternatively, the &lt;code&gt;CREATE&lt;/code&gt; option for advanced users who are setting up their
+own WireGuard network, typically if you host your own VPN server.&lt;/p&gt;
+&lt;p&gt;After this is setup you should always verify that your traffic is encrypted
+(hidden IP) and your DNS queries are protected (no leaks).&lt;/p&gt;
+&lt;p&gt;You could:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;First check what your IP address is before enabling WireGuard at
+&lt;code&gt;whatismyipaddress.com&lt;/code&gt; or &lt;code&gt;ipleak.net&lt;/code&gt;, take note of your Public IP, ISP,
+and City/Country this is your real info that the VPN needs to hide.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Connect to your Wireguard/VPN server. Choose the server location you want and
+go back to check again.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Check for leaks, go to &lt;code&gt;dnsleaktest.com&lt;/code&gt; and run a Standard test. If you
+don’t see your Public IP listed anywhere, you don’t have a leak.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Fixing DNS Leaks&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Use WireGuard in Simple mode.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Or, use &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; Split DNS&lt;/code&gt; with WireGuard in
+&lt;code&gt;Advanved + Lockdown&lt;/code&gt; mode (if running on Android 12+)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To ensure your DNS requests go through your VPN, check
+&lt;code&gt;Configure -&amp;gt; Logs -&amp;gt; DNS&lt;/code&gt;. Tap on the entries that appear there, which should
+bring up a bottomsheet with more info about the request and how it was handled.
+Requests handled by WireGuard are shown with sub-text “resolved x min ago by
+wg…” –celzero&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;Proton VPN&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This works for ProtonVPN Free as well.&lt;/p&gt;
+&lt;p&gt;Written by celzero
+&lt;a href=&quot;https://www.reddit.com/r/rethinkdns/comments/163e83l/proton_vpn/&quot;&gt;Here&lt;/a&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;On your Android, visit https://account.protonvpn.com/downloads&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Scroll to WireGuard&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Give it a name&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Select Android&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Enable VPN options as needed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Press Create or tap on Download.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&quot;3&quot;&gt;
+&lt;li&gt;Open Rethink, goto Configure -&amp;gt; Proxy -&amp;gt; Setup WireGuard&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Tap on the “+” button&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Choose Import&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Select the downloaded configuration file&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&quot;4&quot;&gt;
+&lt;li&gt;
+&lt;p&gt;If the import is successful, you should see a new profile prefixed wg added
+to the list.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Tap on that &lt;code&gt;wg&lt;/code&gt; entry.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;In the new screen that opens up, tap on Add / Remove applications.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Select apps that should be part of this particular WireGuard profile.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Go back.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&quot;6&quot;&gt;
+&lt;li&gt;Enable / disable that wg profile as desirable.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;On my phone, when I saved the VPN profile, it automatically added &lt;code&gt;.txt&lt;/code&gt; to
+the end of the file causing the import to fail. I was able to open my phones
+documents and long hold the file to rename it, afterwards I was able import
+it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;SIMPLE&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When you enable: &lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup WireGuard - SIMPLE&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;All connections from all apps, including DNS, will be routed to a single, active
+WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.&lt;/p&gt;
+&lt;p&gt;If you tap SIMPLE, you can see the name of your VPN, check your Logs, and see
+your Peer connection.(your device that participates in the VPN network)&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;ADVANCED&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Same as above but tap &lt;code&gt;ADVANCED&lt;/code&gt; before enabling the toggle. This lets you
+choose which apps will be routed through the VPN while the rest are routed as
+usual.&lt;/p&gt;
+&lt;p&gt;This Mode also lets you enable:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Lockdown&lt;/strong&gt;: Selected apps will only be routed through this WireGuard VPN,
+regardless of whether the VPN is active or disabled.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Always-on&lt;/strong&gt;: All connections and apps not routed by other WireGuard VPNs
+will be routed by this one.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Mobile only&lt;/strong&gt;: Use this WireGuard exclusively over mobile data.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After you configure your Advanced settings as needed, enable the toggle.&lt;/p&gt;
+&lt;p&gt;Always make sure to watch your Logs as well as test with something like
+&amp;lt;dnsleaktest.com&amp;gt;, you shouldn’t see your actual Public IP anywhere. It’s
+advisable to check for WebRTC Leaks as well if you have that enabled.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Troubleshooting VPN issues&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There are a few Proxy settings in &lt;code&gt;Configure -&amp;gt; Network -&amp;gt; PROXY&lt;/code&gt;, where you
+can:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Enable &lt;code&gt;Do not randomize WireGuard listen port&lt;/code&gt;: Keep WireGuard listen ports
+fixed (no randomization) in Advanced mode.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Enable &lt;code&gt;Endpoint-Independent mapping&lt;/code&gt;: When enabled, UDP sockets maintain a
+fixed address and port for all destinations.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Check your Logs&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;Configure -&amp;gt; Proxy -&amp;gt; Setup WireGuard&lt;/code&gt;, click on your VPN which will give
+you access to the &lt;code&gt;LOGS&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Click the top entry, it will bring up the IP address and domain and show your
+rules the app. You can click the dropdown menu’s to set new Universal Firewall
+rules, as well as block/trust rules for IPs and domains.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#logs&quot;&gt;Logs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;On-device logging is on by default. You can find it in &lt;code&gt;Configure -&amp;gt; Settings&lt;/code&gt;.
+From there, you can set the log level and choose a notification action.&lt;/p&gt;
+&lt;p&gt;If anyone else uses your phone, it’s probably a good idea to enable app lock.&lt;/p&gt;
+&lt;p&gt;Go to &lt;code&gt;Configure -&amp;gt; Logs&lt;/code&gt;, and try to access the app that’s not working. You
+should see said app at the top of the Network Logs, click it. In the top right
+of the tab, you’ll see the reason why it’s not working such as: &lt;code&gt;App Blocked&lt;/code&gt;,
+or &lt;code&gt;DNS Bypass&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This &lt;code&gt;DNS Bypass&lt;/code&gt; means that the App in question is trying to bypass the Rethink
+Tunnel and being actively blocked. You can search for said app and try setting
+IP or Port Trust rules.&lt;/p&gt;
+&lt;p&gt;You can also go to &lt;code&gt;Home -&amp;gt; Apps&lt;/code&gt; and search for the App you need, click on it
+and at the bottom of the screen you will see &lt;code&gt;IP Logs&lt;/code&gt;, and &lt;code&gt;Domain Logs&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once you click on the log of the app in question, you’ll be given 3 drop down
+options. If you set an app to Bypass DNS and Firewall settings, you will see
+that in the first dropdown box.&lt;/p&gt;
+&lt;p&gt;The next drop down is &lt;code&gt;Block,trust this IP for this app&lt;/code&gt; where you can set a
+rule to &lt;code&gt;Block&lt;/code&gt; or &lt;code&gt;Trust&lt;/code&gt;.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h3&gt;&lt;a href=&quot;#resources&quot;&gt;Resources&lt;/a&gt;&lt;/h3&gt;
+&lt;details&gt;
+&lt;summary&gt;
+✔️ Click to Expand Resources
+&lt;/summary&gt;
+&lt;p&gt;Things change frequently in the privacy/security relm, many sites provide an RSS
+feed that automatically updates when they post new content. I’ve listed a few
+feeds that are good to follow IMO.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RSS&lt;/strong&gt; (Really Simple Syndication) is a technology that delivers automatic
+updates from your favorite websites, blogs, or podcasts in a standardized
+format. It saves you time by eliminating the need to manually check for new
+content. Best of all, your feed includes only what you choose—no algorithms
+deciding what you see.&lt;/p&gt;
+&lt;p&gt;I personally use &lt;a href=&quot;https://feeder.co/&quot;&gt;Feeder&lt;/a&gt; as my RSS reader, it’s open-source
+and has been great IMO.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.privacytools.io/privacy-rss-feed-readers&quot;&gt;PrivacyTools privacy-rss-feed-readers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;RSS Feeds&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;With Feeder, you click the 3 dots in the top right and click + Add feed, you can
+then type the regular address of a site &amp;amp; if it has RSS feeds, Feeder will list
+them. Most sites that have an RSS feed will have an orange RSS button that you
+can click on to get the address.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;PrivacyTools: &lt;a href=&quot;https://www.privacytools.io/guides/rss.xml&quot;&gt;https://www.privacytools.io/guides/rss.xml&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Darknet Diaries: &lt;a href=&quot;https://podcast.darknetdiaries.com/&quot;&gt;https://podcast.darknetdiaries.com/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Hacker News: &lt;a href=&quot;https://news.ycombinator.com/rss&quot;&gt;https://news.ycombinator.com/rss&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PrivacyGuides: &lt;a href=&quot;https://privacyguides.org/rss/&quot;&gt;https://privacyguides.org/rss/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Tor Project blog: &lt;a href=&quot;https://blog.torproject.org/feed.xml&quot;&gt;https://blog.torproject.org/feed.xml&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Mozilla Security Blog: &lt;a href=&quot;https://blog.mozilla.org/security/feed/&quot;&gt;https://blog.mozilla.org/security/feed/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;MDN Blog: &lt;a href=&quot;https://developer.mozilla.org/en-US/blog/rss.xml&quot;&gt;https://developer.mozilla.org/en-US/blog/rss.xml&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;F-Droid Forum - Latest posts: &lt;a href=&quot;https://forum.f-droid.org/posts.rss&quot;&gt;https://forum.f-droid.org/posts.rss&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Opensource.com: &lt;a href=&quot;https://opensource.com/feed&quot;&gt;https://opensource.com/feed&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;DuckDuckGo Blog: &lt;a href=&quot;https://spreadprivacy.com/rss/&quot;&gt;https://spreadprivacy.com/rss/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Electronic Frontier Foundation Deeplinks Blog:
+&lt;a href=&quot;https://www.eff.org/rss/updates.xml&quot;&gt;https://www.eff.org/rss/updates.xml&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;KrebsonSecurity: &lt;a href=&quot;https://krebsonsecurity.com/feed/&quot;&gt;https://krebsonsecurity.com/feed/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Arkenfox recent commits:
+&lt;a href=&quot;https://github.com/arkenfox/user.js/commits/master.atom&quot;&gt;https://github.com/arkenfox/user.js/commits/master.atom&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Arkenfox release notes: &lt;a href=&quot;https://github.com/arkenfox/user.js/releases.atom&quot;&gt;https://github.com/arkenfox/user.js/releases.atom&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Brave Blog: &lt;a href=&quot;https://brave.com/blog/index.xml&quot;&gt;https://brave.com/blog/index.xml&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ars Technica: &lt;a href=&quot;https://feeds.arstechnica.com/arstechnica/index/&quot;&gt;https://feeds.arstechnica.com/arstechnica/index/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PrivacySavvy: &lt;a href=&quot;https://privacysavvy.com/feed/&quot;&gt;https://privacysavvy.com/feed/&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PrivacySavvy Security Archive: &lt;a href=&quot;https://privacysavvy.com/security/feed/&quot;&gt;https://privacysavvy.com/security/feed/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://research.cloudflare.com/projects/network-privacy/odns/&quot;&gt;Oblivious DNS over HTTPS&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.ietf.org/archive/id/draft-denis-dprive-dnscrypt-06.html&quot;&gt;DNSCrypt Protocol&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacytools.io/&quot;&gt;PrivacyTools.io&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/articles/2025/04/30/in-praise-of-tor/&quot;&gt;PrivacyGuides In Praise of Tor&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/en/advanced/tor-overview/&quot;&gt;PrivacyGuides Tor Overview&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://orbot.app/en/&quot;&gt;Orbot app&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Orbot is a free app from the Guardian Project that empowers other apps on your
+device to use the internet more securely. Orbot uses Tor to encrypt your
+internet traffic and hide it by bouncing through a seris of computers around
+the world.
+–&lt;a href=&quot;https://support.torproject.org/glossary/orbot/&quot;&gt;TorProject Orbot&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://guardianproject.info/apps/org.torproject.android/&quot;&gt;Guardian Project Orbot&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;WireGuard is an extremely simple yet fast and modern VPN that utilizes
+state-of-the-art cryptography. –&lt;a href=&quot;https://www.wireguard.com/&quot;&gt;Wireguard.com&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://ssd.eff.org/&quot;&gt;EFF Surveillance Self Defense&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://coveryourtracks.eff.org/&quot;&gt;EFF Cover Your Tracks&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://amiunique.org/&quot;&gt;AmIUnique?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://noscript.net/&quot;&gt;What is NoScript?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.privacyguides.org/en/dns/&quot;&gt;PrivacyGuides DNS Recommendations&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cloudflare.com/learning/dns/what-is-a-dns-server/&quot;&gt;What is a DNS Server?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cloudflare.com/learning/dns/what-is-anycast-dns/&quot;&gt;What is Anycast&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://dn.org/anycast-dns-vs-unicast-dns-a-comparative-guide/&quot;&gt;anycast-dns-vs-unicast-dns&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cloudflare.com/learning/ddos/glossary/user-datagram-protocol-udp/&quot;&gt;What is UDP?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security&quot;&gt;MDN TLS&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cloudflare.com/learning/ssl/transport-layer-security-tls/&quot;&gt;What is TLS&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://network-guides.com/tcp-ip-basics/&quot;&gt;Networking-Guides TCP/IP Basics&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cloudflare.com/learning/dns/what-is-recursive-dns/&quot;&gt;Cloudflare What is recursive DNS?&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/evilsocket/opensnitch&quot;&gt;OpenSnitch&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/pi-hole/pi-hole&quot;&gt;pi-hole&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://spyware.neocities.org/&quot;&gt;Sypware Watchdog&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/details&gt;
+</content></entry><entry><title>fingerprinting</title><id>https://mako088.github.io/browsers/fingerprinting.html</id><updated>2025-10-27T11:33:55+00:00</updated><link href="https://mako088.github.io/browsers/fingerprinting.html" rel="alternate"/><content type="html"></content></entry></feed>
