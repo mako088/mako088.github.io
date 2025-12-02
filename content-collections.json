@@ -3,6 +3,17 @@
     {
       "author": null,
       "collection": null,
+      "date": "2025-12-02T13:58:35.873038284+00:00",
+      "description": "\n",
+      "draft": false,
+      "path": "android/android_privacy.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "android_privacy"
+    },
+    {
+      "author": null,
+      "collection": null,
       "date": "2025-11-28T20:07:52.108710141+00:00",
       "description": "\n",
       "draft": false,
@@ -116,17 +127,6 @@
         "privacy"
       ],
       "title": "RethinkDNS"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-11-27T15:10:37.972909998+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "android/android_privacy.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "android_privacy"
     },
     {
       "author": null,
