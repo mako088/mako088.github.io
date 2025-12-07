@@ -1,20 +1,23 @@
 {
   "entries": [
     {
-      "author": null,
-      "collection": null,
-      "date": "2025-12-03T00:05:27.930343261+00:00",
-      "description": "\n",
+      "author": "saylesss88",
+      "collection": "notes",
+      "date": "2025-12-07T00:00:00+00:00",
+      "description": null,
       "draft": false,
-      "path": "index.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "index"
+      "path": "android/RethinkDNS_Guide.md",
+      "preview_html": "<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>",
+      "tags": [
+        "android",
+        "privacy"
+      ],
+      "title": "RethinkDNS"
     },
     {
       "author": "saylesss88",
       "collection": "blog",
-      "date": "2025-11-28T00:00:00+00:00",
+      "date": "2025-12-05T00:00:00+00:00",
       "description": null,
       "draft": false,
       "path": "arch/enc_dns.md",
@@ -24,6 +27,17 @@
         "security"
       ],
       "title": "Encrypted DNS on Arch"
+    },
+    {
+      "author": null,
+      "collection": null,
+      "date": "2025-12-03T00:05:27.930343261+00:00",
+      "description": "\n",
+      "draft": false,
+      "path": "index.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "index"
     },
     {
       "author": "saylesss88",
@@ -80,20 +94,6 @@
         "security"
       ],
       "title": "Hardening Networking"
-    },
-    {
-      "author": "saylesss88",
-      "collection": "blog",
-      "date": "2025-11-28T00:00:00+00:00",
-      "description": null,
-      "draft": false,
-      "path": "android/RethinkDNS_Guide.md",
-      "preview_html": "<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>",
-      "tags": [
-        "android",
-        "privacy"
-      ],
-      "title": "RethinkDNS"
     }
   ]
 }
