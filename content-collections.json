@@ -48,8 +48,8 @@
       "path": "arch/hardening_networking.md",
       "preview_html": "<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>",
       "tags": [
-        "arch",
-        "security"
+        "security",
+        "networking"
       ],
       "title": "Hardening Networking"
     },
