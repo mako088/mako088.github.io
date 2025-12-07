@@ -2111,7 +2111,1782 @@ net.ipv6.conf.wlp3s0.use_tempaddr = 2
 <pre><code class="language-conf">[connection]
 ipv6.ip6-privacy=2
 </code></pre>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_dns.html</guid><pubDate>Fri, 5 Dec 2025 00:00:00 +0000</pubDate></item><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Wed, 3 Dec 2025 00:05:27 +0000</pubDate></item><item><title>Hardening Arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<h1>Hardening Arch Linux</h1>
+]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_dns.html</guid><pubDate>Fri, 5 Dec 2025 00:00:00 +0000</pubDate></item><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Wed, 3 Dec 2025 00:05:27 +0000</pubDate></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<h1>Hardening Networking</h1>
+<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
+Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p>
+<p>After editing a config file, apply the changes with:</p>
+<pre><code class="language-bash">sudo nmcli general reload
+</code></pre>
+<pre><code class="language-bash">sudo usermod -aG network $USER
+</code></pre>
+<h2>Investigate sockets</h2>
+<p>Display all TCP Sockets with service names:</p>
+<pre><code class="language-bash">ss -at
+</code></pre>
+<p>Display all TCP Sockets with port numbers:</p>
+<pre><code class="language-bash">ss -atn
+</code></pre>
+<p>Display all UDP Sockets:</p>
+<pre><code class="language-bash">ss -au
+</code></pre>
+<h2>Configure NetworkManager to use Quad9s DoT</h2>
+<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
+<pre><code class="language-.nmconnection">[connection]
+dns-over-tls=2
+
+[ipv4]
+dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
+ignore-auto-dns=true
+
+[ipv6]
+dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
+ignore-auto-dns=true
+</code></pre>
+<pre><code class="language-bash">sudo systemctl restart NetworkManager
+</code></pre>
+<p><strong>Wi-Fi MAC randomization</strong></p>
+<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
+<pre><code class="language-conf">[device-mac-randomization]
+# "yes" is already the default for scanning
+wifi.scan-rand-mac-address=yes
+
+[connection-mac-randomization]
+# Randomize MAC for every ethernet connection
+ethernet.cloned-mac-address=random
+# Generate a random MAC every time you connect to a wifi network
+wifi.cloned-mac-address=random
+</code></pre>
+<p><strong>Unique DUID per connection</strong></p>
+<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
+<pre><code class="language-conf">[connection]
+ipv6.dhcp-duid=stable-uuid
+</code></pre>
+<h2>MAC Address spoofing</h2>
+<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
+<p><strong>Manual MAC randomization with macchanger</strong></p>
+<p>Find your device interface and check your current MAC address:</p>
+<pre><code class="language-bash"># find interface
+ip add
+sudo iplink show wlp3s0
+</code></pre>
+<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
+it:</p>
+<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
+# or
+# sudo ifconfig wlp3s0 down
+</code></pre>
+<p>Install the <code>macchanger</code> package and run:</p>
+<pre><code class="language-bash">sudo macchanger -a wlp3s0
+</code></pre>
+<ul>
+<li>
+<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
+</li>
+<li>
+<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
+</li>
+</ul>
+<p><strong>Automatically with systemd &amp; macchanger</strong></p>
+<p>systemd unit setting a random address while preserving the original NIC vendor
+bytes.</p>
+<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
+<pre><code class="language-macspoof@.service">[Unit]
+Description=macchanger on %I
+Wants=network-pre.target
+Before=network-pre.target
+BindsTo=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+ExecStart=/usr/bin/macchanger -e %I
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<ul>
+<li>
+<p>You can use <code>-r</code> to randomize everything but it’s important that the vendor
+bytes actually match something and aren’t just random numbers so it’s less
+recommended.</p>
+</li>
+<li>
+<p>The <code>@.service</code> pattern allows per-interface instantiation like
+<code>macspoof@wlp3s0.service</code>.</p>
+</li>
+<li>
+<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
+</li>
+<li>
+<p>You only need to append your interface name when enabling the service.</p>
+</li>
+</ul>
+<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
+</code></pre>
+<h2>Resources</h2>
+<ul>
+<li>
+<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
+</li>
+<li>
+<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
+</li>
+</ul>
+]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted Arch Install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<h1>Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</h1>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<!-- toc -->
+</details>
+<p>The ultimate installation resource is always goint to be the:</p>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+</li>
+<li>
+<p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
+directory is just the same directory where your Arch Linux ISO file is stored.</p>
+</li>
+</ul>
+<blockquote>
+<p>Always review the Wiki and never just plug random things suggested by me or
+anyone else without first doing your own research.</p>
+</blockquote>
+<p>Edited: 09-25-25 Removed encrypted swap section. Big usability downside IMO.</p>
+<details>
+<summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
+<blockquote>
+<p>❗ NOTE: If you only want to verify the ISO once, you can temporarily import
+the public key, verify the signature, and then you don’t need to keep the key
+permanently in your keyring or sign it locally. This example is from the last
+release, but the process is the same.</p>
+</blockquote>
+<p>With <code>sequoia-sq</code>, you can get the Arch release signing key with:</p>
+<pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
+</code></pre>
+<p>Export the chosen key to a <code>.pgp</code> file:</p>
+<pre><code class="language-bash">sq cert export --keyring=release-key.pgp --cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp
+</code></pre>
+<p>Import into your keychain:</p>
+<pre><code class="language-bash">gpg --import pierre-archlinux.pgp
+gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
+gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
+gpg: next trustdb check due at 2026-08-23
+</code></pre>
+<ul>
+<li>Now, you should see <code>&lt;pierre@archlinux.org&gt;</code> and his keys when you run
+<code>gpg --list-keys</code></li>
+</ul>
+<p>Finally, verify the signature:</p>
+<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
+Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
+
+1 authenticated signature.
+</code></pre>
+<blockquote>
+<p>❗ To ensure the key is authentic and not spoofed, verify that the key
+fingerprint matches the official Arch Linux signing key fingerprint, which can
+is linked below and on the Arch website.</p>
+</blockquote>
+<p>This shows that the signature was made by the key with the ID
+<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz)</code></p>
+<p>You can check the keys fingerprint with:</p>
+<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
+</code></pre>
+<ul>
+<li>Verify it against the
+<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
+</ul>
+<p>Verify it against the Arch Linux master-keys</p>
+<p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
+that the key used to sign is trusted in our keyring.</p>
+<p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
+<p>We have successfully verified that the file was signed by Pierr’s official Arch
+Linux key and has not been tampered with.</p>
+<p>The following is only if you currently already have keys on your gpg keyring.</p>
+<details>
+<summary> ☑️ Click to expand Key Signing and Publishing Example </summary>
+<p>List your keys to get the arch keyID:</p>
+<pre><code class="language-bash">gpg --list-keys
+# ... snip ...
+pub   ed25519/0x76A5EF9054449A5C 2022-10-31 [SC] [expires: 2037-10-27]
+      Key fingerprint = 3E80 CA1A 8B89 F69C BA57  D98A 76A5 EF90 5444 9A5C
+uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.org&gt;
+uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.de&gt;
+sub   ed25519/0xD6D13C45BFCFBAFD 2022-10-31 [A] [expires: 2037-10-27]
+sub   cv25519/0x7F56ADE50CA3D899 2022-10-31 [E] [expires: 2037-10-27]
+</code></pre>
+<p>Sign the key:</p>
+<pre><code class="language-bash">gpg --sign-key 0x76A5EF9054449A5C
+</code></pre>
+<p>Now you can export and publish the new public key and send it to a keyserver:</p>
+<pre><code class="language-bash">gpg --export --armor 0x76A5EF9054449A5C &gt; archlinux-signed.asc
+gpg --send-keys 0x76A5EF9054449A5C
+</code></pre>
+<p>The more people that verify, sign, and re-export and publish their keys the
+better for the web of trust that gpg uses making the network more secure for
+everyone.</p>
+</details>
+</details>
+<hr />
+<ol>
+<li><strong>Connect to Wi-Fi</strong>:</li>
+</ol>
+<pre><code class="language-bash">iwctl
+[iwd]# device list
+[iwd]# station wlan0 scan
+[iwd]# station wlan0 connect NETGEAR80
+# Enter your Password
+# Check Connection
+[iwd]# station wlan0 show
+[iwd]# exit
+</code></pre>
+<pre><code class="language-bash">ping -c 3 archlinux.org
+</code></pre>
+<hr />
+<ol start="2">
+<li><strong>Update package databases and mirrorlist</strong>:</li>
+</ol>
+<pre><code class="language-bash">pacman -Syyu
+</code></pre>
+<p>Save a backup of your current mirrorlist so we can safely update it:</p>
+<pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+</code></pre>
+<pre><code class="language-bash">pacman -S reflector
+reflector --list-countries
+# Example if you live in the US
+reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
+</code></pre>
+<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
+both HTTP and HTTPS are used.</p>
+<p>NOTE: This can take a bit and you can expect some failures..</p>
+<hr />
+<ol start="3">
+<li><strong>Set keyboard layout, font, and system clock</strong>:</li>
+</ol>
+<p>Default keymap is US, if you need something different:</p>
+<pre><code class="language-bash">localectl list-keymaps
+loadkeys &lt;chosen-map&gt;
+# Increase font size
+setfont ter-132b
+</code></pre>
+<pre><code class="language-bash">sudo pacman -S chrony
+</code></pre>
+<p><code>/etc/chrony.conf</code>:</p>
+<pre><code class="language-conf"># Copyright © 2014-2025 GrapheneOS
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+server time.cloudflare.com iburst nts
+server ntppool1.time.nl iburst nts
+server nts.netnod.se iburst nts
+server ptbtime1.ptb.de iburst nts
+server time.dfm.dk iburst nts
+server time.cifelli.xyz iburst nts
+
+minsources 3
+authselectmode require
+
+# EF
+dscp 46
+
+driftfile /var/lib/chrony/drift
+dumpdir /var/lib/chrony
+ntsdumpdir /var/lib/chrony
+
+leapseclist /usr/share/zoneinfo/leap-seconds.list
+makestep 1.0 3
+
+rtconutc
+rtcsync
+
+cmdport 0
+
+noclientlog
+</code></pre>
+<p>The above setup uses Network Time Security (NTS) and is a more modern safer way
+to synchronize time using chrony.</p>
+<pre><code class="language-bash">sudo systemctl disable --now systemd-timesyncd
+sudo systemctl enable --now chronyd
+</code></pre>
+<pre><code class="language-bash">timedatectl set-ntp true
+timedatectl list-timezones
+# Example
+sudo timedatectl set-timezone America/New_York
+</code></pre>
+<hr />
+<ol start="4">
+<li><strong>Partition your Disk</strong>:</li>
+</ol>
+<p>The only required partitions are one for the root directory <code>/</code> (typically <code>1G</code>)
+and one for booting in UEFI mode, an EFI system partition (typically the rest of
+the space left).</p>
+<p>In this section, I’ll assume that you’re starting with a clean slate. If you’re
+not, you can use your existing partitions if they meet the above requirements or
+delete them.</p>
+<p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
+filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
+until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
+to save your changes.</p>
+<p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
+<pre><code class="language-bash">fdisk -l
+</code></pre>
+<pre><code class="language-bash">cfdisk /dev/nvme0n1
+</code></pre>
+<ul>
+<li>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
+<p>Select -&gt; <code>[ New ]</code></p>
+</li>
+<li>
+<p>Partition size: <code>1G</code></p>
+</li>
+<li>
+<p>Type -&gt; <code>EFI System</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
+<p>Partition size: The rest of the space</p>
+</li>
+<li>
+<p>Type -&gt; <code>Linux filesystem</code></p>
+</li>
+<li>
+<p>Select -&gt; <code>[ Write ]</code></p>
+</li>
+<li>
+<p>Select -&gt; <code>[ Quit ]</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<ol start="5">
+<li><strong>Format the EFI partition as FAT32</strong>:</li>
+</ol>
+<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
+</code></pre>
+<p>Leave the root partition unformatted for the next step.</p>
+<hr />
+<ol start="6">
+<li><strong>Encrypt the Root partition and Open it</strong>:</li>
+</ol>
+<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup open /dev/nvme0n1p2 cryptroot
+</code></pre>
+<p>Create a filesystem:</p>
+<pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
+</code></pre>
+<p>If you mount the filesystem with compression before running <code>genfstab</code>, it will
+automatically add the chosen compression to the <code>fstab</code>.</p>
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot  # Mount EFI partition at /mnt/boot
+mount -o compress=zstd /dev/mapper/cryptroot /mnt
+</code></pre>
+<hr />
+<h2>Install the Base System on <code>/mnt</code> with <code>pacstrap</code></h2>
+<p>If you prefer Nvim or a hardened kernel, change it here.</p>
+<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr systemd-ukify
+</code></pre>
+<hr />
+<ol start="7">
+<li><strong>Generate the Filesystem Table</strong>:</li>
+</ol>
+<p>The EFI and root partitions need to be mounted before you generate the
+filesystem table in the next step.</p>
+<pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+#
+hx /mnt/etc/fstab
+cat /mnt/etc/fstab
+</code></pre>
+<p>Fix security hole and harden <code>/boot</code> permissions by adding
+<code>fmask=0137, dmask=0027</code>:</p>
+<pre><code class="language-bash">hx /mnt/etc/fstab
+</code></pre>
+<p>Example</p>
+<pre><code class="language-fstab"># Static information about the filesystems.
+# See fstab(5) for details.
+
+# &lt;file system&gt; &lt;dir&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;
+# /dev/mapper/cryptroot
+UUID=6d68a2bf-34ea-4adc-86d5-cb1d56de44a4	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/	0 0
+
+# /dev/nvme0n1p1
+UUID=B88B-844F      	/boot     	vfat      	rw,relatime,fmask=0137,dmask=0027,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
+</code></pre>
+<pre><code class="language-bash">chmod 700 /boot
+chmod 600 /boot/loader/random-seed
+</code></pre>
+<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn’t you’ll
+need to ensure both partitions are mounted and regenerate your fstab again with
+<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
+<hr />
+<ol start="8">
+<li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
+</ol>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<p>Create a user:</p>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
+passwd yourusername
+</code></pre>
+<p>Create an admin password:</p>
+<pre><code class="language-bash">passwd
+</code></pre>
+<p>Enable sudo for wheel group:</p>
+<p>In <code>/etc/sudoers</code> uncomment the line:</p>
+<pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
+</code></pre>
+<hr />
+<ol start="9">
+<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>sd-encrypt</code> hook
+before the <code>filesystems</code> attribute.</li>
+</ol>
+<ul>
+<li>
+<p>Locate the <code>HOOKS</code> line</p>
+</li>
+<li>
+<p>Insert <code>encrypt</code> <strong>before</strong> filesystems</p>
+</li>
+</ul>
+<pre><code class="language-bash">vim /etc/mkinitcpio.conf
+</code></pre>
+<p>To use <code>sd-encrypt</code>, it is necessary to replace <code>udev</code> with <code>systemd</code> and if you
+require a different keyboard layout from US <code>sd-vconsole</code> is needed.</p>
+<pre><code class="language-bash"># mkinitcpio.conf
+# *IF* you use an nvme drive
+MODULES=(nvme)
+FILES=(/etc/crypttab.initramfs /etc/vconsole.conf)
+# ... snip ...
+HOOKS=(base systemd autodetect microcode modconf kms keyboard keymap consolefont sd-vconsole block sd-encrypt filesystems fsck systemd-ukify)
+# ... snip ...
+</code></pre>
+<p>Create <code>/etc/crypttab.initramfs</code>:</p>
+<pre><code class="language-initramfs">cryptroot UUID=your-uuid none luks,discard
+</code></pre>
+<hr />
+<p>Create <code>/etc/vconsole.conf</code>:</p>
+<p>For example <code>KEYMAP=fr</code> is french</p>
+<pre><code class="language-conf">KEYMAP=us
+FONT=lat9w-16
+</code></pre>
+<hr />
+<p>Edit <code>/etc/mkinitcpio.d/linux-zen.preset</code>, this enables <code>mkinitcpio -P</code> to
+generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
+<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-zen' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-zen"
+
+PRESETS=('default' 'fallback')
+# PRESETS=('default')
+
+# default_config="/etc/mkinitcpio.conf"
+# default_image="/boot/initramfs-linux-zen.img"
+default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
+default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+#fallback_config="/etc/mkinitcpio.conf"
+#fallback_image="/boot/initramfs-linux-zen-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
+fallback_options="-S autodetect"
+</code></pre>
+<p>Generate the initial RAM Filesystem (initramfs) image.</p>
+<pre><code class="language-bash">mkinitcpio -P
+</code></pre>
+<blockquote>
+<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
+&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
+Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
+<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
+</blockquote>
+<hr />
+<ol start="10">
+<li><strong>Install systemd-boot and setup Unified Kernel Image</strong>, (while still in
+chroot environment):</li>
+</ol>
+<p>Ensure your UEFI variables are accessible:</p>
+<pre><code class="language-bash">efivar --list
+</code></pre>
+<p>This command won’t work if both partitions aren’t mounted, ensure they are both
+mounted and if it still doesn’t work you can use <code>--esp-path=/boot</code> or
+<code>--esp-path=/mnt/boot</code>.</p>
+<pre><code class="language-bash">bootctl install
+</code></pre>
+<p>Edit <code>/etc/kernel/cmdline</code> and add the output of <code>blkid</code> on your root partition.
+For example:</p>
+<pre><code class="language-bash">blkid /dev/nvme0n1p2 &gt; /tmp/uuid.txt
+</code></pre>
+<p>When you open <code>/etc/kernel/cmdline</code> in vim or helix, run <code>:r /tmp/uuid.txt</code> to
+read the UUID of your root partition into the file. You only need the numbers
+like so:</p>
+<pre><code class="language-cmdline">rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw
+</code></pre>
+<p>In the above example, <code>7b78e942-f4f7-4dde-a015-3a816305483f</code> is the UUID
+extracted from the <code>blkid</code> command.</p>
+<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
+<pre><code class="language-conf">title Arch Linux
+linux /vmlinuz-linux-zen
+initrd /initramfs-linux-zen.img
+options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw quiet
+</code></pre>
+<blockquote>
+<p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
+configured to autodetect the UKI. It doesn’t hurt to add it though and can
+prevent issues in the future. Ensure <code>rd.luks.name=</code> contains the UUID from
+the encrypted root partition. (e.g., <code>blkid /dev/nvme0n1p2</code>).</p>
+</blockquote>
+<p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">default arch.conf
+# default @saved  # return to last choice
+timeout 4
+console-mode auto
+auto-entries 1
+</code></pre>
+<pre><code class="language-bash">bootctl status
+</code></pre>
+<p>Set a password to protect <code>systemd-boot</code> with <code>systemd-boot-password</code>:</p>
+<pre><code class="language-bash">paru -S systemd-boot-password
+</code></pre>
+<pre><code class="language-bash">sudo sbpctl install /boot
+</code></pre>
+<p>You will now be prompted for your password before you can edit kernel
+parameters.</p>
+<hr />
+<p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
+<p>We already added <code>systemd-ukify</code> in the pacstrap command, let’s add a few more
+tools for this process:</p>
+<pre><code class="language-bash">sudo pacman -S sbsigntools efitools
+</code></pre>
+<p>Copy the existing template to <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-bash">cp /usr/lib/kernel/uki.conf /etc/kernel/uki.conf
+</code></pre>
+<p>Edit <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-conf">[UKI]
+#Initrd=
+#Microcode=
+#Splash=
+#PCRPKey=
+#PCRBanks=
+#SecureBootSigningTool=
+SecureBootPrivateKey=/etc/kernel/secure-boot-private-key.pem
+SecureBootCertificate=/etc/kernel/secure-boot-certificate.pem
+#SecureBootCertificateDir=
+#SecureBootCertificateName=
+#SecureBootCertificateValidity=
+#SigningEngine=
+SignKernel=yes
+</code></pre>
+<p>Generate your signing keys:</p>
+<pre><code class="language-bash">ukify genkey --config /etc/kernel/uki.conf
+</code></pre>
+<p>The above command creates <code>/etc/kernel/secure-boot-certificate.pem</code> and
+<code>/etc/kernel/secure-boot-private-key.pem</code>.</p>
+<p>Building the UKIs:</p>
+<pre><code class="language-bash">mkdir -p /boot/EFI/Linux
+mkinitcpio -P
+# Output
+Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
+==&gt; Unified kernel image generation successful
+</code></pre>
+<p>Sign the boot loader with the new keys:</p>
+<pre><code class="language-bash">/usr/lib/systemd/systemd-sbsign sign \
+--private-key /etc/kernel/secure-boot-private-key.pem \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--output /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed \
+/usr/lib/systemd/boot/efi/systemd-bootx64.efi
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Wrote signed PE binary to /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
+</code></pre>
+<pre><code class="language-bash">sudo bootctl install --secure-boot-auto-enroll yes \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--private-key /etc/kernel/secure-boot-private-key.pem
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/systemd/systemd-bootx64.efi".
+    3 Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/BOOT/BOOTX64.EFI".
+    4 ⚠️  Mount point '/boot' which backs the random seed file is world accessible, which is a security hole!  ⚠️
+    5 ⚠️ Random seed file '/boot/loader/random-seed' is world accessible, which is a security hole! ⚠️
+    6 Random seed file /boot/loader/random-seed successfully refreshed (32 bytes).
+    7 Secure boot auto-enrollment file /boot/loader/keys/auto/PK.auth successfully written.
+    8 Secure boot auto-enrollment file /boot/loader/keys/auto/KEK.auth successfully written.
+    9 Secure boot auto-enrollment file /boot/loader/keys/auto/db.auth successfully written.
+   10 Created EFI boot entry "Linux Boot Manager".
+</code></pre>
+<p>Fix the security hole:</p>
+<pre><code class="language-bash">chmod 700 /boot
+</code></pre>
+<p>Add the following to your <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">secure-boot-enroll force
+</code></pre>
+<p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
+your keys when the time runs out.</p>
+<p>After successful key enrollment, reboot into UEFI again, enable Secure Boot and
+reboot.</p>
+<p>When the desktop launches, check the output of <code>bootctl status</code> to ensure
+<code>Secure Boot: enabled (user)</code></p>
+<p>If your system doesn’t accept them, you may have to do some conversions. You can
+also add the keys manually which is what I did.</p>
+<details>
+<summary> ✔️ Click to Expand conversion Examples </summary>
+<pre><code class="language-bash"># Create workspace for certs and outputs
+mkdir -p ~/secureboot/output
+
+# Define certificate location
+CERT_PEM="/etc/kernel/secure-boot-certificate.pem"
+
+# Convert PEM cert to DER format for UEFI enrollment
+sudo openssl x509 -in $CERT_PEM -out ~/secureboot/output/db.cer -outform DER
+
+# Convert PEM cert to EFI Signature List
+cert-to-efi-sig-list $CERT_PEM ~/secureboot/output/db.esl
+
+# Sign the Signature List (run from wherever your private key is; do not copy it)
+sudo sign-efi-sig-list -k /etc/kernel/secure-boot-private-key.pem -c $CERT_PEM db \
+    ~/secureboot/output/db.esl ~/secureboot/output/db.auth
+</code></pre>
+<p>Manual Key Enrollment:</p>
+<ul>
+<li>
+<p><code>db.cer</code> -&gt; enroll in db (Trusted Signatures), Choose the desired drive, find
+the file and add it. Save as an <code>Authorized Signature</code> instead of <code>Public Key</code></p>
+</li>
+<li>
+<p><code>PK.cer</code> -&gt; enroll in <code>Platform Key</code>(PK)</p>
+</li>
+<li>
+<p>Keep your <code>secure-boot-private-key.pem</code> <strong>private</strong>, with the above commands
+we only use it when signing, and otherwise keep it protected.</p>
+</li>
+</ul>
+</details>
+<hr />
+<ol start="11">
+<li><strong>Enable LightDM and NetworkManager</strong></li>
+</ol>
+<pre><code class="language-bash">systemctl enable lightdm
+systemctl enable NetworkManager
+</code></pre>
+<blockquote>
+<p>❗️ NOTE: If you’re ever unable to run the above commands in the chroot
+environment, exit chroot and run:</p>
+<pre><code class="language-bash">systemctl --root=/mnt enable lightdm
+systemctl --root=/mnt enable NetworkManager
+</code></pre>
+</blockquote>
+<p>Configure LightDM greeter, edit <code>/etc/lightdm/lightdm.conf</code> to add:</p>
+<pre><code class="language-conf"># lightdm.conf
+[Seat:*]
+greeter-session=lightdm-gtk-greeter
+</code></pre>
+<p>Exit <code>arch-chroot</code> with <code>exit</code></p>
+<p>Unmount your partitions and reboot:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+</code></pre>
+<hr />
+<ol start="12">
+<li><strong>Reboot</strong></li>
+</ol>
+<pre><code class="language-bash">bootctl status
+System:
+      Firmware: UEFI 2.70 (American Megatrends)
+ Firmware Arch: x64
+   Secure Boot: enabled (user)
+  TPM2 Support: yes
+  Measured UKI: yes
+  Boot into FW: supported
+</code></pre>
+<hr />
+<h3>Creating a readonly snapshot of your root subvolume:</h3>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/System_backup">Arch Wiki System Backup</a></li>
+</ul>
+<details>
+<summary> ✔️ Click to Expand snapshot & Backup Example </summary>
+<ol>
+<li>Create readonly snapshot of root subvol:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume snapshot -r / /root-snapshot-$(date +%Y%m%d%H%M%S)
+</code></pre>
+<ol start="2">
+<li>Mount your external backup disk:</li>
+</ol>
+<pre><code class="language-bash">sudo mkdir -p /mnt/backup
+sudo mount /dev/sdc1 /mnt/backup
+</code></pre>
+<ol start="3">
+<li>Use rsync to copy the snapshot to the external drive:</li>
+</ol>
+<p>List the available snapshots and get the exact name:</p>
+<pre><code class="language-bash">sudo btrfs subvolume list /
+</code></pre>
+<pre><code class="language-bash">sudo rsync -aAXv --delete --progress /root-snapshot-20251002135000/ /mnt/backup/root-backup/
+</code></pre>
+<ol start="4">
+<li>Unmount the external drive:</li>
+</ol>
+<pre><code class="language-bash">sudo umount /mnt/backup
+</code></pre>
+<ol start="5">
+<li>Optionally, delete older snapshots to save space:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume delete /root-snapshot-OLD_TIMESTAMP
+</code></pre>
+<h3>Restoring from a Backup</h3>
+<p>For this, you mount the partitions but don’t need to <code>arch-chroot</code> in.</p>
+<ol>
+<li>
+<p>Boot from a live USB</p>
+</li>
+<li>
+<p>Mount your encrypted root partition (unlock if encrypted) and the external
+backup drive.</p>
+</li>
+<li>
+<p>Move or delete the corrupted data on the root partition.</p>
+</li>
+<li>
+<p>Use rsync to copy the backed-up snapshot from the external disk back to the
+root partition, preserving permissions and attributes.</p>
+</li>
+</ol>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-backup/ /
+</code></pre>
+<p>Or, the Wiki’s suggestion, (Much more efficient, Direct backup of a running
+system without the need for btrfs snapshots):</p>
+<pre><code class="language-bash">sudo rsync -aAXHv --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/tmp/*' --exclude='/run/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found/' / /path/to/backup
+</code></pre>
+<ul>
+<li>
+<p><code>/mnt/backup/root-backup/</code> is the path where the backup snapshot is mounted on
+the external disk.</p>
+</li>
+<li>
+<p><code>/</code> is the root partition mount point where you want to restore the files.</p>
+</li>
+<li>
+<p>The options:</p>
+<ul>
+<li>
+<p><code>-a</code> archive mode to preserve symbolic links, permissions, timestamps, etc.</p>
+</li>
+<li>
+<p><code>-A</code> preserve ACLs (access control lists).</p>
+</li>
+<li>
+<p><code>-X</code> preserve extended attributes.</p>
+</li>
+<li>
+<p><code>-v</code> verbose output.</p>
+</li>
+<li>
+<p><code>--delete</code> deletes files on the destination that don’t exist in the source,
+keeping an exact mirror.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>If you want to restore a specific snapshot directory (e.g.,
+<code>/root-snapshot-20251002135000</code>), replace the source path accordingly, like:</p>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-snapshot-20251002135000/ /
+</code></pre>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Rsync#As_a_backup_utility">Arch Wiki rsync</a></li>
+</ul>
+<ol start="5">
+<li>
+<p>Reinstall the bootloader if necessary.</p>
+</li>
+<li>
+<p>Unmount everything and reboot.</p>
+</li>
+</ol>
+<h3>Automated backup</h3>
+<p>Create <code>/etc/cron.daily/backup</code>:</p>
+<pre><code class="language-backup">#!/bin/sh
+rsync -a --delete --quiet /path/to/backup /location/of/backup
+</code></pre>
+<p>Change <code>/path/to/backup</code> to what needs to be backed-up such as <code>/home</code> or <code>/</code></p>
+</details>
+<hr />
+<h3>arch-chroot</h3>
+<details>
+<summary>  ✔️ Click to Expand `arch-chroot` Example </summary>
+<p>Say you forgot something, like forgetting to add a user and password. You reboot
+and go to TTY into your system and are hit with a AHHH I can’t log in WTF!</p>
+<p>It’s as easy as repeating some of the steps above. Reboot into the Live
+environment, remount your partitions and <code>arch-chroot</code> back in:</p>
+<p>Open the encrypted root partition:</p>
+<pre><code class="language-bash">cryptsetup open /dev/nvme0n1p2 cryptroot
+</code></pre>
+<p>Mount the decrypted root:</p>
+<pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
+</code></pre>
+<p>Mount the EFI partition:</p>
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot
+</code></pre>
+<p>Chroot into your installed system:</p>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername passwd yourusername
+</code></pre>
+<ul>
+<li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
+installed.</li>
+</ul>
+<p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
+<p>Exit chroot:</p>
+<pre><code class="language-bash">exit
+</code></pre>
+<p>Unmount and close LUKS:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+reboot
+</code></pre>
+</details>
+<h3>Resources</h3>
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki UKI/SecureBoot</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_kernel_image">Wiki UKI</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Systemd-boot">Wiki systemd-boot</a></p>
+</li>
+</ul>
+</details>
+]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<h1>Hardening Firefox on Arch</h1>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<!-- toc -->
+</details>
+<h2>🔑 Key Terms</h2>
+<ul>
+<li>
+<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
+by disabling or restricting features like JavaScript, cookies, telemetry, and
+third-party scripts.</p>
+</li>
+<li>
+<p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser
+indistinguishable from others. Instead of just blocking data collection, it
+ensures that your browser’s configuration; screen size, fonts, user agent,
+etc. matches a large group of users, so you blend in.</p>
+</li>
+<li>
+<p><strong>Browser compartmentalization</strong> is a technique where different browsers are
+dedicated to distinct online activities to isolate cookies, trackers, and
+browsing data. For example, Mullvad Browser can be used solely for activities
+where fingerprinting resistance is critical, such as anonymous browsing or
+visiting privacy-sensitive sites. Meanwhile, a hardened LibreWolf or Firefox
+can be used for general browsing, email, or banking where you want solid
+security and feature flexibility but aren’t as concerned about fingerprint
+uniqueness.</p>
+</li>
+<li>
+<p><strong>Web APIs</strong>: are sets of rules and protocols that allow browsers or servers
+to communicate and share data or functions over the internet. It lets
+developers access features or data of a web service or application without
+exposing the underlying system details, enabling different software to
+interact smoothly and securely.</p>
+</li>
+<li>
+<p><strong>Anonymity</strong>: Maximizing anonymity often means restricting or masking
+features (setting a generic fingerprint, disabling browser APIs, blocking
+trackers) so the browser blends in with many others. This reduces uniqueness
+but can break website functionality, cause CAPTCHAs, and limit usability.</p>
+</li>
+<li>
+<p><strong>Usability</strong>: Keeping your browser features enabled improves compatibility
+and user experience but increase uniqueness and thus make you easier to track.</p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Entropy</a>: in this
+context, is a measure of how much unique information a specific browser
+feature contributes to your fingerprint. It’s often quantified in <strong>bits of
+entropy</strong>, where higher bits mean more uniqueness (i.e., easier to identify
+you).</p>
+<ul>
+<li>A “bit” is a basic unit of information for computers. Entropy measuring
+sites results are measured in “bits of identifying information”.</li>
+</ul>
+</li>
+<li>
+<p><a href="https://developer.mozilla.org/en-US/docs/Glossary/Origin">Origin</a>: Web
+content’s <em>origin</em> is defined by the <em>scheme</em> (protocol), <em>hostname</em> (domain),
+and port of the URL used to access it. Two objects have the same origin only
+when the scheme, hostname, and port all match.</p>
+</li>
+<li>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">Same-origin policy</a>:
+is a critical security mechanism that restricts how a document or script
+loaded by one origin can interact with a resource from another origin. It
+helps isolate potentially malicious documents, reducing possible attack
+vectors.</p>
+</li>
+<li>
+<p><a href="https://blog.mozilla.org/security/2021/05/18/introducing-site-isolation-in-firefox/">Firefox Site-Isolation</a>.
+Firefox does provide site-isolation as well.</p>
+</li>
+<li>
+<p><a href="https://www.mozilla.org/en-US/security/advisories/mfsa2018-01/">Protection from side-channel attacks</a></p>
+</li>
+<li>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Insecure_passwords">MDN Insecure passwords</a></p>
+<ul>
+<li><a href="https://blog.mozilla.org/tanvi/2016/01/28/no-more-passwords-over-http-please/">Risks of reused passwords</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Tor Browser is <strong>not</strong> the most secure browser, anonymity, and security can
+often be at odds with each other. Having the exact same browser as many other
+people isn’t the best security practice, but it is great for anonymity. Tor is
+also based on Firefox Esr, which only receives patches for vulnerabilities
+considered Critical or High which can be taken advantage of.</p>
+</blockquote>
+<h3>Fingerprinting Explained</h3>
+<p>Modern Web APIs enable highly customized user experiences but also expose
+detailed device information that attackers can exploit to create browser
+fingerprints, unique identifiers used for covert tracking, even when cookies are
+blocked.</p>
+<p><strong>Entropy</strong>, a measure of randomness or uniqueness in data, is a critical metric
+for assessing the risk of browser fingerprinting.</p>
+<p>Browser fingerprinting is a tracking technique, often done by third-party
+companies that specialize in it. They provide code (usually JavaScript) that a
+website owner can embed on their site. When you visit the site, the script runs
+in the background, silently collecting data about your device and browser.</p>
+<p>There are two main approaches to obfuscating your fingerprint:</p>
+<ul>
+<li>
+<p><strong>Standardization</strong>: Make browsers standardized and therefore have the same
+fingerprint to blend into a crowd. This is what Tor and Mullvad Browser do.
+Best for anonymity; increases the crowd you blend into, but may decrease
+usability (site breakage, CAPTCHAs); adversaries may still find subtle
+differences.</p>
+</li>
+<li>
+<p><strong>Randomization</strong>: Randomize fingerprint metrics so it’s not directly linkable
+to you. Brave has this feature, if you run coveryourtracks with Brave you will
+get a result of “your browser has a randomized fingerprint”. This is good for
+privacy but may be detectable by advanced scripts.</p>
+</li>
+</ul>
+<p>Test your browsers fingerprint:</p>
+<ul>
+<li>
+<p><a href="https://coveryourtracks.eff.org/">CoverYourTracks</a></p>
+</li>
+<li>
+<p><a href="https://amiunique.org/">AmIUnique</a></p>
+</li>
+</ul>
+<p>Test how well your browser implements security standards and features:</p>
+<ul>
+<li><a href="https://browseraudit.com">BrowserAudit</a></li>
+</ul>
+<p>Test the sites you visit for trackers:</p>
+<ul>
+<li><a href="https://themarkup.org/ask-the-markup/2020/09/22/i-scanned-the-websites-i-visit-with-blacklight-and-its-horrifying-now-what">Blacklight</a></li>
+</ul>
+<p>Don’t put too much weight into the results as people often check their
+fingerprint, change one metric and check it again over and over skewing the
+results. It is helpful for knowing the fingerprint values that trackers track.</p>
+<ul>
+<li>
+<p><a href="https://forum.torproject.org/t/browser-fingerprinting/1228/25">Browser Fingerprinting Tor Forum</a></p>
+</li>
+<li>
+<p><a href="https://madaidans-insecurities.github.io/browser-tracking.html">Madaidans Hot Take on Browser Tracking</a></p>
+</li>
+</ul>
+<p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
+JavaScript, preventing the scripts from running that do most of the
+fingerprinting. Extensions can make you more unique but it’s a give and take.</p>
+<p>The following website lists the tracking protection mechanisms implemented by
+the major browsers and browser engines:</p>
+<ul>
+<li><a href="https://www.cookiestatus.com/">Cookie Status</a></li>
+</ul>
+<hr />
+<h2>Metasearch Engines</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Metasearch_engine">Wikipedia Metasearch engine</a></li>
+</ul>
+<h3>SearXNG</h3>
+<p><strong>SearXNG</strong> an open-source, privacy-respecting metasearch engine that aggregates
+results from various search services, such as Google, DuckDuckGo, etc without
+tracking you or profiling your searches. You can add SearXNG to firefox by going
+to <code>about:preferences#search</code> and at the bottom click <code>Add</code>, URL will be
+<code>https://searx.be/search?q=%s</code>.</p>
+<blockquote>
+<p>❗️ NOTE: The above searx is the default and doesn’t give many relevant
+results. To get relevant results find a
+<a href="https://searx.space/">public instance</a> with a good rating from your area and
+add the <code>search?q=%s</code> to the end of it. For example, I’m using
+<code>https://priv.au/search?q=%s</code>. This gives much better results than DDG in my
+opinion.</p>
+</blockquote>
+<p>SearXNG is a bit different, you can choose which search engine you want for your
+current search with <code>!ddg search term</code> to use duckduckgo for example.</p>
+<ul>
+<li><a href="https://github.com/searxng/searxng?tab=readme-ov-file">searxng repo</a>
+<ul>
+<li>
+<p><a href="https://docs.searxng.org/admin/installation.html">Install guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.searxng.org/admin/settings/index.html">Configuration guide</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<p><strong>Startpage</strong> is another metasearch engine that I’ve heard good things about.</p>
+<ul>
+<li>
+<p><a href="https://www.startpage.com/privacy-please/">Startpage Privacy Please!</a></p>
+</li>
+<li>
+<p><a href="https://www.startpage.com/privacy-please/startpage-articles/easy-privacy-control-across-the-internet-introducing-startpage-privacy-protection">Startpage Privacy Protection</a></p>
+</li>
+</ul>
+<hr />
+<h2>Defenses</h2>
+<h4>Encrypted DNS</h4>
+<p>DNS (Domain Name System) resolution is the process of translating a website’s
+domain name into its corresponding IP address. By default, this traffic isn’t
+encrypted, which means anyone on the network, from your ISP to potential
+hackers, can see the websites you’re trying to visit. <strong>Encrypted DNS</strong> uses
+protocols to scramble this information, protecting your queries and responses
+from being intercepted and viewed by others.</p>
+<blockquote>
+<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
+what domain you looked up via DNS that it’s effectiveness is questionable
+without also using Tor or a VPN. Encrypted DNS will not help you hide any of
+your browsing activity.</p>
+</blockquote>
+<p>There are 3 main types of DNS protection:</p>
+<ul>
+<li>
+<p><strong>DNS over HTTPS (DoH)</strong>: Uses the HTTPS protocol to encrypt data between the
+client and the resolver.</p>
+</li>
+<li>
+<p><strong>DNS over TLS (DoT)</strong>: Similar to (DoH), differs in the methods used for
+encryption and delivery using a separate port from HTTPS.</p>
+</li>
+<li>
+<p><strong>DNSCrypt</strong>: Uses end-to-end encryption with the added benefit of being able
+to prevent DNS spoofing attacks.</p>
+</li>
+</ul>
+<p>Useful resources:</p>
+<details>
+<summary> ✔️ Click to Expand DNS Resources </summary>
+<ul>
+<li>
+<p><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">Domain Name System (DNS)</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/DNS_over_HTTPS">Wikipedia DNS over HTTPS (DoH)</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/DNS_over_TLS">Wikipedia DNS over TLS (DoT)</a></p>
+</li>
+<li>
+<p><a href="https://blog.cloudflare.com/dns-encryption-explained/">Cloudflare Dns Encryption Explained</a></p>
+</li>
+<li>
+<p><a href="https://nordvpn.com/blog/encrypted-dns-traffic/">NordVPN Encrypted Dns Traffic</a></p>
+</li>
+</ul>
+<p><strong>Hot Take</strong>:</p>
+<ul>
+<li><a href="https://madaidans-insecurities.github.io/encrypted-dns.html">Encrypted DNS is ineffective without a VPN or Tor by madaidan</a></li>
+</ul>
+</details>
+<p>I recommend either setting up dnscrypt-proxy:</p>
+<ul>
+<li><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy on Arch</a></li>
+</ul>
+<p>Or set Firefox’s DNS over HTTPS to Max protection with a custom resolver:</p>
+<p>In <code>about:preferences#privacy</code> scroll down to <code>DNS over HTTPS</code>, Select
+<code>Max Protection</code> -&gt; <code>Custom</code> -&gt; <code>https://dns.quad9.net/dns-query</code></p>
+<hr />
+<h4>Enhanced Tracking Protection (ETP)</h4>
+<p>Browsers that have a form of tracking protection typically use lists of known
+trackers and match each outgoing request against these lists.</p>
+<p>Enhanced Tracking Protection is how you deal with cookies and more on Firefox.</p>
+<ul>
+<li>
+<p><a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop">Enhanced Tracking Protection (ETP)</a>
+blocks known “third-party requests” to companies that participate in
+fingerprinting, according to the
+<a href="https://disconnect.me/trackerprotection">Disconnect List</a></p>
+<ul>
+<li>
+<p>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
+either Strict or Custom enables FPP as well, explained further down.</p>
+</li>
+<li>
+<p><a href="https://blog.mozilla.org/mozilla/firefox-rolls-out-total-cookie-protection-by-default-to-all-users-worldwide/">Total Cookie Protection</a>
+is enabled by default in Standard mode.</p>
+</li>
+<li>
+<p>When you set ETP to Strict, it includes
+<a href="https://blog.mozilla.org/security/2021/08/10/firefox-91-introduces-enhanced-cookie-clearing/">Enhanced Cookie Clearing</a>,
+which improves on the removal of third-party cookies, as well as Bounce
+Tracking Protection that prevents redirect trackers.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://wiki.mozilla.org/Security/FirstPartyIsolation">First-Party Isolation</a>
+From the Tor Uplift Project.</p>
+</li>
+</ul>
+<h3>Resist Fingerprinting</h3>
+<ul>
+<li>
+<p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
+</li>
+<li>
+<p>RFP (Resist Fingerprinting) set in <code>about:config</code> with
+<code>privacy.resistFingerprinting</code>. Resist Fingerprinting alters the following:</p>
+<ul>
+<li>
+<p>The timezone is reported as UTC or Icelandic</p>
+</li>
+<li>
+<p>Locale is reported as en-US</p>
+</li>
+<li>
+<p>Several properties of the navigator object are fixed, including the hardware
+concurrency value, application version and build ID. The User Agent version
+is reported to be the major version (for example, 119.0 instead of 119.1)</p>
+<ul>
+<li>And much more…</li>
+</ul>
+</li>
+<li>
+<p>You can set <code>privacy.resistFingerprinting.pbMode</code> (private-browsing) without
+<code>privacy.resistFingerprinting</code> and still get certain Resist Fingerprinting
+behaviors on normal windows, because it’s impossible to separate these
+behaviors per-window.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>FPP (Fingerprinting Protection) is enabled in normal browsing when Enhanced
+Tracking Protection is set to Strict. Both Known Fingerprinters and Suspected
+Fingerprinters Protection are enabled in Private Browsing and when ETP is set
+to strict. On the Custom level of ETP you can toggle on/off different
+features.</p>
+</li>
+</ul>
+<hr />
+<h2>Disable JavaScript</h2>
+<p>Most trackers run on JavaScript, thus blocking JavaScript prevents them from
+gathering much of the info needed to form a browser fingerprint.</p>
+<ul>
+<li>
+<p><a href="https://noscript.net/">NoScript</a> lets you selectively block scripts on
+websites. Its core function is to block all scripts by default on websites,
+allowing you to manually enable scripts on trusted sites.</p>
+<p><a href="https://blog.jeaye.com/2017/11/30/noscript/">NoScript PrivacyGuides</a> should</p>
+</li>
+<li>
+<p><a href="https://ublockorigin.com/">uBlock Origin</a> also lets you block JavaScript,
+just be aware that many sites may break so you’ll have to whitelist
+selectively.</p>
+</li>
+</ul>
+<h2>Disable WebRTC</h2>
+<p>The main reason people disable WebRTC is to prevent an IP address leak. WebRTC
+is designed for real-time communication like video calls and file sharing. If
+you don’t use those features, it makes sense to disable it.</p>
+<p>Disabling WebRTC eliminates specific data points that trackers use, reducing
+entropy &amp; the uniqueness of your fingerprint.</p>
+<p>In <code>about:preferences#privacy</code> -&gt; <code>Privacy &amp; Security</code> -&gt; <code>Permissions</code>. Click
+<code>Settings</code>.</p>
+<ul>
+<li>
+<p><input disabled="" type="checkbox" checked=""/>
+Block new requests asking to access your microphone</p>
+</li>
+<li>
+<p><input disabled="" type="checkbox" checked=""/>
+Block new requests asking to access your camera</p>
+</li>
+<li>
+<p>You may also want to block Location, but that isn’t involving WebRTC.</p>
+</li>
+</ul>
+<p>You can also use the master switch by going to <code>about:config</code> and setting
+<code>media.peerconnection.enabled</code> to <code>false</code></p>
+<p><code>user.js</code> settings related to WebRTC:</p>
+<pre><code class="language-js">/* 2002: force WebRTC inside the proxy [FF70+] ***/
+user_pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
+ * When using a system-wide proxy, it uses the proxy interface
+ * [1] https://developer.mozilla.org/docs/Web/API/RTCIceCandidate
+ * [2] https://wiki.mozilla.org/Media/WebRTC/Privacy ***/
+user_pref("media.peerconnection.ice.default_address_only", true);
+user_pref("media.peerconnection.enabled", false);
+user_pref("media.peerconnection.ice.obfuscate_host_address", true);
+/* 2004: force exclusion of private IPs from ICE candidates [FF51+]
+ * [SETUP-HARDEN] This will protect your private IP even in TRUSTED scenarios after you
+ * grant device access, but often results in breakage on video-conferencing platforms ***/
+user_pref("media.peerconnection.ice.no_host", true);
+</code></pre>
+<hr />
+<h2>Disable Canvas Fingerprinting</h2>
+<p>Canvas Fingerprinting uses the HTML5 <code>&lt;canvas&gt;</code> element to generate a
+fingerprint. It gets your device to render an image or text on a canvas and then
+reads the pixel data. Since devices render things differently, those differences
+are identifiable.</p>
+<p>When the pref <code>privacy.resistFingerprinting</code> is set to <code>true</code>, restricts APIs
+commonly used for fingerprinting, including the HTML5 Canvas API. When enabled,
+it returns a randomized or generic canvas output to prevent unique
+identification.</p>
+<hr />
+<h2>Disable WebGL</h2>
+<p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
+and 3D graphics. The way your system renders these graphics provides information
+about your GPU and graphics drivers, which contributes to your unique
+fingerprint.</p>
+<blockquote>
+<p>❗️ NOTE: It’s unnecessary to disable webgl if you’re already using RFP and
+will likely make you stand out more because most people don’t disable it.</p>
+</blockquote>
+<p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
+<hr />
+<h2>Install Firefox/LibreWolf &amp; ArkenFox</h2>
+<blockquote>
+<p>⚠️ Firefox offers excellent privacy and customization but falls behind
+Chromium-based browsers in isolation and patch timing. Compartmentalization
+can help balance strong privacy with optimal security by using Brave or
+Chromium for high-risk browsing alongside Firefox for general and
+privacy-focused tasks.</p>
+</blockquote>
+<p>Download Firefox from the
+<a href="https://ftp.mozilla.org/pub/firefox/releases/">Mozilla FTP site</a> if you are
+worried about the download token, the FTP site lets you download the version you
+want without a token.</p>
+<p>For example, for the latest firefox as of 09-30-25 for the US:</p>
+<p><code>https://download.mozilla.org/?product=firefox-latest&amp;os=linux64&amp;lang=en-US</code></p>
+<p><strong>LibreWolf</strong> is an open-source fork of Firefox with a strong focus on privacy,
+security, and user freedom. LibreWolf enables always HTTPS, includes
+uBlockOrigin, and more providing strong defaults.</p>
+<details>
+<summary> ✔️ Click to Expand Arkenfox How To </summary>
+<p>The process is the same for both Firefox &amp; LibreWolf. I like LibreWolf for it’s
+strong defaults but may lag behind Firefox getting security patches.</p>
+<pre><code class="language-bash">paru -S librewolf-bin
+</code></pre>
+<p>Read the <a href="https://github.com/arkenfox/user.js/wiki">ArkenFox Wiki</a></p>
+<h2>Apply</h2>
+<p>Open <code>about:support</code> and look for <code>Profile Directory</code> under <code>Application Basics</code>
+Select <code>Open Directory</code>, it will bring you to somewhere like
+<code>~/.librewolf/pefoo8xx.default-default/</code> and that is where you place the
+<code>user.js</code>.</p>
+<p>Place the following files in your <code>Profile Directory</code>:</p>
+<ol>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/user.js">Arkenfox user.js</a>
+Read through the <code>user.js</code>, not all settings are applied by default such as
+RFP Fingerprinting protection.</p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/updater.sh">updater.sh</a></p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js/blob/master/prefsCleaner.sh">prefsCleaner.sh</a></p>
+</li>
+<li>
+<p>Also create your own <code>user-overrides.js</code> with any changes you want to make to
+the default <code>user.js</code>. These changes are amended to the <code>user.js</code> and applied
+last enabling them to override the default settings. It’s best to make
+changes here so that updating the Arkenfox <code>user.js</code> doesn’t make you lose
+all of your customizations.</p>
+</li>
+</ol>
+<p>Example <code>user-overrides.js</code> spoofing the user agent:</p>
+<blockquote>
+<p>❗️ This is just an example, always check for common useragent strings
+yourself. Read the Arkenfox Wiki!</p>
+</blockquote>
+<pre><code class="language-js">&lt;!-- user_pref( --&gt;
+  &lt;!-- "general.useragent.override", --&gt;
+  &lt;!-- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", --&gt;
+&lt;!-- ); --&gt;
+// Disable Activity Stream on new windows and tab pages
+user_pref("browser.newtab.preload", false);
+// Enhanced Tracking Protection (ETP)
+user_pref("privacy.bounceTrackingProtection.mode", 1); // [FF131+] [ETP FF133+]
+user_pref("privacy.trackingprotection.enabled", true);
+// Resist Fingerprinting (RFP)
+user_pref("privacy.resistFingerprinting", true); // [FF41+]
+user_pref("privacy.resistFingerprinting.pbmode", true); // [FF114+]
+// WebRTC
+user_pref("media.peerconnection.enabled", false);
+user_pref("media.peerconnection.ice.default_address_only", true);
+// WebGL
+user_pref("webgl.disabled", true);
+// Geolocation
+user_pref("geo.enabled", false);
+user_pref("full-screen-api.enabled", false);
+user_pref(
+  "geo.provider.network.url",
+  "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%",
+);
+// Disable studies
+user_pref("app.sheild.optoutstudies.enabled", false);
+// Master Switches, Be Careful
+user_pref("browser.safebrowsing.malware.enabled", false);
+user_pref("browser.safebrowsing.phishing.enabled", false);
+user_pref("browser.safebrowsing.provider.google4.gethashURL", "");
+user_pref("browser.safebrowsing.provider.google4.updateURL", "");
+user_pref("browser.safebrowsing.provider.google.gethashURL", "");
+user_pref("browser.safebrowsing.provider.google.updateURL", "");
+user_pref("browser.safebrowsing.provider.google4.dataSharingURL", "");
+user_pref("signon.rememberSignons", false);
+user_pref("browser.xul.error_pages.expert_bad_cert", true);
+//* [NOTE] Will cause breakage: older modems/routers and some sites e.g banks, vimeo, icloud, instagram ***/
+user_pref("network.http.referer.XOriginPolicy", 2);
+user_pref("network.http.sendRefererHeader", 1);
+// 0 is most strict:
+user_pref("network.http.referer.trimmingPolicy", 0);
+user_pref("network.http.referer.XOriginTrimmingPolicy", 2);
+</code></pre>
+<p>To apply your prefs you have to run the <code>updater.sh</code> script.</p>
+<pre><code class="language-bash">~/.mozilla/firefox/v5kwl3c0.default-release&gt; ./updater.sh
+
+                ############################################################################
+                ####                                                                    ####
+                ####                          arkenfox user.js                          ####
+                ####       Hardening the Privacy and Security Settings of Firefox       ####
+                ####           Maintained by @Thorin-Oakenpants and @earthlng           ####
+                ####            Updater for macOS and Linux by @overdodactyl            ####
+                ####                                                                    ####
+                ############################################################################
+
+
+Documentation for this script is available here: https://github.com/arkenfox/user.js/wiki/5.1-Updater-[Options]#-maclinux
+
+Please observe the following information:
+    Firefox profile:  /home/jr/.mozilla/firefox/v5kwl3c0.default-release
+    Available online: * version: 140
+    Currently using:  * version: 140
+
+
+This script will update to the latest user.js file and append any custom configurations from user-overrides.js. Continue Y/N?
+y
+
+Status: user.js has been backed up and replaced with the latest version!
+Status: Override file appended: user-overrides.js
+</code></pre>
+<h2>Check</h2>
+<p>Launch LibreWolf or Firefox and press <code>Ctrl-Shift-J</code> to launch Browser Console
+Mode, and look for any errors.</p>
+<p>Go to <code>about:config</code> -&gt; [x] <code>Show only modified preferences</code>. You should see
+<code>SUCCESS: No no he's not dead, he's, he's restin'!</code></p>
+</details>
+<h3>User Agent Spoofing</h3>
+<blockquote>
+<p>❗️ NOTE: Spoofing your useragent alone likely isn’t worth the protections you
+lose from disabling <code>resistFingerprinting</code>. <code>resistFingerprinting</code> spoofs many
+different fingerprinting aspects. If you don’t get it right, you will get
+captcha requests constantly.</p>
+</blockquote>
+<p>Research what the most common user agent is. You’ll need to disable
+<code>privacy.resistFingerprinting</code> for this to work.</p>
+<p>Place the user agent string in <code>general.useragent.override</code> something like:
+<code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code>
+<a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
+<p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
+<hr />
+<h2>uBlock Origin</h2>
+<p>BetterFox does a great job explaining how to use uBlock with solid
+recommendations.</p>
+<ul>
+<li><a href="https://github.com/yokoffing/filterlists?tab=readme-ov-file#guidelines">BetterFox uBlock filterlists</a></li>
+</ul>
+<p>If you wanted to apply the
+<a href="https://github.com/yokoffing/filterlists/blob/main/privacy_essentials.txt">Privacy Essentials</a>
+list you would click
+<a href="https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt&amp;title=Privacy%20Essentials">subscribe</a>,
+which launches the uBlock asset viewer where you can see all of the domains that
+will be blocked before clicking <code>Subscribe</code> again to apply them.</p>
+<h3>Adding other lists</h3>
+<ul>
+<li>
+<p><a href="https://github.com/hagezi/dns-blocklists">Hagezi dns-blocklists</a></p>
+</li>
+<li>
+<p><a href="https://github.com/ppfeufer/adguard-filter-list">adguard-filter-list</a></p>
+</li>
+</ul>
+<p>Click the uBlock logo, Settings, Filter lists, scroll to the bottom and choose
+Import…, Paste the url of your chosen list, and click Apply changes.</p>
+<p>For example, Arkenfox suggests adding the Actually Legitimate URL Shortener
+Tool. Add
+<a href="https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt">https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt</a>
+to the Import… section and click Apply changes. If you scroll up, you’ll see
+that it was added and chosen.</p>
+<p>Setup your <a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode">Blocking mode</a></p>
+<p>Many opt for
+<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-medium-mode">medium mode</a>.
+To do so you need to:</p>
+<p><strong>Settings pane</strong>:</p>
+<ul>
+<li>Open the dashboard, and choose I am an advanced user.</li>
+</ul>
+<p><strong>Filter lists pane</strong>:</p>
+<ul>
+<li>
+<p>All of uBO’s filter lists: checked</p>
+</li>
+<li>
+<p>EasyList: checked</p>
+</li>
+<li>
+<p>Peter Lowe’s Ad server list: checked</p>
+</li>
+<li>
+<p>EasyPrivacy: checked</p>
+</li>
+<li>
+<p>Online Malicious URL Blocklist: checked</p>
+</li>
+</ul>
+<p><strong>My rules pane (4th pane from the left)</strong>:</p>
+<p>Underneath Temporary rules add, you literally type this in:</p>
+<ul>
+<li>
+<p>Add <code>* * 3p-script block</code></p>
+</li>
+<li>
+<p>Add <code>* * 3p-frame block</code></p>
+</li>
+<li>
+<p>Click <code>Save</code></p>
+</li>
+<li>
+<p>Click <code>&lt;- Commit</code> (Not required on phone)</p>
+</li>
+</ul>
+<p><strong>Fallback to
+<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-easy-mode">easy mode</a></strong></p>
+<p>Click the uBlock logo while on the site you want to use easy mode on. You’ll see
+the power button to the top right, the Global rules and the Local rules which
+start 3 boxes from the left. Click the box under the Local rules for 3rd-party
+scripts. The box will change colors, dark gray = NOOP (No Operation). This tells
+uBO to ignore the aggressive global block for this site, and let the normal
+filter lists handle the blocking.</p>
+<p>You can also disable JavaScript in My rules as needed.</p>
+<hr />
+<h2>Set up a SOCKS5 Proxy with Arti</h2>
+<blockquote>
+<p>❗️ NOTE: This is one example of using a SOCKS5 proxy to circumvent censorship
+or add additional privacy without the Tor Browser. You can also route other
+apps through the proxy, such as email clients, messaging apps, torrent
+clients, and more.</p>
+</blockquote>
+<ol>
+<li>Clone the arti repo:</li>
+</ol>
+<pre><code class="language-bash"># clone the repo
+git clone https://gitlab.torproject.org/tpo/core/arti.git
+
+# navigate to the directory
+cd arti
+</code></pre>
+<hr />
+<ol start="2">
+<li>To build the Arti binary, compile the code and generate the executable run:</li>
+</ol>
+<p>These are the safer build options so you can leave the arti repo in your home
+directory without it leaking your username:</p>
+<pre><code class="language-bash">RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=." \
+   cargo build --release -p arti
+</code></pre>
+<hr />
+<ol start="3">
+<li>To allow Arti SOCKS proxy traffic you need to add a rule permitting incoming
+connections to port 9150.</li>
+</ol>
+<p>For nftables, you would open <code>/etc/nftables.conf</code> and add:</p>
+<pre><code class="language-conf">chain input {
+  # ...snip...
+
+  # Allow Arti SOCKS proxy (port 9150)
+    tcp dport 9150 ct state new accept
+
+  # ...snip...
+}
+</code></pre>
+<p>Enable it with <code>sudo nft -f /etc/nftables.conf</code></p>
+<hr />
+<ol start="4">
+<li>To run Arti as a SOCKS proxy on port <code>9150</code>, execute:</li>
+</ol>
+<pre><code class="language-bash">./target/release/arti proxy
+</code></pre>
+<hr />
+<ol start="5">
+<li>Configure LibreWolf/Firefox to use the Arti proxy:</li>
+</ol>
+<p>Open LibreWolf or Firefox</p>
+<p>Go to the menu and open <code>Preferences/Settings</code>.</p>
+<p>Scroll to the bottom <code>Network Settings</code> section.</p>
+<p>Click on “<code>Settings...</code>” under Network Settings.</p>
+<p>In the connection settings dialog:</p>
+<p>Select “<code>Manual proxy configuration</code>”.</p>
+<p>For “SOCKS Host”, enter <code>127.0.0.1</code>.</p>
+<p>For the port next to SOCKS Host, enter <code>9150</code>.</p>
+<p>Select the SOCKS version 5 option (<code>SOCKS v5</code>).</p>
+<p>Optionally check the box “<code>Proxy DNS when using SOCKS v5</code>” to route DNS queries
+through the proxy for enhanced privacy.</p>
+<p>Click “<code>OK</code>” to apply the settings.</p>
+<hr />
+<ol start="6">
+<li>Verify Your Proxy Setup Open a new tab and visit <code>https://dnsleaktest.com</code>
+and run an <code>Extended Test</code>.</li>
+</ol>
+<p>Your IP address should now appear as a Tor exit node IP, indicating your traffic
+is routed through the Arti proxy.</p>
+<ul>
+<li>
+<p>Make sure Arti is running in its terminal or background before you start
+browsing.</p>
+</li>
+<li>
+<p>If you close the terminal or stop Arti, your browser will lose the proxy
+connection.</p>
+</li>
+</ul>
+<p>This setup only proxies the configured browser traffic; other apps are not
+affected unless configured similarly.</p>
+<p>This setup turns LibreWolf or Firefox into a Tor-enabled browser without
+installing the Tor Browser Bundle, using the Arti SOCKS proxy instead. It can be
+useful if you want to use a more customizable or alternative browser while still
+accessing the Tor network securely.</p>
+<blockquote>
+<p>⚠️ While using LibreWolf with the Arti SOCKS5 proxy provides network-level
+anonymity by routing traffic through the Tor network, it does not include the
+extensive browser-level privacy and security enhancements found in the
+official Tor Browser. For casual or moderate privacy needs the SOCKS proxy can
+be useful but for stronger anonymity guarantees and protection, the Tor
+Browser is recommended.</p>
+</blockquote>
+<h2>Setup an Arti service to run in the background</h2>
+<blockquote>
+<p>Be careful here, its not as easy to tell if Arti failed for some reason.</p>
+</blockquote>
+<p>Create a service file at <code>/etc/systemd/system/arti.service</code>:</p>
+<p>Replace <code>your-username</code> with your username</p>
+<pre><code class="language-.service">[Unit]
+Description=Arti Tor Proxy Service
+After=network.target
+
+[Service]
+ExecStart=/home/your-username/arti/target/release/arti proxy
+Restart=on-failure
+User=jr
+Group=jr
+WorkingDirectory=/home/your-username/arti
+Environment=RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=."
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Enable &amp; Start the service:</p>
+<pre><code class="language-bash">sudo systemctl enable arti
+sudo systemctl start arti --now
+</code></pre>
+<p>Ensure its running:</p>
+<pre><code class="language-bash">sudo systemctl status arti
+</code></pre>
+<hr />
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
+<ul>
+<li>
+<p><a href="https://docs.searxng.org/">Welcome to SearXNG</a></p>
+</li>
+<li>
+<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">Firefox Hardening Guide</a></p>
+</li>
+<li>
+<p><a href="https://www.ghacks.net/2015/08/18/a-comprehensive-list-of-firefox-privacy-and-security-settings/">Firefox ghacks</a></p>
+</li>
+<li>
+<p><a href="https://github.com/arkenfox/user.js">ArkenFox user.js</a> Just right IMO.</p>
+</li>
+<li>
+<p><a href="https://github.com/yokoffing/Betterfox">BetterFox user.js</a> Easiest to use
+with less breakage.</p>
+</li>
+<li>
+<p><a href="https://codeberg.org/Narsil/user.js/src/branch/main/desktop">Narsil user.js</a>
+Most hardened.</p>
+</li>
+<li>
+<p><a href="https://www.privacytools.io/private-browser">PrivacyTools.io</a></p>
+</li>
+<li>
+<p><a href="https://privacytests.org/">PrivacyTests.org</a></p>
+</li>
+<li>
+<p><a href="https://github.com/simeononsecurity/FireFox-Privacy-Script">simeononsecurity Firefox-Privacy-Script</a></p>
+</li>
+<li>
+<p><a href="https://anhkhoakz.neocities.org/blog/browsers-for-daily-using/#firefox-but-hardened">Browsers for Daily Using</a></p>
+</li>
+<li>
+<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">brianfucksec firefox-hardening-Guide 2023</a></p>
+</li>
+<li>
+<p><a href="https://simeononsecurity.com/guides/enhance-firefox-security-configuring-guide/">STIG Firefox Hardening</a></p>
+</li>
+</ul>
+<blockquote>
+<p>If you should trust the U.S. Governments recommendations is another story but
+it can be good to compare and contrast with other trusted resources. You’ll
+have to think whether the CISA recommending that everyone uses Signal is solid
+advice or guiding you towards a honeypot, I can’t say for sure.</p>
+</blockquote>
+<ul>
+<li>
+<p><a href="https://stigviewer.com/stigs/mozilla_firefox">Mozilla Firefox Security Technical Implementation Guide</a>
+The STIG for Mozilla Firefox (Security Technical Implementation Guide) is a
+set of security configuration standards developed by the U.S. Department of
+Defense. They are created by the Defense Information Systems Agency (DISA) to
+secure and harden DoD information systems and software.</p>
+</li>
+<li>
+<p><a href="https://thenewoil.org/en/guides/prologue/why/">Privacy, The New Oil (Why Privacy &amp; Security Matter)</a></p>
+</li>
+<li>
+<p><a href="https://www.privacyguides.org/en/">PrivacyGuides</a></p>
+</li>
+<li>
+<p><a href="https://relay.firefox.com/accounts/profile/">Firefox Relay</a> can be used to
+create email aliases that forward to your real email address. The paid plan
+also lets you create phone number aliases that forward to your phone number.</p>
+</li>
+<li>
+<p><a href="https://zebracrossing.narwhalacademy.org/">Zebra Crossing digital safety checklist</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/essentials#step-1">DataDetoxKit</a></p>
+</li>
+<li>
+<p><a href="https://datadetoxkit.org/en/privacy/degooglise/">DataDetox Degooglise</a></p>
+</li>
+<li>
+<p><a href="https://tb-manual.torproject.org/">Tor Browser User Manual</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.torproject.org/tpo/team/-/wikis/home">Tor Wiki</a></p>
+</li>
+<li>
+<p><a href="https://blog.torproject.org/">Tor Blog</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.torproject.org/tpo/core/arti/#why-rewrite-tor-in-rust">Arti why-rewrite-tor-in-rust</a></p>
+</li>
+<li>
+<p><a href="https://wiki.mozilla.org/Security/Tor_Uplift/Tracking">The Tor Uplift Project</a></p>
+</li>
+<li>
+<p><a href="https://www.browsercat.com/post/browser-fingerprint-spoofing-explained">BrowserCat Fingerprint Spoofing</a></p>
+</li>
+<li>
+<p><a href="https://cyberinsider.com/firefox-privacy/">cyberinsider Firefox privacy 2025</a></p>
+</li>
+<li>
+<p><a href="https://cyberinsider.com/browser-fingerprinting/">cyberinsider Browser Fingerprinting</a></p>
+</li>
+<li>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/Privacy">Mozilla Web Docs Privacy on the web</a></p>
+</li>
+<li>
+<p><a href="https://adguard-dns.io/en/blog/techtok-9-browser-extensions-and-firewall.html">Adguard Blog Browser Extensions and Firewalls explained</a></p>
+</li>
+<li>
+<p><a href="https://searchfox.org/firefox-main/source/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc">searchfox RFPTargetsDefault</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Wikipedia Entropy (computing)</a></p>
+</li>
+<li>
+<p><a href="https://brave.com/blog/">Brave Blog</a></p>
+</li>
+</ul>
+<p><strong>Cheatsheets</strong></p>
+<ul>
+<li>
+<p><a href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html">HTTP Security Response Headers Cheat Sheet</a></p>
+</li>
+<li>
+<p><a href="https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html">Zero Trust Architecture Cheat Sheet</a></p>
+</li>
+<li>
+<p><a href="https://we.riseup.net/riseup+tech/entropy">riseup entropy</a></p>
+</li>
+<li>
+<p><a href="https://www.kicksecure.com/wiki/Dev/Entropy">kicksecure entropy</a></p>
+</li>
+<li>
+<p><a href="https://riseup.net/en/security">riseup Digital Security</a></p>
+</li>
+</ul>
+</details>
+]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<h1>Hardening Arch Linux</h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <!-- toc -->
@@ -4298,1779 +6073,4 @@ hardening.There are recommendations for hardening all kinds of software in the
 </li>
 </ul>
 </details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<h1>Hardening Firefox on Arch</h1>
-<details>
-<summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
-</details>
-<h2>🔑 Key Terms</h2>
-<ul>
-<li>
-<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking
-by disabling or restricting features like JavaScript, cookies, telemetry, and
-third-party scripts.</p>
-</li>
-<li>
-<p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser
-indistinguishable from others. Instead of just blocking data collection, it
-ensures that your browser’s configuration; screen size, fonts, user agent,
-etc. matches a large group of users, so you blend in.</p>
-</li>
-<li>
-<p><strong>Browser compartmentalization</strong> is a technique where different browsers are
-dedicated to distinct online activities to isolate cookies, trackers, and
-browsing data. For example, Mullvad Browser can be used solely for activities
-where fingerprinting resistance is critical, such as anonymous browsing or
-visiting privacy-sensitive sites. Meanwhile, a hardened LibreWolf or Firefox
-can be used for general browsing, email, or banking where you want solid
-security and feature flexibility but aren’t as concerned about fingerprint
-uniqueness.</p>
-</li>
-<li>
-<p><strong>Web APIs</strong>: are sets of rules and protocols that allow browsers or servers
-to communicate and share data or functions over the internet. It lets
-developers access features or data of a web service or application without
-exposing the underlying system details, enabling different software to
-interact smoothly and securely.</p>
-</li>
-<li>
-<p><strong>Anonymity</strong>: Maximizing anonymity often means restricting or masking
-features (setting a generic fingerprint, disabling browser APIs, blocking
-trackers) so the browser blends in with many others. This reduces uniqueness
-but can break website functionality, cause CAPTCHAs, and limit usability.</p>
-</li>
-<li>
-<p><strong>Usability</strong>: Keeping your browser features enabled improves compatibility
-and user experience but increase uniqueness and thus make you easier to track.</p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Entropy</a>: in this
-context, is a measure of how much unique information a specific browser
-feature contributes to your fingerprint. It’s often quantified in <strong>bits of
-entropy</strong>, where higher bits mean more uniqueness (i.e., easier to identify
-you).</p>
-<ul>
-<li>A “bit” is a basic unit of information for computers. Entropy measuring
-sites results are measured in “bits of identifying information”.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://developer.mozilla.org/en-US/docs/Glossary/Origin">Origin</a>: Web
-content’s <em>origin</em> is defined by the <em>scheme</em> (protocol), <em>hostname</em> (domain),
-and port of the URL used to access it. Two objects have the same origin only
-when the scheme, hostname, and port all match.</p>
-</li>
-<li>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">Same-origin policy</a>:
-is a critical security mechanism that restricts how a document or script
-loaded by one origin can interact with a resource from another origin. It
-helps isolate potentially malicious documents, reducing possible attack
-vectors.</p>
-</li>
-<li>
-<p><a href="https://blog.mozilla.org/security/2021/05/18/introducing-site-isolation-in-firefox/">Firefox Site-Isolation</a>.
-Firefox does provide site-isolation as well.</p>
-</li>
-<li>
-<p><a href="https://www.mozilla.org/en-US/security/advisories/mfsa2018-01/">Protection from side-channel attacks</a></p>
-</li>
-<li>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Insecure_passwords">MDN Insecure passwords</a></p>
-<ul>
-<li><a href="https://blog.mozilla.org/tanvi/2016/01/28/no-more-passwords-over-http-please/">Risks of reused passwords</a></li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Tor Browser is <strong>not</strong> the most secure browser, anonymity, and security can
-often be at odds with each other. Having the exact same browser as many other
-people isn’t the best security practice, but it is great for anonymity. Tor is
-also based on Firefox Esr, which only receives patches for vulnerabilities
-considered Critical or High which can be taken advantage of.</p>
-</blockquote>
-<h3>Fingerprinting Explained</h3>
-<p>Modern Web APIs enable highly customized user experiences but also expose
-detailed device information that attackers can exploit to create browser
-fingerprints, unique identifiers used for covert tracking, even when cookies are
-blocked.</p>
-<p><strong>Entropy</strong>, a measure of randomness or uniqueness in data, is a critical metric
-for assessing the risk of browser fingerprinting.</p>
-<p>Browser fingerprinting is a tracking technique, often done by third-party
-companies that specialize in it. They provide code (usually JavaScript) that a
-website owner can embed on their site. When you visit the site, the script runs
-in the background, silently collecting data about your device and browser.</p>
-<p>There are two main approaches to obfuscating your fingerprint:</p>
-<ul>
-<li>
-<p><strong>Standardization</strong>: Make browsers standardized and therefore have the same
-fingerprint to blend into a crowd. This is what Tor and Mullvad Browser do.
-Best for anonymity; increases the crowd you blend into, but may decrease
-usability (site breakage, CAPTCHAs); adversaries may still find subtle
-differences.</p>
-</li>
-<li>
-<p><strong>Randomization</strong>: Randomize fingerprint metrics so it’s not directly linkable
-to you. Brave has this feature, if you run coveryourtracks with Brave you will
-get a result of “your browser has a randomized fingerprint”. This is good for
-privacy but may be detectable by advanced scripts.</p>
-</li>
-</ul>
-<p>Test your browsers fingerprint:</p>
-<ul>
-<li>
-<p><a href="https://coveryourtracks.eff.org/">CoverYourTracks</a></p>
-</li>
-<li>
-<p><a href="https://amiunique.org/">AmIUnique</a></p>
-</li>
-</ul>
-<p>Test how well your browser implements security standards and features:</p>
-<ul>
-<li><a href="https://browseraudit.com">BrowserAudit</a></li>
-</ul>
-<p>Test the sites you visit for trackers:</p>
-<ul>
-<li><a href="https://themarkup.org/ask-the-markup/2020/09/22/i-scanned-the-websites-i-visit-with-blacklight-and-its-horrifying-now-what">Blacklight</a></li>
-</ul>
-<p>Don’t put too much weight into the results as people often check their
-fingerprint, change one metric and check it again over and over skewing the
-results. It is helpful for knowing the fingerprint values that trackers track.</p>
-<ul>
-<li>
-<p><a href="https://forum.torproject.org/t/browser-fingerprinting/1228/25">Browser Fingerprinting Tor Forum</a></p>
-</li>
-<li>
-<p><a href="https://madaidans-insecurities.github.io/browser-tracking.html">Madaidans Hot Take on Browser Tracking</a></p>
-</li>
-</ul>
-<p>You can use something like <a href="https://noscript.net/">NoScript</a> to block
-JavaScript, preventing the scripts from running that do most of the
-fingerprinting. Extensions can make you more unique but it’s a give and take.</p>
-<p>The following website lists the tracking protection mechanisms implemented by
-the major browsers and browser engines:</p>
-<ul>
-<li><a href="https://www.cookiestatus.com/">Cookie Status</a></li>
-</ul>
-<hr />
-<h2>Metasearch Engines</h2>
-<ul>
-<li><a href="https://en.wikipedia.org/wiki/Metasearch_engine">Wikipedia Metasearch engine</a></li>
-</ul>
-<h3>SearXNG</h3>
-<p><strong>SearXNG</strong> an open-source, privacy-respecting metasearch engine that aggregates
-results from various search services, such as Google, DuckDuckGo, etc without
-tracking you or profiling your searches. You can add SearXNG to firefox by going
-to <code>about:preferences#search</code> and at the bottom click <code>Add</code>, URL will be
-<code>https://searx.be/search?q=%s</code>.</p>
-<blockquote>
-<p>❗️ NOTE: The above searx is the default and doesn’t give many relevant
-results. To get relevant results find a
-<a href="https://searx.space/">public instance</a> with a good rating from your area and
-add the <code>search?q=%s</code> to the end of it. For example, I’m using
-<code>https://priv.au/search?q=%s</code>. This gives much better results than DDG in my
-opinion.</p>
-</blockquote>
-<p>SearXNG is a bit different, you can choose which search engine you want for your
-current search with <code>!ddg search term</code> to use duckduckgo for example.</p>
-<ul>
-<li><a href="https://github.com/searxng/searxng?tab=readme-ov-file">searxng repo</a>
-<ul>
-<li>
-<p><a href="https://docs.searxng.org/admin/installation.html">Install guide</a></p>
-</li>
-<li>
-<p><a href="https://docs.searxng.org/admin/settings/index.html">Configuration guide</a></p>
-</li>
-</ul>
-</li>
-</ul>
-<hr />
-<p><strong>Startpage</strong> is another metasearch engine that I’ve heard good things about.</p>
-<ul>
-<li>
-<p><a href="https://www.startpage.com/privacy-please/">Startpage Privacy Please!</a></p>
-</li>
-<li>
-<p><a href="https://www.startpage.com/privacy-please/startpage-articles/easy-privacy-control-across-the-internet-introducing-startpage-privacy-protection">Startpage Privacy Protection</a></p>
-</li>
-</ul>
-<hr />
-<h2>Defenses</h2>
-<h4>Encrypted DNS</h4>
-<p>DNS (Domain Name System) resolution is the process of translating a website’s
-domain name into its corresponding IP address. By default, this traffic isn’t
-encrypted, which means anyone on the network, from your ISP to potential
-hackers, can see the websites you’re trying to visit. <strong>Encrypted DNS</strong> uses
-protocols to scramble this information, protecting your queries and responses
-from being intercepted and viewed by others.</p>
-<blockquote>
-<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
-what domain you looked up via DNS that it’s effectiveness is questionable
-without also using Tor or a VPN. Encrypted DNS will not help you hide any of
-your browsing activity.</p>
-</blockquote>
-<p>There are 3 main types of DNS protection:</p>
-<ul>
-<li>
-<p><strong>DNS over HTTPS (DoH)</strong>: Uses the HTTPS protocol to encrypt data between the
-client and the resolver.</p>
-</li>
-<li>
-<p><strong>DNS over TLS (DoT)</strong>: Similar to (DoH), differs in the methods used for
-encryption and delivery using a separate port from HTTPS.</p>
-</li>
-<li>
-<p><strong>DNSCrypt</strong>: Uses end-to-end encryption with the added benefit of being able
-to prevent DNS spoofing attacks.</p>
-</li>
-</ul>
-<p>Useful resources:</p>
-<details>
-<summary> ✔️ Click to Expand DNS Resources </summary>
-<ul>
-<li>
-<p><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">Domain Name System (DNS)</a></p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/DNS_over_HTTPS">Wikipedia DNS over HTTPS (DoH)</a></p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/DNS_over_TLS">Wikipedia DNS over TLS (DoT)</a></p>
-</li>
-<li>
-<p><a href="https://blog.cloudflare.com/dns-encryption-explained/">Cloudflare Dns Encryption Explained</a></p>
-</li>
-<li>
-<p><a href="https://nordvpn.com/blog/encrypted-dns-traffic/">NordVPN Encrypted Dns Traffic</a></p>
-</li>
-</ul>
-<p><strong>Hot Take</strong>:</p>
-<ul>
-<li><a href="https://madaidans-insecurities.github.io/encrypted-dns.html">Encrypted DNS is ineffective without a VPN or Tor by madaidan</a></li>
-</ul>
-</details>
-<p>I recommend either setting up dnscrypt-proxy:</p>
-<ul>
-<li><a href="https://mako088.github.io/arch/enc_dns.html">dnscrypt-proxy on Arch</a></li>
-</ul>
-<p>Or set Firefox’s DNS over HTTPS to Max protection with a custom resolver:</p>
-<p>In <code>about:preferences#privacy</code> scroll down to <code>DNS over HTTPS</code>, Select
-<code>Max Protection</code> -&gt; <code>Custom</code> -&gt; <code>https://dns.quad9.net/dns-query</code></p>
-<hr />
-<h4>Enhanced Tracking Protection (ETP)</h4>
-<p>Browsers that have a form of tracking protection typically use lists of known
-trackers and match each outgoing request against these lists.</p>
-<p>Enhanced Tracking Protection is how you deal with cookies and more on Firefox.</p>
-<ul>
-<li>
-<p><a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop">Enhanced Tracking Protection (ETP)</a>
-blocks known “third-party requests” to companies that participate in
-fingerprinting, according to the
-<a href="https://disconnect.me/trackerprotection">Disconnect List</a></p>
-<ul>
-<li>
-<p>In <code>about:preferences#privacy</code>, setting Enhanced Tracking Protection to
-either Strict or Custom enables FPP as well, explained further down.</p>
-</li>
-<li>
-<p><a href="https://blog.mozilla.org/mozilla/firefox-rolls-out-total-cookie-protection-by-default-to-all-users-worldwide/">Total Cookie Protection</a>
-is enabled by default in Standard mode.</p>
-</li>
-<li>
-<p>When you set ETP to Strict, it includes
-<a href="https://blog.mozilla.org/security/2021/08/10/firefox-91-introduces-enhanced-cookie-clearing/">Enhanced Cookie Clearing</a>,
-which improves on the removal of third-party cookies, as well as Bounce
-Tracking Protection that prevents redirect trackers.</p>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="https://wiki.mozilla.org/Security/FirstPartyIsolation">First-Party Isolation</a>
-From the Tor Uplift Project.</p>
-</li>
-</ul>
-<h3>Resist Fingerprinting</h3>
-<ul>
-<li>
-<p><a href="https://wiki.mozilla.org/Security/Fingerprinting">Fingerprinting</a></p>
-</li>
-<li>
-<p>RFP (Resist Fingerprinting) set in <code>about:config</code> with
-<code>privacy.resistFingerprinting</code>. Resist Fingerprinting alters the following:</p>
-<ul>
-<li>
-<p>The timezone is reported as UTC or Icelandic</p>
-</li>
-<li>
-<p>Locale is reported as en-US</p>
-</li>
-<li>
-<p>Several properties of the navigator object are fixed, including the hardware
-concurrency value, application version and build ID. The User Agent version
-is reported to be the major version (for example, 119.0 instead of 119.1)</p>
-<ul>
-<li>And much more…</li>
-</ul>
-</li>
-<li>
-<p>You can set <code>privacy.resistFingerprinting.pbMode</code> (private-browsing) without
-<code>privacy.resistFingerprinting</code> and still get certain Resist Fingerprinting
-behaviors on normal windows, because it’s impossible to separate these
-behaviors per-window.</p>
-</li>
-</ul>
-</li>
-<li>
-<p>FPP (Fingerprinting Protection) is enabled in normal browsing when Enhanced
-Tracking Protection is set to Strict. Both Known Fingerprinters and Suspected
-Fingerprinters Protection are enabled in Private Browsing and when ETP is set
-to strict. On the Custom level of ETP you can toggle on/off different
-features.</p>
-</li>
-</ul>
-<hr />
-<h2>Disable JavaScript</h2>
-<p>Most trackers run on JavaScript, thus blocking JavaScript prevents them from
-gathering much of the info needed to form a browser fingerprint.</p>
-<ul>
-<li>
-<p><a href="https://noscript.net/">NoScript</a> lets you selectively block scripts on
-websites. Its core function is to block all scripts by default on websites,
-allowing you to manually enable scripts on trusted sites.</p>
-<p><a href="https://blog.jeaye.com/2017/11/30/noscript/">NoScript PrivacyGuides</a> should</p>
-</li>
-<li>
-<p><a href="https://ublockorigin.com/">uBlock Origin</a> also lets you block JavaScript,
-just be aware that many sites may break so you’ll have to whitelist
-selectively.</p>
-</li>
-</ul>
-<h2>Disable WebRTC</h2>
-<p>The main reason people disable WebRTC is to prevent an IP address leak. WebRTC
-is designed for real-time communication like video calls and file sharing. If
-you don’t use those features, it makes sense to disable it.</p>
-<p>Disabling WebRTC eliminates specific data points that trackers use, reducing
-entropy &amp; the uniqueness of your fingerprint.</p>
-<p>In <code>about:preferences#privacy</code> -&gt; <code>Privacy &amp; Security</code> -&gt; <code>Permissions</code>. Click
-<code>Settings</code>.</p>
-<ul>
-<li>
-<p><input disabled="" type="checkbox" checked=""/>
-Block new requests asking to access your microphone</p>
-</li>
-<li>
-<p><input disabled="" type="checkbox" checked=""/>
-Block new requests asking to access your camera</p>
-</li>
-<li>
-<p>You may also want to block Location, but that isn’t involving WebRTC.</p>
-</li>
-</ul>
-<p>You can also use the master switch by going to <code>about:config</code> and setting
-<code>media.peerconnection.enabled</code> to <code>false</code></p>
-<p><code>user.js</code> settings related to WebRTC:</p>
-<pre><code class="language-js">/* 2002: force WebRTC inside the proxy [FF70+] ***/
-user_pref("media.peerconnection.ice.proxy_only_if_behind_proxy", true);
- * When using a system-wide proxy, it uses the proxy interface
- * [1] https://developer.mozilla.org/docs/Web/API/RTCIceCandidate
- * [2] https://wiki.mozilla.org/Media/WebRTC/Privacy ***/
-user_pref("media.peerconnection.ice.default_address_only", true);
-user_pref("media.peerconnection.enabled", false);
-user_pref("media.peerconnection.ice.obfuscate_host_address", true);
-/* 2004: force exclusion of private IPs from ICE candidates [FF51+]
- * [SETUP-HARDEN] This will protect your private IP even in TRUSTED scenarios after you
- * grant device access, but often results in breakage on video-conferencing platforms ***/
-user_pref("media.peerconnection.ice.no_host", true);
-</code></pre>
-<hr />
-<h2>Disable Canvas Fingerprinting</h2>
-<p>Canvas Fingerprinting uses the HTML5 <code>&lt;canvas&gt;</code> element to generate a
-fingerprint. It gets your device to render an image or text on a canvas and then
-reads the pixel data. Since devices render things differently, those differences
-are identifiable.</p>
-<p>When the pref <code>privacy.resistFingerprinting</code> is set to <code>true</code>, restricts APIs
-commonly used for fingerprinting, including the HTML5 Canvas API. When enabled,
-it returns a randomized or generic canvas output to prevent unique
-identification.</p>
-<hr />
-<h2>Disable WebGL</h2>
-<p>Similar to canvas fingerprinting, this technique uses the WebGL API to render 2D
-and 3D graphics. The way your system renders these graphics provides information
-about your GPU and graphics drivers, which contributes to your unique
-fingerprint.</p>
-<blockquote>
-<p>❗️ NOTE: It’s unnecessary to disable webgl if you’re already using RFP and
-will likely make you stand out more because most people don’t disable it.</p>
-</blockquote>
-<p>It can be disabled in <code>about:config</code> by setting <code>webgl.disabled</code> to <code>true</code>.</p>
-<hr />
-<h2>Install Firefox/LibreWolf &amp; ArkenFox</h2>
-<blockquote>
-<p>⚠️ Firefox offers excellent privacy and customization but falls behind
-Chromium-based browsers in isolation and patch timing. Compartmentalization
-can help balance strong privacy with optimal security by using Brave or
-Chromium for high-risk browsing alongside Firefox for general and
-privacy-focused tasks.</p>
-</blockquote>
-<p>Download Firefox from the
-<a href="https://ftp.mozilla.org/pub/firefox/releases/">Mozilla FTP site</a> if you are
-worried about the download token, the FTP site lets you download the version you
-want without a token.</p>
-<p>For example, for the latest firefox as of 09-30-25 for the US:</p>
-<p><code>https://download.mozilla.org/?product=firefox-latest&amp;os=linux64&amp;lang=en-US</code></p>
-<p><strong>LibreWolf</strong> is an open-source fork of Firefox with a strong focus on privacy,
-security, and user freedom. LibreWolf enables always HTTPS, includes
-uBlockOrigin, and more providing strong defaults.</p>
-<details>
-<summary> ✔️ Click to Expand Arkenfox How To </summary>
-<p>The process is the same for both Firefox &amp; LibreWolf. I like LibreWolf for it’s
-strong defaults but may lag behind Firefox getting security patches.</p>
-<pre><code class="language-bash">paru -S librewolf-bin
-</code></pre>
-<p>Read the <a href="https://github.com/arkenfox/user.js/wiki">ArkenFox Wiki</a></p>
-<h2>Apply</h2>
-<p>Open <code>about:support</code> and look for <code>Profile Directory</code> under <code>Application Basics</code>
-Select <code>Open Directory</code>, it will bring you to somewhere like
-<code>~/.librewolf/pefoo8xx.default-default/</code> and that is where you place the
-<code>user.js</code>.</p>
-<p>Place the following files in your <code>Profile Directory</code>:</p>
-<ol>
-<li>
-<p><a href="https://github.com/arkenfox/user.js/blob/master/user.js">Arkenfox user.js</a>
-Read through the <code>user.js</code>, not all settings are applied by default such as
-RFP Fingerprinting protection.</p>
-</li>
-<li>
-<p><a href="https://github.com/arkenfox/user.js/blob/master/updater.sh">updater.sh</a></p>
-</li>
-<li>
-<p><a href="https://github.com/arkenfox/user.js/blob/master/prefsCleaner.sh">prefsCleaner.sh</a></p>
-</li>
-<li>
-<p>Also create your own <code>user-overrides.js</code> with any changes you want to make to
-the default <code>user.js</code>. These changes are amended to the <code>user.js</code> and applied
-last enabling them to override the default settings. It’s best to make
-changes here so that updating the Arkenfox <code>user.js</code> doesn’t make you lose
-all of your customizations.</p>
-</li>
-</ol>
-<p>Example <code>user-overrides.js</code> spoofing the user agent:</p>
-<blockquote>
-<p>❗️ This is just an example, always check for common useragent strings
-yourself. Read the Arkenfox Wiki!</p>
-</blockquote>
-<pre><code class="language-js">&lt;!-- user_pref( --&gt;
-  &lt;!-- "general.useragent.override", --&gt;
-  &lt;!-- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", --&gt;
-&lt;!-- ); --&gt;
-// Disable Activity Stream on new windows and tab pages
-user_pref("browser.newtab.preload", false);
-// Enhanced Tracking Protection (ETP)
-user_pref("privacy.bounceTrackingProtection.mode", 1); // [FF131+] [ETP FF133+]
-user_pref("privacy.trackingprotection.enabled", true);
-// Resist Fingerprinting (RFP)
-user_pref("privacy.resistFingerprinting", true); // [FF41+]
-user_pref("privacy.resistFingerprinting.pbmode", true); // [FF114+]
-// WebRTC
-user_pref("media.peerconnection.enabled", false);
-user_pref("media.peerconnection.ice.default_address_only", true);
-// WebGL
-user_pref("webgl.disabled", true);
-// Geolocation
-user_pref("geo.enabled", false);
-user_pref("full-screen-api.enabled", false);
-user_pref(
-  "geo.provider.network.url",
-  "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%",
-);
-// Disable studies
-user_pref("app.sheild.optoutstudies.enabled", false);
-// Master Switches, Be Careful
-user_pref("browser.safebrowsing.malware.enabled", false);
-user_pref("browser.safebrowsing.phishing.enabled", false);
-user_pref("browser.safebrowsing.provider.google4.gethashURL", "");
-user_pref("browser.safebrowsing.provider.google4.updateURL", "");
-user_pref("browser.safebrowsing.provider.google.gethashURL", "");
-user_pref("browser.safebrowsing.provider.google.updateURL", "");
-user_pref("browser.safebrowsing.provider.google4.dataSharingURL", "");
-user_pref("signon.rememberSignons", false);
-user_pref("browser.xul.error_pages.expert_bad_cert", true);
-//* [NOTE] Will cause breakage: older modems/routers and some sites e.g banks, vimeo, icloud, instagram ***/
-user_pref("network.http.referer.XOriginPolicy", 2);
-user_pref("network.http.sendRefererHeader", 1);
-// 0 is most strict:
-user_pref("network.http.referer.trimmingPolicy", 0);
-user_pref("network.http.referer.XOriginTrimmingPolicy", 2);
-</code></pre>
-<p>To apply your prefs you have to run the <code>updater.sh</code> script.</p>
-<pre><code class="language-bash">~/.mozilla/firefox/v5kwl3c0.default-release&gt; ./updater.sh
-
-                ############################################################################
-                ####                                                                    ####
-                ####                          arkenfox user.js                          ####
-                ####       Hardening the Privacy and Security Settings of Firefox       ####
-                ####           Maintained by @Thorin-Oakenpants and @earthlng           ####
-                ####            Updater for macOS and Linux by @overdodactyl            ####
-                ####                                                                    ####
-                ############################################################################
-
-
-Documentation for this script is available here: https://github.com/arkenfox/user.js/wiki/5.1-Updater-[Options]#-maclinux
-
-Please observe the following information:
-    Firefox profile:  /home/jr/.mozilla/firefox/v5kwl3c0.default-release
-    Available online: * version: 140
-    Currently using:  * version: 140
-
-
-This script will update to the latest user.js file and append any custom configurations from user-overrides.js. Continue Y/N?
-y
-
-Status: user.js has been backed up and replaced with the latest version!
-Status: Override file appended: user-overrides.js
-</code></pre>
-<h2>Check</h2>
-<p>Launch LibreWolf or Firefox and press <code>Ctrl-Shift-J</code> to launch Browser Console
-Mode, and look for any errors.</p>
-<p>Go to <code>about:config</code> -&gt; [x] <code>Show only modified preferences</code>. You should see
-<code>SUCCESS: No no he's not dead, he's, he's restin'!</code></p>
-</details>
-<h3>User Agent Spoofing</h3>
-<blockquote>
-<p>❗️ NOTE: Spoofing your useragent alone likely isn’t worth the protections you
-lose from disabling <code>resistFingerprinting</code>. <code>resistFingerprinting</code> spoofs many
-different fingerprinting aspects. If you don’t get it right, you will get
-captcha requests constantly.</p>
-</blockquote>
-<p>Research what the most common user agent is. You’ll need to disable
-<code>privacy.resistFingerprinting</code> for this to work.</p>
-<p>Place the user agent string in <code>general.useragent.override</code> something like:
-<code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36</code>
-<a href="https://www.whatsmyuseragent.com">https://www.whatsmyuseragent.com</a></p>
-<p><a href="https://www.useragentstring.com">https://www.useragentstring.com</a></p>
-<hr />
-<h2>uBlock Origin</h2>
-<p>BetterFox does a great job explaining how to use uBlock with solid
-recommendations.</p>
-<ul>
-<li><a href="https://github.com/yokoffing/filterlists?tab=readme-ov-file#guidelines">BetterFox uBlock filterlists</a></li>
-</ul>
-<p>If you wanted to apply the
-<a href="https://github.com/yokoffing/filterlists/blob/main/privacy_essentials.txt">Privacy Essentials</a>
-list you would click
-<a href="https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt&amp;title=Privacy%20Essentials">subscribe</a>,
-which launches the uBlock asset viewer where you can see all of the domains that
-will be blocked before clicking <code>Subscribe</code> again to apply them.</p>
-<h3>Adding other lists</h3>
-<ul>
-<li>
-<p><a href="https://github.com/hagezi/dns-blocklists">Hagezi dns-blocklists</a></p>
-</li>
-<li>
-<p><a href="https://github.com/ppfeufer/adguard-filter-list">adguard-filter-list</a></p>
-</li>
-</ul>
-<p>Click the uBlock logo, Settings, Filter lists, scroll to the bottom and choose
-Import…, Paste the url of your chosen list, and click Apply changes.</p>
-<p>For example, Arkenfox suggests adding the Actually Legitimate URL Shortener
-Tool. Add
-<a href="https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt">https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt</a>
-to the Import… section and click Apply changes. If you scroll up, you’ll see
-that it was added and chosen.</p>
-<p>Setup your <a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode">Blocking mode</a></p>
-<p>Many opt for
-<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-medium-mode">medium mode</a>.
-To do so you need to:</p>
-<p><strong>Settings pane</strong>:</p>
-<ul>
-<li>Open the dashboard, and choose I am an advanced user.</li>
-</ul>
-<p><strong>Filter lists pane</strong>:</p>
-<ul>
-<li>
-<p>All of uBO’s filter lists: checked</p>
-</li>
-<li>
-<p>EasyList: checked</p>
-</li>
-<li>
-<p>Peter Lowe’s Ad server list: checked</p>
-</li>
-<li>
-<p>EasyPrivacy: checked</p>
-</li>
-<li>
-<p>Online Malicious URL Blocklist: checked</p>
-</li>
-</ul>
-<p><strong>My rules pane (4th pane from the left)</strong>:</p>
-<p>Underneath Temporary rules add, you literally type this in:</p>
-<ul>
-<li>
-<p>Add <code>* * 3p-script block</code></p>
-</li>
-<li>
-<p>Add <code>* * 3p-frame block</code></p>
-</li>
-<li>
-<p>Click <code>Save</code></p>
-</li>
-<li>
-<p>Click <code>&lt;- Commit</code> (Not required on phone)</p>
-</li>
-</ul>
-<p><strong>Fallback to
-<a href="https://github.com/gorhill/uBlock/wiki/Blocking-mode:-easy-mode">easy mode</a></strong></p>
-<p>Click the uBlock logo while on the site you want to use easy mode on. You’ll see
-the power button to the top right, the Global rules and the Local rules which
-start 3 boxes from the left. Click the box under the Local rules for 3rd-party
-scripts. The box will change colors, dark gray = NOOP (No Operation). This tells
-uBO to ignore the aggressive global block for this site, and let the normal
-filter lists handle the blocking.</p>
-<p>You can also disable JavaScript in My rules as needed.</p>
-<hr />
-<h2>Set up a SOCKS5 Proxy with Arti</h2>
-<blockquote>
-<p>❗️ NOTE: This is one example of using a SOCKS5 proxy to circumvent censorship
-or add additional privacy without the Tor Browser. You can also route other
-apps through the proxy, such as email clients, messaging apps, torrent
-clients, and more.</p>
-</blockquote>
-<ol>
-<li>Clone the arti repo:</li>
-</ol>
-<pre><code class="language-bash"># clone the repo
-git clone https://gitlab.torproject.org/tpo/core/arti.git
-
-# navigate to the directory
-cd arti
-</code></pre>
-<hr />
-<ol start="2">
-<li>To build the Arti binary, compile the code and generate the executable run:</li>
-</ol>
-<p>These are the safer build options so you can leave the arti repo in your home
-directory without it leaking your username:</p>
-<pre><code class="language-bash">RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=." \
-   cargo build --release -p arti
-</code></pre>
-<hr />
-<ol start="3">
-<li>To allow Arti SOCKS proxy traffic you need to add a rule permitting incoming
-connections to port 9150.</li>
-</ol>
-<p>For nftables, you would open <code>/etc/nftables.conf</code> and add:</p>
-<pre><code class="language-conf">chain input {
-  # ...snip...
-
-  # Allow Arti SOCKS proxy (port 9150)
-    tcp dport 9150 ct state new accept
-
-  # ...snip...
-}
-</code></pre>
-<p>Enable it with <code>sudo nft -f /etc/nftables.conf</code></p>
-<hr />
-<ol start="4">
-<li>To run Arti as a SOCKS proxy on port <code>9150</code>, execute:</li>
-</ol>
-<pre><code class="language-bash">./target/release/arti proxy
-</code></pre>
-<hr />
-<ol start="5">
-<li>Configure LibreWolf/Firefox to use the Arti proxy:</li>
-</ol>
-<p>Open LibreWolf or Firefox</p>
-<p>Go to the menu and open <code>Preferences/Settings</code>.</p>
-<p>Scroll to the bottom <code>Network Settings</code> section.</p>
-<p>Click on “<code>Settings...</code>” under Network Settings.</p>
-<p>In the connection settings dialog:</p>
-<p>Select “<code>Manual proxy configuration</code>”.</p>
-<p>For “SOCKS Host”, enter <code>127.0.0.1</code>.</p>
-<p>For the port next to SOCKS Host, enter <code>9150</code>.</p>
-<p>Select the SOCKS version 5 option (<code>SOCKS v5</code>).</p>
-<p>Optionally check the box “<code>Proxy DNS when using SOCKS v5</code>” to route DNS queries
-through the proxy for enhanced privacy.</p>
-<p>Click “<code>OK</code>” to apply the settings.</p>
-<hr />
-<ol start="6">
-<li>Verify Your Proxy Setup Open a new tab and visit <code>https://dnsleaktest.com</code>
-and run an <code>Extended Test</code>.</li>
-</ol>
-<p>Your IP address should now appear as a Tor exit node IP, indicating your traffic
-is routed through the Arti proxy.</p>
-<ul>
-<li>
-<p>Make sure Arti is running in its terminal or background before you start
-browsing.</p>
-</li>
-<li>
-<p>If you close the terminal or stop Arti, your browser will lose the proxy
-connection.</p>
-</li>
-</ul>
-<p>This setup only proxies the configured browser traffic; other apps are not
-affected unless configured similarly.</p>
-<p>This setup turns LibreWolf or Firefox into a Tor-enabled browser without
-installing the Tor Browser Bundle, using the Arti SOCKS proxy instead. It can be
-useful if you want to use a more customizable or alternative browser while still
-accessing the Tor network securely.</p>
-<blockquote>
-<p>⚠️ While using LibreWolf with the Arti SOCKS5 proxy provides network-level
-anonymity by routing traffic through the Tor network, it does not include the
-extensive browser-level privacy and security enhancements found in the
-official Tor Browser. For casual or moderate privacy needs the SOCKS proxy can
-be useful but for stronger anonymity guarantees and protection, the Tor
-Browser is recommended.</p>
-</blockquote>
-<h2>Setup an Arti service to run in the background</h2>
-<blockquote>
-<p>Be careful here, its not as easy to tell if Arti failed for some reason.</p>
-</blockquote>
-<p>Create a service file at <code>/etc/systemd/system/arti.service</code>:</p>
-<p>Replace <code>your-username</code> with your username</p>
-<pre><code class="language-.service">[Unit]
-Description=Arti Tor Proxy Service
-After=network.target
-
-[Service]
-ExecStart=/home/your-username/arti/target/release/arti proxy
-Restart=on-failure
-User=jr
-Group=jr
-WorkingDirectory=/home/your-username/arti
-Environment=RUSTFLAGS="--remap-path-prefix $HOME/.cargo=.cargo --remap-path-prefix $(pwd)=."
-
-[Install]
-WantedBy=multi-user.target
-</code></pre>
-<p>Enable &amp; Start the service:</p>
-<pre><code class="language-bash">sudo systemctl enable arti
-sudo systemctl start arti --now
-</code></pre>
-<p>Ensure its running:</p>
-<pre><code class="language-bash">sudo systemctl status arti
-</code></pre>
-<hr />
-<details>
-<summary> ✔️ Click to Expand Resources </summary>
-<ul>
-<li>
-<p><a href="https://docs.searxng.org/">Welcome to SearXNG</a></p>
-</li>
-<li>
-<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">Firefox Hardening Guide</a></p>
-</li>
-<li>
-<p><a href="https://www.ghacks.net/2015/08/18/a-comprehensive-list-of-firefox-privacy-and-security-settings/">Firefox ghacks</a></p>
-</li>
-<li>
-<p><a href="https://github.com/arkenfox/user.js">ArkenFox user.js</a> Just right IMO.</p>
-</li>
-<li>
-<p><a href="https://github.com/yokoffing/Betterfox">BetterFox user.js</a> Easiest to use
-with less breakage.</p>
-</li>
-<li>
-<p><a href="https://codeberg.org/Narsil/user.js/src/branch/main/desktop">Narsil user.js</a>
-Most hardened.</p>
-</li>
-<li>
-<p><a href="https://www.privacytools.io/private-browser">PrivacyTools.io</a></p>
-</li>
-<li>
-<p><a href="https://privacytests.org/">PrivacyTests.org</a></p>
-</li>
-<li>
-<p><a href="https://github.com/simeononsecurity/FireFox-Privacy-Script">simeononsecurity Firefox-Privacy-Script</a></p>
-</li>
-<li>
-<p><a href="https://anhkhoakz.neocities.org/blog/browsers-for-daily-using/#firefox-but-hardened">Browsers for Daily Using</a></p>
-</li>
-<li>
-<p><a href="https://brainfucksec.github.io/firefox-hardening-guide">brianfucksec firefox-hardening-Guide 2023</a></p>
-</li>
-<li>
-<p><a href="https://simeononsecurity.com/guides/enhance-firefox-security-configuring-guide/">STIG Firefox Hardening</a></p>
-</li>
-</ul>
-<blockquote>
-<p>If you should trust the U.S. Governments recommendations is another story but
-it can be good to compare and contrast with other trusted resources. You’ll
-have to think whether the CISA recommending that everyone uses Signal is solid
-advice or guiding you towards a honeypot, I can’t say for sure.</p>
-</blockquote>
-<ul>
-<li>
-<p><a href="https://stigviewer.com/stigs/mozilla_firefox">Mozilla Firefox Security Technical Implementation Guide</a>
-The STIG for Mozilla Firefox (Security Technical Implementation Guide) is a
-set of security configuration standards developed by the U.S. Department of
-Defense. They are created by the Defense Information Systems Agency (DISA) to
-secure and harden DoD information systems and software.</p>
-</li>
-<li>
-<p><a href="https://thenewoil.org/en/guides/prologue/why/">Privacy, The New Oil (Why Privacy &amp; Security Matter)</a></p>
-</li>
-<li>
-<p><a href="https://www.privacyguides.org/en/">PrivacyGuides</a></p>
-</li>
-<li>
-<p><a href="https://relay.firefox.com/accounts/profile/">Firefox Relay</a> can be used to
-create email aliases that forward to your real email address. The paid plan
-also lets you create phone number aliases that forward to your phone number.</p>
-</li>
-<li>
-<p><a href="https://zebracrossing.narwhalacademy.org/">Zebra Crossing digital safety checklist</a></p>
-</li>
-<li>
-<p><a href="https://datadetoxkit.org/en/privacy/essentials#step-1">DataDetoxKit</a></p>
-</li>
-<li>
-<p><a href="https://datadetoxkit.org/en/privacy/degooglise/">DataDetox Degooglise</a></p>
-</li>
-<li>
-<p><a href="https://tb-manual.torproject.org/">Tor Browser User Manual</a></p>
-</li>
-<li>
-<p><a href="https://gitlab.torproject.org/tpo/team/-/wikis/home">Tor Wiki</a></p>
-</li>
-<li>
-<p><a href="https://blog.torproject.org/">Tor Blog</a></p>
-</li>
-<li>
-<p><a href="https://gitlab.torproject.org/tpo/core/arti/#why-rewrite-tor-in-rust">Arti why-rewrite-tor-in-rust</a></p>
-</li>
-<li>
-<p><a href="https://wiki.mozilla.org/Security/Tor_Uplift/Tracking">The Tor Uplift Project</a></p>
-</li>
-<li>
-<p><a href="https://www.browsercat.com/post/browser-fingerprint-spoofing-explained">BrowserCat Fingerprint Spoofing</a></p>
-</li>
-<li>
-<p><a href="https://cyberinsider.com/firefox-privacy/">cyberinsider Firefox privacy 2025</a></p>
-</li>
-<li>
-<p><a href="https://cyberinsider.com/browser-fingerprinting/">cyberinsider Browser Fingerprinting</a></p>
-</li>
-<li>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/Privacy">Mozilla Web Docs Privacy on the web</a></p>
-</li>
-<li>
-<p><a href="https://adguard-dns.io/en/blog/techtok-9-browser-extensions-and-firewall.html">Adguard Blog Browser Extensions and Firewalls explained</a></p>
-</li>
-<li>
-<p><a href="https://searchfox.org/firefox-main/source/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc">searchfox RFPTargetsDefault</a></p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/Entropy_(computing)">Wikipedia Entropy (computing)</a></p>
-</li>
-<li>
-<p><a href="https://brave.com/blog/">Brave Blog</a></p>
-</li>
-</ul>
-<p><strong>Cheatsheets</strong></p>
-<ul>
-<li>
-<p><a href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html">HTTP Security Response Headers Cheat Sheet</a></p>
-</li>
-<li>
-<p><a href="https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html">Zero Trust Architecture Cheat Sheet</a></p>
-</li>
-<li>
-<p><a href="https://we.riseup.net/riseup+tech/entropy">riseup entropy</a></p>
-</li>
-<li>
-<p><a href="https://www.kicksecure.com/wiki/Dev/Entropy">kicksecure entropy</a></p>
-</li>
-<li>
-<p><a href="https://riseup.net/en/security">riseup Digital Security</a></p>
-</li>
-</ul>
-</details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted Arch Install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<h1>Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</h1>
-<details>
-<summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
-</details>
-<p>The ultimate installation resource is always goint to be the:</p>
-<ul>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
-</li>
-<li>
-<p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
-directory is just the same directory where your Arch Linux ISO file is stored.</p>
-</li>
-</ul>
-<blockquote>
-<p>Always review the Wiki and never just plug random things suggested by me or
-anyone else without first doing your own research.</p>
-</blockquote>
-<p>Edited: 09-25-25 Removed encrypted swap section. Big usability downside IMO.</p>
-<details>
-<summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
-<blockquote>
-<p>❗ NOTE: If you only want to verify the ISO once, you can temporarily import
-the public key, verify the signature, and then you don’t need to keep the key
-permanently in your keyring or sign it locally. This example is from the last
-release, but the process is the same.</p>
-</blockquote>
-<p>With <code>sequoia-sq</code>, you can get the Arch release signing key with:</p>
-<pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
-</code></pre>
-<p>Export the chosen key to a <code>.pgp</code> file:</p>
-<pre><code class="language-bash">sq cert export --keyring=release-key.pgp --cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp
-</code></pre>
-<p>Import into your keychain:</p>
-<pre><code class="language-bash">gpg --import pierre-archlinux.pgp
-gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
-gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
-gpg: Total number processed: 1
-gpg:               imported: 1
-gpg: marginals needed: 3  completes needed: 1  trust model: pgp
-gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
-gpg: next trustdb check due at 2026-08-23
-</code></pre>
-<ul>
-<li>Now, you should see <code>&lt;pierre@archlinux.org&gt;</code> and his keys when you run
-<code>gpg --list-keys</code></li>
-</ul>
-<p>Finally, verify the signature:</p>
-<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
-Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
-
-1 authenticated signature.
-</code></pre>
-<blockquote>
-<p>❗ To ensure the key is authentic and not spoofed, verify that the key
-fingerprint matches the official Arch Linux signing key fingerprint, which can
-is linked below and on the Arch website.</p>
-</blockquote>
-<p>This shows that the signature was made by the key with the ID
-<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz)</code></p>
-<p>You can check the keys fingerprint with:</p>
-<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
-</code></pre>
-<ul>
-<li>Verify it against the
-<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
-</ul>
-<p>Verify it against the Arch Linux master-keys</p>
-<p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
-that the key used to sign is trusted in our keyring.</p>
-<p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
-<p>We have successfully verified that the file was signed by Pierr’s official Arch
-Linux key and has not been tampered with.</p>
-<p>The following is only if you currently already have keys on your gpg keyring.</p>
-<details>
-<summary> ☑️ Click to expand Key Signing and Publishing Example </summary>
-<p>List your keys to get the arch keyID:</p>
-<pre><code class="language-bash">gpg --list-keys
-# ... snip ...
-pub   ed25519/0x76A5EF9054449A5C 2022-10-31 [SC] [expires: 2037-10-27]
-      Key fingerprint = 3E80 CA1A 8B89 F69C BA57  D98A 76A5 EF90 5444 9A5C
-uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.org&gt;
-uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.de&gt;
-sub   ed25519/0xD6D13C45BFCFBAFD 2022-10-31 [A] [expires: 2037-10-27]
-sub   cv25519/0x7F56ADE50CA3D899 2022-10-31 [E] [expires: 2037-10-27]
-</code></pre>
-<p>Sign the key:</p>
-<pre><code class="language-bash">gpg --sign-key 0x76A5EF9054449A5C
-</code></pre>
-<p>Now you can export and publish the new public key and send it to a keyserver:</p>
-<pre><code class="language-bash">gpg --export --armor 0x76A5EF9054449A5C &gt; archlinux-signed.asc
-gpg --send-keys 0x76A5EF9054449A5C
-</code></pre>
-<p>The more people that verify, sign, and re-export and publish their keys the
-better for the web of trust that gpg uses making the network more secure for
-everyone.</p>
-</details>
-</details>
-<hr />
-<ol>
-<li><strong>Connect to Wi-Fi</strong>:</li>
-</ol>
-<pre><code class="language-bash">iwctl
-[iwd]# device list
-[iwd]# station wlan0 scan
-[iwd]# station wlan0 connect NETGEAR80
-# Enter your Password
-# Check Connection
-[iwd]# station wlan0 show
-[iwd]# exit
-</code></pre>
-<pre><code class="language-bash">ping -c 3 archlinux.org
-</code></pre>
-<hr />
-<ol start="2">
-<li><strong>Update package databases and mirrorlist</strong>:</li>
-</ol>
-<pre><code class="language-bash">pacman -Syyu
-</code></pre>
-<p>Save a backup of your current mirrorlist so we can safely update it:</p>
-<pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-</code></pre>
-<pre><code class="language-bash">pacman -S reflector
-reflector --list-countries
-# Example if you live in the US
-reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
-</code></pre>
-<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
-both HTTP and HTTPS are used.</p>
-<p>NOTE: This can take a bit and you can expect some failures..</p>
-<hr />
-<ol start="3">
-<li><strong>Set keyboard layout, font, and system clock</strong>:</li>
-</ol>
-<p>Default keymap is US, if you need something different:</p>
-<pre><code class="language-bash">localectl list-keymaps
-loadkeys &lt;chosen-map&gt;
-# Increase font size
-setfont ter-132b
-</code></pre>
-<pre><code class="language-bash">sudo pacman -S chrony
-</code></pre>
-<p><code>/etc/chrony.conf</code>:</p>
-<pre><code class="language-conf"># Copyright © 2014-2025 GrapheneOS
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-server time.cloudflare.com iburst nts
-server ntppool1.time.nl iburst nts
-server nts.netnod.se iburst nts
-server ptbtime1.ptb.de iburst nts
-server time.dfm.dk iburst nts
-server time.cifelli.xyz iburst nts
-
-minsources 3
-authselectmode require
-
-# EF
-dscp 46
-
-driftfile /var/lib/chrony/drift
-dumpdir /var/lib/chrony
-ntsdumpdir /var/lib/chrony
-
-leapseclist /usr/share/zoneinfo/leap-seconds.list
-makestep 1.0 3
-
-rtconutc
-rtcsync
-
-cmdport 0
-
-noclientlog
-</code></pre>
-<p>The above setup uses Network Time Security (NTS) and is a more modern safer way
-to synchronize time using chrony.</p>
-<pre><code class="language-bash">sudo systemctl disable --now systemd-timesyncd
-sudo systemctl enable --now chronyd
-</code></pre>
-<pre><code class="language-bash">timedatectl set-ntp true
-timedatectl list-timezones
-# Example
-sudo timedatectl set-timezone America/New_York
-</code></pre>
-<hr />
-<ol start="4">
-<li><strong>Partition your Disk</strong>:</li>
-</ol>
-<p>The only required partitions are one for the root directory <code>/</code> (typically <code>1G</code>)
-and one for booting in UEFI mode, an EFI system partition (typically the rest of
-the space left).</p>
-<p>In this section, I’ll assume that you’re starting with a clean slate. If you’re
-not, you can use your existing partitions if they meet the above requirements or
-delete them.</p>
-<p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
-filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
-until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
-to save your changes.</p>
-<p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
-<pre><code class="language-bash">fdisk -l
-</code></pre>
-<pre><code class="language-bash">cfdisk /dev/nvme0n1
-</code></pre>
-<ul>
-<li>
-<p>Select -&gt; <code>[ Free Space ]</code></p>
-<ul>
-<li>
-<p>Select -&gt; <code>[ New ]</code></p>
-</li>
-<li>
-<p>Partition size: <code>1G</code></p>
-</li>
-<li>
-<p>Type -&gt; <code>EFI System</code></p>
-</li>
-</ul>
-</li>
-<li>
-<p>Select -&gt; <code>[ Free Space ]</code></p>
-<ul>
-<li>
-<p>Partition size: The rest of the space</p>
-</li>
-<li>
-<p>Type -&gt; <code>Linux filesystem</code></p>
-</li>
-<li>
-<p>Select -&gt; <code>[ Write ]</code></p>
-</li>
-<li>
-<p>Select -&gt; <code>[ Quit ]</code></p>
-</li>
-</ul>
-</li>
-</ul>
-<hr />
-<ol start="5">
-<li><strong>Format the EFI partition as FAT32</strong>:</li>
-</ol>
-<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
-</code></pre>
-<p>Leave the root partition unformatted for the next step.</p>
-<hr />
-<ol start="6">
-<li><strong>Encrypt the Root partition and Open it</strong>:</li>
-</ol>
-<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
-cryptsetup open /dev/nvme0n1p2 cryptroot
-</code></pre>
-<p>Create a filesystem:</p>
-<pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
-</code></pre>
-<p>If you mount the filesystem with compression before running <code>genfstab</code>, it will
-automatically add the chosen compression to the <code>fstab</code>.</p>
-<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot  # Mount EFI partition at /mnt/boot
-mount -o compress=zstd /dev/mapper/cryptroot /mnt
-</code></pre>
-<hr />
-<h2>Install the Base System on <code>/mnt</code> with <code>pacstrap</code></h2>
-<p>If you prefer Nvim or a hardened kernel, change it here.</p>
-<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr systemd-ukify
-</code></pre>
-<hr />
-<ol start="7">
-<li><strong>Generate the Filesystem Table</strong>:</li>
-</ol>
-<p>The EFI and root partitions need to be mounted before you generate the
-filesystem table in the next step.</p>
-<pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
-#
-hx /mnt/etc/fstab
-cat /mnt/etc/fstab
-</code></pre>
-<p>Fix security hole and harden <code>/boot</code> permissions by adding
-<code>fmask=0137, dmask=0027</code>:</p>
-<pre><code class="language-bash">hx /mnt/etc/fstab
-</code></pre>
-<p>Example</p>
-<pre><code class="language-fstab"># Static information about the filesystems.
-# See fstab(5) for details.
-
-# &lt;file system&gt; &lt;dir&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;
-# /dev/mapper/cryptroot
-UUID=6d68a2bf-34ea-4adc-86d5-cb1d56de44a4	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/	0 0
-
-# /dev/nvme0n1p1
-UUID=B88B-844F      	/boot     	vfat      	rw,relatime,fmask=0137,dmask=0027,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
-</code></pre>
-<pre><code class="language-bash">chmod 700 /boot
-chmod 600 /boot/loader/random-seed
-</code></pre>
-<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn’t you’ll
-need to ensure both partitions are mounted and regenerate your fstab again with
-<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
-<hr />
-<ol start="8">
-<li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
-</ol>
-<pre><code class="language-bash">arch-chroot /mnt
-</code></pre>
-<p>Create a user:</p>
-<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
-passwd yourusername
-</code></pre>
-<p>Create an admin password:</p>
-<pre><code class="language-bash">passwd
-</code></pre>
-<p>Enable sudo for wheel group:</p>
-<p>In <code>/etc/sudoers</code> uncomment the line:</p>
-<pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
-</code></pre>
-<hr />
-<ol start="9">
-<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>sd-encrypt</code> hook
-before the <code>filesystems</code> attribute.</li>
-</ol>
-<ul>
-<li>
-<p>Locate the <code>HOOKS</code> line</p>
-</li>
-<li>
-<p>Insert <code>encrypt</code> <strong>before</strong> filesystems</p>
-</li>
-</ul>
-<pre><code class="language-bash">vim /etc/mkinitcpio.conf
-</code></pre>
-<p>To use <code>sd-encrypt</code>, it is necessary to replace <code>udev</code> with <code>systemd</code> and if you
-require a different keyboard layout from US <code>sd-vconsole</code> is needed.</p>
-<pre><code class="language-bash"># mkinitcpio.conf
-# *IF* you use an nvme drive
-MODULES=(nvme)
-FILES=(/etc/crypttab.initramfs /etc/vconsole.conf)
-# ... snip ...
-HOOKS=(base systemd autodetect microcode modconf kms keyboard keymap consolefont sd-vconsole block sd-encrypt filesystems fsck systemd-ukify)
-# ... snip ...
-</code></pre>
-<p>Create <code>/etc/crypttab.initramfs</code>:</p>
-<pre><code class="language-initramfs">cryptroot UUID=your-uuid none luks,discard
-</code></pre>
-<hr />
-<p>Create <code>/etc/vconsole.conf</code>:</p>
-<p>For example <code>KEYMAP=fr</code> is french</p>
-<pre><code class="language-conf">KEYMAP=us
-FONT=lat9w-16
-</code></pre>
-<hr />
-<p>Edit <code>/etc/mkinitcpio.d/linux-zen.preset</code>, this enables <code>mkinitcpio -P</code> to
-generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
-<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-zen' package
-
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-zen"
-
-PRESETS=('default' 'fallback')
-# PRESETS=('default')
-
-# default_config="/etc/mkinitcpio.conf"
-# default_image="/boot/initramfs-linux-zen.img"
-default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
-default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
-
-#fallback_config="/etc/mkinitcpio.conf"
-#fallback_image="/boot/initramfs-linux-zen-fallback.img"
-fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
-fallback_options="-S autodetect"
-</code></pre>
-<p>Generate the initial RAM Filesystem (initramfs) image.</p>
-<pre><code class="language-bash">mkinitcpio -P
-</code></pre>
-<blockquote>
-<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
-&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
-Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
-<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
-</blockquote>
-<hr />
-<ol start="10">
-<li><strong>Install systemd-boot and setup Unified Kernel Image</strong>, (while still in
-chroot environment):</li>
-</ol>
-<p>Ensure your UEFI variables are accessible:</p>
-<pre><code class="language-bash">efivar --list
-</code></pre>
-<p>This command won’t work if both partitions aren’t mounted, ensure they are both
-mounted and if it still doesn’t work you can use <code>--esp-path=/boot</code> or
-<code>--esp-path=/mnt/boot</code>.</p>
-<pre><code class="language-bash">bootctl install
-</code></pre>
-<p>Edit <code>/etc/kernel/cmdline</code> and add the output of <code>blkid</code> on your root partition.
-For example:</p>
-<pre><code class="language-bash">blkid /dev/nvme0n1p2 &gt; /tmp/uuid.txt
-</code></pre>
-<p>When you open <code>/etc/kernel/cmdline</code> in vim or helix, run <code>:r /tmp/uuid.txt</code> to
-read the UUID of your root partition into the file. You only need the numbers
-like so:</p>
-<pre><code class="language-cmdline">rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw
-</code></pre>
-<p>In the above example, <code>7b78e942-f4f7-4dde-a015-3a816305483f</code> is the UUID
-extracted from the <code>blkid</code> command.</p>
-<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
-<pre><code class="language-conf">title Arch Linux
-linux /vmlinuz-linux-zen
-initrd /initramfs-linux-zen.img
-options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw quiet
-</code></pre>
-<blockquote>
-<p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
-configured to autodetect the UKI. It doesn’t hurt to add it though and can
-prevent issues in the future. Ensure <code>rd.luks.name=</code> contains the UUID from
-the encrypted root partition. (e.g., <code>blkid /dev/nvme0n1p2</code>).</p>
-</blockquote>
-<p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
-<pre><code class="language-conf">default arch.conf
-# default @saved  # return to last choice
-timeout 4
-console-mode auto
-auto-entries 1
-</code></pre>
-<pre><code class="language-bash">bootctl status
-</code></pre>
-<p>Set a password to protect <code>systemd-boot</code> with <code>systemd-boot-password</code>:</p>
-<pre><code class="language-bash">paru -S systemd-boot-password
-</code></pre>
-<pre><code class="language-bash">sudo sbpctl install /boot
-</code></pre>
-<p>You will now be prompted for your password before you can edit kernel
-parameters.</p>
-<hr />
-<p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
-<p>We already added <code>systemd-ukify</code> in the pacstrap command, let’s add a few more
-tools for this process:</p>
-<pre><code class="language-bash">sudo pacman -S sbsigntools efitools
-</code></pre>
-<p>Copy the existing template to <code>/etc/kernel/uki.conf</code>:</p>
-<pre><code class="language-bash">cp /usr/lib/kernel/uki.conf /etc/kernel/uki.conf
-</code></pre>
-<p>Edit <code>/etc/kernel/uki.conf</code>:</p>
-<pre><code class="language-conf">[UKI]
-#Initrd=
-#Microcode=
-#Splash=
-#PCRPKey=
-#PCRBanks=
-#SecureBootSigningTool=
-SecureBootPrivateKey=/etc/kernel/secure-boot-private-key.pem
-SecureBootCertificate=/etc/kernel/secure-boot-certificate.pem
-#SecureBootCertificateDir=
-#SecureBootCertificateName=
-#SecureBootCertificateValidity=
-#SigningEngine=
-SignKernel=yes
-</code></pre>
-<p>Generate your signing keys:</p>
-<pre><code class="language-bash">ukify genkey --config /etc/kernel/uki.conf
-</code></pre>
-<p>The above command creates <code>/etc/kernel/secure-boot-certificate.pem</code> and
-<code>/etc/kernel/secure-boot-private-key.pem</code>.</p>
-<p>Building the UKIs:</p>
-<pre><code class="language-bash">mkdir -p /boot/EFI/Linux
-mkinitcpio -P
-# Output
-Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
-==&gt; Unified kernel image generation successful
-</code></pre>
-<p>Sign the boot loader with the new keys:</p>
-<pre><code class="language-bash">/usr/lib/systemd/systemd-sbsign sign \
---private-key /etc/kernel/secure-boot-private-key.pem \
---certificate /etc/kernel/secure-boot-certificate.pem \
---output /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed \
-/usr/lib/systemd/boot/efi/systemd-bootx64.efi
-</code></pre>
-<p>Output:</p>
-<pre><code class="language-text">Wrote signed PE binary to /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
-</code></pre>
-<pre><code class="language-bash">sudo bootctl install --secure-boot-auto-enroll yes \
---certificate /etc/kernel/secure-boot-certificate.pem \
---private-key /etc/kernel/secure-boot-private-key.pem
-</code></pre>
-<p>Output:</p>
-<pre><code class="language-text">Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/systemd/systemd-bootx64.efi".
-    3 Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/BOOT/BOOTX64.EFI".
-    4 ⚠️  Mount point '/boot' which backs the random seed file is world accessible, which is a security hole!  ⚠️
-    5 ⚠️ Random seed file '/boot/loader/random-seed' is world accessible, which is a security hole! ⚠️
-    6 Random seed file /boot/loader/random-seed successfully refreshed (32 bytes).
-    7 Secure boot auto-enrollment file /boot/loader/keys/auto/PK.auth successfully written.
-    8 Secure boot auto-enrollment file /boot/loader/keys/auto/KEK.auth successfully written.
-    9 Secure boot auto-enrollment file /boot/loader/keys/auto/db.auth successfully written.
-   10 Created EFI boot entry "Linux Boot Manager".
-</code></pre>
-<p>Fix the security hole:</p>
-<pre><code class="language-bash">chmod 700 /boot
-</code></pre>
-<p>Add the following to your <code>/boot/loader/loader.conf</code>:</p>
-<pre><code class="language-conf">secure-boot-enroll force
-</code></pre>
-<p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
-your keys when the time runs out.</p>
-<p>After successful key enrollment, reboot into UEFI again, enable Secure Boot and
-reboot.</p>
-<p>When the desktop launches, check the output of <code>bootctl status</code> to ensure
-<code>Secure Boot: enabled (user)</code></p>
-<p>If your system doesn’t accept them, you may have to do some conversions. You can
-also add the keys manually which is what I did.</p>
-<details>
-<summary> ✔️ Click to Expand conversion Examples </summary>
-<pre><code class="language-bash"># Create workspace for certs and outputs
-mkdir -p ~/secureboot/output
-
-# Define certificate location
-CERT_PEM="/etc/kernel/secure-boot-certificate.pem"
-
-# Convert PEM cert to DER format for UEFI enrollment
-sudo openssl x509 -in $CERT_PEM -out ~/secureboot/output/db.cer -outform DER
-
-# Convert PEM cert to EFI Signature List
-cert-to-efi-sig-list $CERT_PEM ~/secureboot/output/db.esl
-
-# Sign the Signature List (run from wherever your private key is; do not copy it)
-sudo sign-efi-sig-list -k /etc/kernel/secure-boot-private-key.pem -c $CERT_PEM db \
-    ~/secureboot/output/db.esl ~/secureboot/output/db.auth
-</code></pre>
-<p>Manual Key Enrollment:</p>
-<ul>
-<li>
-<p><code>db.cer</code> -&gt; enroll in db (Trusted Signatures), Choose the desired drive, find
-the file and add it. Save as an <code>Authorized Signature</code> instead of <code>Public Key</code></p>
-</li>
-<li>
-<p><code>PK.cer</code> -&gt; enroll in <code>Platform Key</code>(PK)</p>
-</li>
-<li>
-<p>Keep your <code>secure-boot-private-key.pem</code> <strong>private</strong>, with the above commands
-we only use it when signing, and otherwise keep it protected.</p>
-</li>
-</ul>
-</details>
-<hr />
-<ol start="11">
-<li><strong>Enable LightDM and NetworkManager</strong></li>
-</ol>
-<pre><code class="language-bash">systemctl enable lightdm
-systemctl enable NetworkManager
-</code></pre>
-<blockquote>
-<p>❗️ NOTE: If you’re ever unable to run the above commands in the chroot
-environment, exit chroot and run:</p>
-<pre><code class="language-bash">systemctl --root=/mnt enable lightdm
-systemctl --root=/mnt enable NetworkManager
-</code></pre>
-</blockquote>
-<p>Configure LightDM greeter, edit <code>/etc/lightdm/lightdm.conf</code> to add:</p>
-<pre><code class="language-conf"># lightdm.conf
-[Seat:*]
-greeter-session=lightdm-gtk-greeter
-</code></pre>
-<p>Exit <code>arch-chroot</code> with <code>exit</code></p>
-<p>Unmount your partitions and reboot:</p>
-<pre><code class="language-bash">umount /mnt/boot
-umount /mnt
-cryptsetup close cryptroot
-</code></pre>
-<hr />
-<ol start="12">
-<li><strong>Reboot</strong></li>
-</ol>
-<pre><code class="language-bash">bootctl status
-System:
-      Firmware: UEFI 2.70 (American Megatrends)
- Firmware Arch: x64
-   Secure Boot: enabled (user)
-  TPM2 Support: yes
-  Measured UKI: yes
-  Boot into FW: supported
-</code></pre>
-<hr />
-<h3>Creating a readonly snapshot of your root subvolume:</h3>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/System_backup">Arch Wiki System Backup</a></li>
-</ul>
-<details>
-<summary> ✔️ Click to Expand snapshot & Backup Example </summary>
-<ol>
-<li>Create readonly snapshot of root subvol:</li>
-</ol>
-<pre><code class="language-bash">sudo btrfs subvolume snapshot -r / /root-snapshot-$(date +%Y%m%d%H%M%S)
-</code></pre>
-<ol start="2">
-<li>Mount your external backup disk:</li>
-</ol>
-<pre><code class="language-bash">sudo mkdir -p /mnt/backup
-sudo mount /dev/sdc1 /mnt/backup
-</code></pre>
-<ol start="3">
-<li>Use rsync to copy the snapshot to the external drive:</li>
-</ol>
-<p>List the available snapshots and get the exact name:</p>
-<pre><code class="language-bash">sudo btrfs subvolume list /
-</code></pre>
-<pre><code class="language-bash">sudo rsync -aAXv --delete --progress /root-snapshot-20251002135000/ /mnt/backup/root-backup/
-</code></pre>
-<ol start="4">
-<li>Unmount the external drive:</li>
-</ol>
-<pre><code class="language-bash">sudo umount /mnt/backup
-</code></pre>
-<ol start="5">
-<li>Optionally, delete older snapshots to save space:</li>
-</ol>
-<pre><code class="language-bash">sudo btrfs subvolume delete /root-snapshot-OLD_TIMESTAMP
-</code></pre>
-<h3>Restoring from a Backup</h3>
-<p>For this, you mount the partitions but don’t need to <code>arch-chroot</code> in.</p>
-<ol>
-<li>
-<p>Boot from a live USB</p>
-</li>
-<li>
-<p>Mount your encrypted root partition (unlock if encrypted) and the external
-backup drive.</p>
-</li>
-<li>
-<p>Move or delete the corrupted data on the root partition.</p>
-</li>
-<li>
-<p>Use rsync to copy the backed-up snapshot from the external disk back to the
-root partition, preserving permissions and attributes.</p>
-</li>
-</ol>
-<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-backup/ /
-</code></pre>
-<p>Or, the Wiki’s suggestion, (Much more efficient, Direct backup of a running
-system without the need for btrfs snapshots):</p>
-<pre><code class="language-bash">sudo rsync -aAXHv --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/tmp/*' --exclude='/run/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found/' / /path/to/backup
-</code></pre>
-<ul>
-<li>
-<p><code>/mnt/backup/root-backup/</code> is the path where the backup snapshot is mounted on
-the external disk.</p>
-</li>
-<li>
-<p><code>/</code> is the root partition mount point where you want to restore the files.</p>
-</li>
-<li>
-<p>The options:</p>
-<ul>
-<li>
-<p><code>-a</code> archive mode to preserve symbolic links, permissions, timestamps, etc.</p>
-</li>
-<li>
-<p><code>-A</code> preserve ACLs (access control lists).</p>
-</li>
-<li>
-<p><code>-X</code> preserve extended attributes.</p>
-</li>
-<li>
-<p><code>-v</code> verbose output.</p>
-</li>
-<li>
-<p><code>--delete</code> deletes files on the destination that don’t exist in the source,
-keeping an exact mirror.</p>
-</li>
-</ul>
-</li>
-</ul>
-<p>If you want to restore a specific snapshot directory (e.g.,
-<code>/root-snapshot-20251002135000</code>), replace the source path accordingly, like:</p>
-<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-snapshot-20251002135000/ /
-</code></pre>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/Rsync#As_a_backup_utility">Arch Wiki rsync</a></li>
-</ul>
-<ol start="5">
-<li>
-<p>Reinstall the bootloader if necessary.</p>
-</li>
-<li>
-<p>Unmount everything and reboot.</p>
-</li>
-</ol>
-<h3>Automated backup</h3>
-<p>Create <code>/etc/cron.daily/backup</code>:</p>
-<pre><code class="language-backup">#!/bin/sh
-rsync -a --delete --quiet /path/to/backup /location/of/backup
-</code></pre>
-<p>Change <code>/path/to/backup</code> to what needs to be backed-up such as <code>/home</code> or <code>/</code></p>
-</details>
-<hr />
-<h3>arch-chroot</h3>
-<details>
-<summary>  ✔️ Click to Expand `arch-chroot` Example </summary>
-<p>Say you forgot something, like forgetting to add a user and password. You reboot
-and go to TTY into your system and are hit with a AHHH I can’t log in WTF!</p>
-<p>It’s as easy as repeating some of the steps above. Reboot into the Live
-environment, remount your partitions and <code>arch-chroot</code> back in:</p>
-<p>Open the encrypted root partition:</p>
-<pre><code class="language-bash">cryptsetup open /dev/nvme0n1p2 cryptroot
-</code></pre>
-<p>Mount the decrypted root:</p>
-<pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
-</code></pre>
-<p>Mount the EFI partition:</p>
-<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot
-</code></pre>
-<p>Chroot into your installed system:</p>
-<pre><code class="language-bash">arch-chroot /mnt
-</code></pre>
-<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername passwd yourusername
-</code></pre>
-<ul>
-<li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
-installed.</li>
-</ul>
-<p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
-<p>Exit chroot:</p>
-<pre><code class="language-bash">exit
-</code></pre>
-<p>Unmount and close LUKS:</p>
-<pre><code class="language-bash">umount /mnt/boot
-umount /mnt
-cryptsetup close cryptroot
-reboot
-</code></pre>
-</details>
-<h3>Resources</h3>
-<details>
-<summary> ✔️ Click to Expand Resources </summary>
-<ul>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki UKI/SecureBoot</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Unified_kernel_image">Wiki UKI</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Systemd-boot">Wiki systemd-boot</a></p>
-</li>
-</ul>
-</details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<h1>Hardening Networking</h1>
-<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
-Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p>
-<p>After editing a config file, apply the changes with:</p>
-<pre><code class="language-bash">sudo nmcli general reload
-</code></pre>
-<pre><code class="language-bash">sudo usermod -aG network $USER
-</code></pre>
-<h2>Investigate sockets</h2>
-<p>Display all TCP Sockets with service names:</p>
-<pre><code class="language-bash">ss -at
-</code></pre>
-<p>Display all TCP Sockets with port numbers:</p>
-<pre><code class="language-bash">ss -atn
-</code></pre>
-<p>Display all UDP Sockets:</p>
-<pre><code class="language-bash">ss -au
-</code></pre>
-<h2>Configure NetworkManager to use Quad9s DoT</h2>
-<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
-<pre><code class="language-.nmconnection">[connection]
-dns-over-tls=2
-
-[ipv4]
-dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
-ignore-auto-dns=true
-
-[ipv6]
-dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
-ignore-auto-dns=true
-</code></pre>
-<pre><code class="language-bash">sudo systemctl restart NetworkManager
-</code></pre>
-<p><strong>Wi-Fi MAC randomization</strong></p>
-<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
-<pre><code class="language-conf">[device-mac-randomization]
-# "yes" is already the default for scanning
-wifi.scan-rand-mac-address=yes
-
-[connection-mac-randomization]
-# Randomize MAC for every ethernet connection
-ethernet.cloned-mac-address=random
-# Generate a random MAC every time you connect to a wifi network
-wifi.cloned-mac-address=random
-</code></pre>
-<p><strong>Unique DUID per connection</strong></p>
-<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
-<pre><code class="language-conf">[connection]
-ipv6.dhcp-duid=stable-uuid
-</code></pre>
-<h2>MAC Address spoofing</h2>
-<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
-<p><strong>Manual MAC randomization with macchanger</strong></p>
-<p>Find your device interface and check your current MAC address:</p>
-<pre><code class="language-bash"># find interface
-ip add
-sudo iplink show wlp3s0
-</code></pre>
-<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
-it:</p>
-<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
-# or
-# sudo ifconfig wlp3s0 down
-</code></pre>
-<p>Install the <code>macchanger</code> package and run:</p>
-<pre><code class="language-bash">sudo macchanger -a wlp3s0
-</code></pre>
-<ul>
-<li>
-<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
-</li>
-<li>
-<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
-</li>
-</ul>
-<p><strong>Automatically with systemd &amp; macchanger</strong></p>
-<p>systemd unit setting a random address while preserving the original NIC vendor
-bytes.</p>
-<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
-<pre><code class="language-macspoof@.service">[Unit]
-Description=macchanger on %I
-Wants=network-pre.target
-Before=network-pre.target
-BindsTo=sys-subsystem-net-devices-%i.device
-After=sys-subsystem-net-devices-%i.device
-
-[Service]
-ExecStart=/usr/bin/macchanger -e %I
-Type=oneshot
-
-[Install]
-WantedBy=multi-user.target
-</code></pre>
-<ul>
-<li>
-<p>You can use <code>-r</code> to randomize everything but it’s important that the vendor
-bytes actually match something and aren’t just random numbers so it’s less
-recommended.</p>
-</li>
-<li>
-<p>The <code>@.service</code> pattern allows per-interface instantiation like
-<code>macspoof@wlp3s0.service</code>.</p>
-</li>
-<li>
-<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
-</li>
-<li>
-<p>You only need to append your interface name when enabling the service.</p>
-</li>
-</ul>
-<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
-</code></pre>
-<h2>Resources</h2>
-<ul>
-<li>
-<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
-</li>
-<li>
-<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
-</li>
-</ul>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item></channel></rss>
+]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item></channel></rss>

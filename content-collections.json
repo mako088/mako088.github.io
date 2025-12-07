@@ -2,7 +2,7 @@
   "entries": [
     {
       "author": "saylesss88",
-      "collection": "posts",
+      "collection": "blog",
       "date": "2025-12-07T00:00:00+00:00",
       "description": null,
       "draft": false,
@@ -45,27 +45,13 @@
       "date": "2025-11-28T00:00:00+00:00",
       "description": null,
       "draft": false,
-      "path": "arch/hardening_arch.md",
-      "preview_html": "<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o",
+      "path": "arch/hardening_networking.md",
+      "preview_html": "<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>",
       "tags": [
         "arch",
         "security"
       ],
-      "title": "Hardening Arch"
-    },
-    {
-      "author": "saylesss88",
-      "collection": "blog",
-      "date": "2025-11-28T00:00:00+00:00",
-      "description": null,
-      "draft": false,
-      "path": "arch/hardening_firefox.md",
-      "preview_html": "<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou",
-      "tags": [
-        "browsers",
-        "security"
-      ],
-      "title": "Hardening Firefox"
+      "title": "Hardening Networking"
     },
     {
       "author": "saylesss88",
@@ -87,13 +73,27 @@
       "date": "2025-11-28T00:00:00+00:00",
       "description": null,
       "draft": false,
-      "path": "arch/hardening_networking.md",
-      "preview_html": "<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>",
+      "path": "arch/hardening_firefox.md",
+      "preview_html": "<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou",
+      "tags": [
+        "browsers",
+        "security"
+      ],
+      "title": "Hardening Firefox"
+    },
+    {
+      "author": "saylesss88",
+      "collection": "blog",
+      "date": "2025-11-28T00:00:00+00:00",
+      "description": null,
+      "draft": false,
+      "path": "arch/hardening_arch.md",
+      "preview_html": "<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o",
       "tags": [
         "arch",
         "security"
       ],
-      "title": "Hardening Networking"
+      "title": "Hardening Arch"
     }
   ]
 }
