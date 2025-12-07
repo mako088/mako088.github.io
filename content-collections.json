@@ -3,46 +3,13 @@
     {
       "author": null,
       "collection": null,
-      "date": "2025-12-02T13:58:35.873038284+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "android/android_privacy.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "android_privacy"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-11-28T20:07:52.108710141+00:00",
+      "date": "2025-12-03T00:05:27.930343261+00:00",
       "description": "\n",
       "draft": false,
       "path": "index.md",
       "preview_html": "",
       "tags": [],
       "title": "index"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-11-28T18:31:31.780645938+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "README.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "README"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-11-28T18:30:57.337587203+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "intro.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "intro"
     },
     {
       "author": "saylesss88",
@@ -127,17 +94,6 @@
         "privacy"
       ],
       "title": "RethinkDNS"
-    },
-    {
-      "author": null,
-      "collection": null,
-      "date": "2025-10-27T11:33:55.871049529+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "browsers/fingerprinting.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "fingerprinting"
     }
   ]
 }
