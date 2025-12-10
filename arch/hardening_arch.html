@@ -29,6 +29,7 @@
 
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../theme/header-buttons-af1bc2f9.css">
+        <link rel="stylesheet" href="../theme/css/catppuccin-mocha-code-05792b31.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,7 +37,7 @@
             const path_to_root = "../";
             const default_light_theme = "coal";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-facc858c.js";
+            window.path_to_searchindex_js = "../searchindex-117f3aea.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-78eae84a.js"></script>
@@ -178,68 +179,17 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
+                        <hr>
+<h2 id="title-hardening-arch-date-2025-11-28-author-saylesss88-collection-blog-tags-arch-security-draft-false"><a class="header" href="#title-hardening-arch-date-2025-11-28-author-saylesss88-collection-blog-tags-arch-security-draft-false">title: Hardening Arch
+date: 2025-11-28
+author: saylesss88
+collection: “blog”
+tags: [“arch”, “security”]
+draft: false</a></h2>
+<h1 id="hardening-arch-linux"><a class="header" href="#hardening-arch-linux">Hardening Arch Linux</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<ul>
-<li><a href="#the-basics">The Basics</a>
-<ul>
-<li><a href="#best-practices-and-standards">Best Practices and Standards</a></li>
-<li><a href="#user-and-group-management--strong-passwords">User and group management &amp; Strong Passwords</a></li>
-</ul>
-</li>
-<li><a href="#hardeningsandboxing-systemd">Hardening/Sandboxing systemd</a></li>
-<li><a href="#lynis-and-other-tools">Lynis and other tools</a></li>
-<li><a href="#hardening-the-kernel">Hardening the Kernel</a></li>
-<li><a href="#hardening-your-current-kernel">Hardening your current Kernel</a></li>
-<li><a href="#disable-core-dumps">Disable Core Dumps</a></li>
-<li><a href="#kernel-and-namespace-hardening-and-blacklisting">Kernel and Namespace Hardening and Blacklisting</a></li>
-<li><a href="#firewall">Firewall</a></li>
-<li><a href="#ssh--gpg-key-generation-and-safety">SSH &amp; GPG Key Generation and Safety</a>
-<ul>
-<li><a href="#ssh-keygen">ssh-keygen</a></li>
-<li><a href="#gnupg-and-gpg-agent">GnuPG and gpg-agent</a></li>
-<li><a href="#generate-a-revocation-certificate">Generate a Revocation Certificate</a></li>
-<li><a href="#generate-gpg-subkeys">Generate Gpg Subkeys</a></li>
-<li><a href="#backing-up-your-keys">Backing up Your Keys</a></li>
-<li><a href="#remove-and-store-your-primary-key-offline">Remove and Store your Primary Key offline</a></li>
-</ul>
-</li>
-<li><a href="#hardening-openssh">Hardening OpenSSH</a>
-<ul>
-<li><a href="#tip-change-the-default-port">Tip Change the Default Port</a></li>
-</ul>
-</li>
-<li><a href="#usb-port-protection">USB Port Protection</a>
-<ul>
-<li><a href="#usbguard-daemon">USBGuard Daemon</a></li>
-<li><a href="#firejail">Firejail</a></li>
-</ul>
-</li>
-<li><a href="#hardening-firejail">Hardening Firejail</a>
-<ul>
-<li><a href="#remove-firejail-symlinks">Remove Firejail symlinks</a></li>
-</ul>
-</li>
-<li><a href="#apparmor">AppArmor</a>
-<ul>
-<li><a href="#switching-an-app-from-unconfined-mode-to-enforce">Switching an app from unconfined mode to enforce</a></li>
-<li><a href="#disabling-apparmor">Disabling AppArmor</a></li>
-</ul>
-</li>
-<li><a href="#creating-or-adding-profiles-that-arent-pre-configured">Creating or adding profiles that aren’t pre-configured</a>
-<ul>
-<li><a href="#profiling-by-hand">Profiling by Hand</a></li>
-<li><a href="#auditd">Auditd</a></li>
-<li><a href="#doas-over-sudo">Doas over sudo</a></li>
-</ul>
-</li>
-<li><a href="#intrusion-detection">Intrusion Detection</a>
-<ul>
-<li><a href="#resources">Resources</a></li>
-</ul>
-</li>
-</ul>
+<!-- toc -->
 </details>
 <blockquote>
 <p>⚠️ Warning: I am not a security expert. This guide presents various options
@@ -2476,6 +2426,7 @@ hardening.There are recommendations for hardening all kinds of software in the
 
         <!-- Custom JS scripts -->
         <script src="../theme/header-buttons-02f32270.js"></script>
+        <script src="../theme/nix_http-f9271c1a.js"></script>
 
 
 
