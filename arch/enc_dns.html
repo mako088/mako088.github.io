@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="light sidebar-visible" dir="ltr">
+<html lang="en" class="coal sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -16,7 +16,7 @@
         <link rel="shortcut icon" href="../favicon-8114d1fc.png">
         <link rel="stylesheet" href="../css/variables-8adf115d.css">
         <link rel="stylesheet" href="../css/general-2459343d.css">
-        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/chrome-ca6ed5dd.css">
         <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
@@ -28,14 +28,17 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/header-buttons-af1bc2f9.css">
+        <link rel="stylesheet" href="../theme/css/kanagawa-code-0be3dd7a.css">
+        <link rel="stylesheet" href="../theme/css/catppuccin-mocha-code-05792b31.css">
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
             const path_to_root = "../";
-            const default_light_theme = "light";
-            const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-23d1c973.js";
+            const default_light_theme = "coal";
+            const default_dark_theme = "coal";
+            window.path_to_searchindex_js = "../searchindex-c6952964.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-78eae84a.js"></script>
@@ -76,7 +79,7 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
-            html.classList.remove('light')
+            html.classList.remove('coal')
             html.classList.add(theme);
             html.classList.add("js");
         </script>
@@ -143,6 +146,9 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
                         </a>
+                        <a href="https://github.com/saylesss88/privacy-book.git" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
 
                     </div>
                 </div>
@@ -174,17 +180,17 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <hr>
-<h2 id="title-encrypted-dns-on-arch-date-2025-12-05-author-saylesss88-collection-blog-tags-arch-security-draft-false"><a class="header" href="#title-encrypted-dns-on-arch-date-2025-12-05-author-saylesss88-collection-blog-tags-arch-security-draft-false">title: Encrypted DNS on Arch
-date: 2025-12-05
-author: saylesss88
-collection: “blog”
-tags: [“arch”, “security”]
-draft: false</a></h2>
+                        <script>window.CONTENT_COLLECTIONS = {"collections":{"blog":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"posts":[{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"}]},"entries":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"generated_at":"2025-12-24T21:58:33.998833546+00:00"};</script>
 <h1 id="encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq"><a class="header" href="#encrypted-dns-archlinux-with-dnscrypt-proxy--dnsmasq">Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</a></h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
+<ul>
+<li><a href="#dnsmasq-as-a-local-dns-server">dnsmasq as a local DNS server</a></li>
+<li><a href="#add-blocklists">Add Blocklists</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#enable-mac-randomization">Enable MAC Randomization</a></li>
+<li><a href="#enable-privacy-extensions">Enable Privacy Extensions</a></li>
+</ul>
 </details>
 <blockquote>
 <p>❗ NOTE: There are many other ways for someone monitoring your traffic to see
@@ -638,6 +644,8 @@ ipv6.ip6-privacy=2
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/header-buttons-02f32270.js"></script>
+        <script src="../theme/nix_http-971fb95c.js"></script>
 
 
 
