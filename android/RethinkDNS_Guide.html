@@ -16,7 +16,7 @@
         <link rel="shortcut icon" href="../favicon-8114d1fc.png">
         <link rel="stylesheet" href="../css/variables-8adf115d.css">
         <link rel="stylesheet" href="../css/general-2459343d.css">
-        <link rel="stylesheet" href="../css/chrome-ca6ed5dd.css">
+        <link rel="stylesheet" href="../css/chrome-e4858e4b.css">
         <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
@@ -30,7 +30,7 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="../theme/header-buttons-af1bc2f9.css">
         <link rel="stylesheet" href="../theme/css/kanagawa-code-0be3dd7a.css">
-        <link rel="stylesheet" href="../theme/css/catppuccin-mocha-code-05792b31.css">
+        <link rel="stylesheet" href="../theme/css/tokyo-night-code-6a5e27e7.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -38,7 +38,7 @@
             const path_to_root = "../";
             const default_light_theme = "coal";
             const default_dark_theme = "coal";
-            window.path_to_searchindex_js = "../searchindex-c6952964.js";
+            window.path_to_searchindex_js = "../searchindex-f9eeabba.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-78eae84a.js"></script>
@@ -180,7 +180,7 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <script>window.CONTENT_COLLECTIONS = {"collections":{"blog":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"posts":[{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"}]},"entries":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"generated_at":"2025-12-24T21:59:54.137648304+00:00"};</script>
+                        <script>window.CONTENT_COLLECTIONS = {"collections":{"blog":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"posts":[{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"}]},"entries":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":null,"collection":null,"date":"2025-12-03T00:05:27.930343261+00:00","description":"\n","draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"}],"generated_at":"2025-12-25T14:15:18.961276570+00:00"};</script>
 <h1 id="rethinkdns"><a class="header" href="#rethinkdns">RethinkDNS</a></h1>
 <details>
 <summary> ✔️ Table of Contents</summary>
@@ -193,7 +193,7 @@
 <li><a href="#configuring-dns">Configuring DNS</a></li>
 <li><a href="#network">Network</a></li>
 <li><a href="#configuring-networking">Configuring Networking</a></li>
-<li><a href="#configuring-firewall">Configuring Firewall</a></li>
+<li><a href="#configuring-the-firewall">Configuring the Firewall</a></li>
 </ul>
 </li>
 <li><a href="#turn-on-dns-and-firewall">Turn ON DNS and Firewall</a>
@@ -513,29 +513,30 @@ first to use DNSSEC cryptographic validation.</p>
 </ul>
 </li>
 <li>
-<p>Mullvad DNS</p>
+<p><strong>Mullvad DNS</strong></p>
 <ul>
 <li><a href="https://mullvad.net/en/help/privacy-policy">Mullvad privacy policy</a></li>
 </ul>
 </li>
 <li>
-<p>NextDNS</p>
+<p><strong>NextDNS</strong></p>
 <ul>
 <li><a href="https://nextdns.io/privacy">NextDNS privacy policy</a></li>
 </ul>
 </li>
 <li>
-<p>Cloudflare publishes regular transparency reports and undergoes independent
-audits and have a great blog explaining the technology which is a major plus.
-GrapheneOS sets Cloudflare as the fallback due to their good privacy policy,
-and widespread usage.</p>
+<p><strong>Cloudflare</strong> publishes regular transparency reports and undergoes
+independent audits and have a great blog explaining the technology which is a
+major plus. GrapheneOS sets Cloudflare as the fallback due to their good
+privacy policy, and widespread usage.</p>
 <ul>
 <li><a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a></li>
 </ul>
 </li>
 <li>
-<p>RethinkDNS: Their DNS code is open source so anyone can audit it themselves.
-They do not collect PII nor seek to profile its users, transparency is great.</p>
+<p><strong>RethinkDNS</strong>: Their DNS code is open source so anyone can audit it
+themselves. They do not collect PII nor seek to profile its users,
+transparency is great.</p>
 <ul>
 <li><a href="https://rethinkdns.com/privacy">DNS Privacy Policy for stub resolvers</a></li>
 <li><a href="https://fly.io/legal/privacy-policy/">Fly.io privacy policy for the recursive resolver</a></li>
@@ -683,6 +684,38 @@ queries made by the app itself, back into the encrypted tunnel through the
 loopback device.</p>
 </li>
 </ul>
+<p><strong>Proxy</strong></p>
+<ul>
+<li>
+<p><strong>Do not randomize WireGuard listen port</strong>: Keep WireGuard listen ports fixed
+(no randomization) in Advanced mode. Enabling it makes the tunnel’s local UDP
+port predictable, which is useful for port-forwarding, firewall rules, and any
+setup where the device must be reachable on a known port.</p>
+</li>
+<li>
+<p><strong>Endpoint-Independent mapping</strong>: When enabled, UDP sockets maintain a fixed
+address and port for all destinations. Turn this on for UDP-based
+P2P/NAT-traversal scenarios: it keeps one stable UDP mapping for a socket
+across multiple destinations, improving compatibility with hole punching /
+ICE-style flows.</p>
+</li>
+</ul>
+<p><strong>TCP / IP</strong></p>
+<ul>
+<li>
+<p><strong>Shorter TCP keep alive</strong>: Quickly close TCP sockets with no recent activity.
+Use when the device is accumulating lots of idle TCP connections and you’d
+rather reclaim resources quickly (and accept that some apps may need to
+reconnect more often).</p>
+</li>
+<li>
+<p><strong>Idle timeout</strong>: Close idle TCP and UDP sockets after this duration. It
+closes TCP/UDP sockets that have had no traffic for the configured duration,
+which reduces the amount of long-lived idle state your device (and the network
+path) has to keep around. I am testing <strong>5 minutes</strong> now, lower is more
+aggressive, set it higher if you notice reconnect churn or app breakage.</p>
+</li>
+</ul>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -710,10 +743,29 @@ be used at the same time by Rethink. (Optional, may use more battery)</p>
 <code>IPv6 (experimental)</code> and <code>Auto (experimental)</code>.</p>
 </li>
 <li>
+<p><strong>Stall on network loss</strong>: Not a full VPN kill switch, but kill-switch-like on
+outages: when the device has no connectivity, Rethink stalls all traffic so
+apps can’t keep retrying or leaking during the gap.</p>
+</li>
+<li>
+<p><strong>Meter mobile networks</strong>: It reduces mobile data usage by telling Android/app
+code that cellular is a metered link, so background transfers and heavy
+downloads are more likely to wait for Wi‑Fi. (Optional)</p>
+</li>
+<li>
+<p><strong>Connection change policy</strong>:</p>
+<ul>
+<li>Most users should leave set to <strong>Auto</strong> because it aims to react to
+<em>important</em> changes without trashing the tunnel on noisy events.</li>
+<li>If connectivity doesn’t recover fast on transitions: try <strong>Sensitive</strong>.</li>
+<li>If Rethink seems to flap/restart too often on your network: try <strong>Relaxed</strong>.</li>
+</ul>
+</li>
+<li>
 <p><strong>Choose fallback DNS</strong>: When your user-preferred DNS is not reachable,
 fallback DNS will used.</p>
 <ul>
-<li>With the F-Droid version in <code>Configure -&gt; DNS -&gt; ADVANCED</code>. You can enable
+<li>In <code>Configure -&gt; DNS -&gt; ADVANCED</code>. You can enable
 <code>Use fallback DNS as bypass</code>, which always uses fallback DNS for bypassed
 apps, domains, and IPs.</li>
 </ul>
@@ -730,7 +782,7 @@ require this)</li>
 </li>
 </ul>
 <hr>
-<h3 id="configuring-firewall"><a class="header" href="#configuring-firewall">Configuring Firewall</a></h3>
+<h3 id="configuring-the-firewall"><a class="header" href="#configuring-the-firewall">Configuring the Firewall</a></h3>
 <p><code>Configure -&gt; Firewall -&gt; Universal firewall rules</code> and set the following to ON:</p>
 <ul>
 <li>
@@ -741,6 +793,36 @@ require this)</li>
 </li>
 <li>
 <p><code>Block port 80 (insecure HTTP) traffic</code></p>
+</li>
+</ul>
+<p><strong>Optional</strong></p>
+<ul>
+<li>
+<p><code>Block on metered (mobile) network</code>: Use if you have limited data and want to
+do the heavy lifting with WiFi.</p>
+</li>
+<li>
+<p><code>Block when source app is unknown</code>: Enable this for a stricter, ‘block
+unattributed traffic’ posture; if anything breaks (missing notifications /
+random app connectivity issues), disable it first and check logs for ‘unknown’
+blocks.</p>
+</li>
+<li>
+<p>Use <code>Block UDP except DNS and NTP</code> when the goal is to make the device behave
+like a “TCP-only internet client” (plus the minimum UDP needed for name
+resolution and time sync), which can reduce attack surface and shut down whole
+classes of UDP-based bypass channels. Avoid if you need UDP-heavy apps: WebRTC
+voice/video, many online games, some VPNs, some streaming/live calls, device
+discovery, and some enterprise tooling will degrade or fail when UDP is
+broadly blocked.</p>
+</li>
+<li>
+<p><code>Block all except bypassed apps and IPs</code>: All traffic is blocked to everything
+<strong>except</strong> apps you’ve marked as bypassed (<em>Bypass Universal</em>, <em>Bypass DNS &amp;
+Firewall</em>, <em>Isolate</em>) and IPs you’ve explicitly trusted/allowed. Expect
+breakage until bypasses are configured. If an app is “bypassed” Rethink is
+still able to monitor/apply app-specific rules, whereas exclude removes the
+app from Rethink’s control entirely (last resort).</p>
 </li>
 </ul>
 <p>You can get more restrictive from here, but it will take some manual
@@ -1957,26 +2039,13 @@ state-of-the-art cryptography. –<a href="https://www.wireguard.com/">Wireguard
 </li>
 </ul>
 </details>
-<div class="nix-repl-block">
-  
-<div class="nix-repl-editor">
-    
-<pre><code class="language-nix">"goodbye ${ { d = "world";}.d}"
+<pre><code class="language-nix repl">"goodbye ${ { d = "world";}.d}"
 </code></pre>
-
-  </div>
-
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;">
   
-<div class="nix-repl-controls">
-    <button class="nix-repl-run">Run</button>
-    <span class="nix-repl-status"></span>
-  </div>
+<p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p>
 
-  
-<pre class="nix-repl-output"></pre>
-
-</div>
-
+</footer>
 
                     </main>
 

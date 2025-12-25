@@ -284,29 +284,30 @@ first to use DNSSEC cryptographic validation.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;Mullvad DNS&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mullvad DNS&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://mullvad.net/en/help/privacy-policy&quot;&gt;Mullvad privacy policy&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;NextDNS&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NextDNS&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://nextdns.io/privacy&quot;&gt;NextDNS privacy policy&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;Cloudflare publishes regular transparency reports and undergoes independent
-audits and have a great blog explaining the technology which is a major plus.
-GrapheneOS sets Cloudflare as the fallback due to their good privacy policy,
-and widespread usage.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cloudflare&lt;/strong&gt; publishes regular transparency reports and undergoes
+independent audits and have a great blog explaining the technology which is a
+major plus. GrapheneOS sets Cloudflare as the fallback due to their good
+privacy policy, and widespread usage.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.cloudflare.com/privacypolicy/&quot;&gt;Cloudflare Privacy Policy&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;RethinkDNS: Their DNS code is open source so anyone can audit it themselves.
-They do not collect PII nor seek to profile its users, transparency is great.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RethinkDNS&lt;/strong&gt;: Their DNS code is open source so anyone can audit it
+themselves. They do not collect PII nor seek to profile its users,
+transparency is great.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://rethinkdns.com/privacy&quot;&gt;DNS Privacy Policy for stub resolvers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://fly.io/legal/privacy-policy/&quot;&gt;Fly.io privacy policy for the recursive resolver&lt;/a&gt;&lt;/li&gt;
@@ -454,6 +455,38 @@ queries made by the app itself, back into the encrypted tunnel through the
 loopback device.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Proxy&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Do not randomize WireGuard listen port&lt;/strong&gt;: Keep WireGuard listen ports fixed
+(no randomization) in Advanced mode. Enabling it makes the tunnel’s local UDP
+port predictable, which is useful for port-forwarding, firewall rules, and any
+setup where the device must be reachable on a known port.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Endpoint-Independent mapping&lt;/strong&gt;: When enabled, UDP sockets maintain a fixed
+address and port for all destinations. Turn this on for UDP-based
+P2P/NAT-traversal scenarios: it keeps one stable UDP mapping for a socket
+across multiple destinations, improving compatibility with hole punching /
+ICE-style flows.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;TCP / IP&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Shorter TCP keep alive&lt;/strong&gt;: Quickly close TCP sockets with no recent activity.
+Use when the device is accumulating lots of idle TCP connections and you’d
+rather reclaim resources quickly (and accept that some apps may need to
+reconnect more often).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Idle timeout&lt;/strong&gt;: Close idle TCP and UDP sockets after this duration. It
+closes TCP/UDP sockets that have had no traffic for the configured duration,
+which reduces the amount of long-lived idle state your device (and the network
+path) has to keep around. I am testing &lt;strong&gt;5 minutes&lt;/strong&gt; now, lower is more
+aggressive, set it higher if you notice reconnect churn or app breakage.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Setting&lt;/th&gt;&lt;th&gt;Function&lt;/th&gt;&lt;th&gt;When to Use&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
 &lt;tr&gt;&lt;td&gt;Loopback Proxy Forwarder Apps&lt;/td&gt;&lt;td&gt;Route proxy-forwarder app traffic back into Rethink VPN tunnel&lt;/td&gt;&lt;td&gt;When you want consistent VPN/privacy coverage for proxies&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;Do Not Route Private IPs&lt;/td&gt;&lt;td&gt;Avoid routing local network/private IP traffic through VPN (send directly)&lt;/td&gt;&lt;td&gt;To access local devices without VPN bottlenecks&lt;/td&gt;&lt;/tr&gt;
@@ -474,10 +507,29 @@ be used at the same time by Rethink. (Optional, may use more battery)&lt;/p&gt;
 &lt;code&gt;IPv6 (experimental)&lt;/code&gt; and &lt;code&gt;Auto (experimental)&lt;/code&gt;.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Stall on network loss&lt;/strong&gt;: Not a full VPN kill switch, but kill-switch-like on
+outages: when the device has no connectivity, Rethink stalls all traffic so
+apps can’t keep retrying or leaking during the gap.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Meter mobile networks&lt;/strong&gt;: It reduces mobile data usage by telling Android/app
+code that cellular is a metered link, so background transfers and heavy
+downloads are more likely to wait for Wi‑Fi. (Optional)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Connection change policy&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Most users should leave set to &lt;strong&gt;Auto&lt;/strong&gt; because it aims to react to
+&lt;em&gt;important&lt;/em&gt; changes without trashing the tunnel on noisy events.&lt;/li&gt;
+&lt;li&gt;If connectivity doesn’t recover fast on transitions: try &lt;strong&gt;Sensitive&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;If Rethink seems to flap/restart too often on your network: try &lt;strong&gt;Relaxed&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Choose fallback DNS&lt;/strong&gt;: When your user-preferred DNS is not reachable,
 fallback DNS will used.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;With the F-Droid version in &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; ADVANCED&lt;/code&gt;. You can enable
+&lt;li&gt;In &lt;code&gt;Configure -&amp;gt; DNS -&amp;gt; ADVANCED&lt;/code&gt;. You can enable
 &lt;code&gt;Use fallback DNS as bypass&lt;/code&gt;, which always uses fallback DNS for bypassed
 apps, domains, and IPs.&lt;/li&gt;
 &lt;/ul&gt;
@@ -494,7 +546,7 @@ require this)&lt;/li&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr /&gt;
-&lt;h3&gt;Configuring Firewall&lt;/h3&gt;
+&lt;h3&gt;Configuring the Firewall&lt;/h3&gt;
 &lt;p&gt;&lt;code&gt;Configure -&amp;gt; Firewall -&amp;gt; Universal firewall rules&lt;/code&gt; and set the following to ON:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -505,6 +557,36 @@ require this)&lt;/li&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;Block port 80 (insecure HTTP) traffic&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Optional&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block on metered (mobile) network&lt;/code&gt;: Use if you have limited data and want to
+do the heavy lifting with WiFi.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block when source app is unknown&lt;/code&gt;: Enable this for a stricter, ‘block
+unattributed traffic’ posture; if anything breaks (missing notifications /
+random app connectivity issues), disable it first and check logs for ‘unknown’
+blocks.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;Block UDP except DNS and NTP&lt;/code&gt; when the goal is to make the device behave
+like a “TCP-only internet client” (plus the minimum UDP needed for name
+resolution and time sync), which can reduce attack surface and shut down whole
+classes of UDP-based bypass channels. Avoid if you need UDP-heavy apps: WebRTC
+voice/video, many online games, some VPNs, some streaming/live calls, device
+discovery, and some enterprise tooling will degrade or fail when UDP is
+broadly blocked.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Block all except bypassed apps and IPs&lt;/code&gt;: All traffic is blocked to everything
+&lt;strong&gt;except&lt;/strong&gt; apps you’ve marked as bypassed (&lt;em&gt;Bypass Universal&lt;/em&gt;, &lt;em&gt;Bypass DNS &amp;amp;
+Firewall&lt;/em&gt;, &lt;em&gt;Isolate&lt;/em&gt;) and IPs you’ve explicitly trusted/allowed. Expect
+breakage until bypasses are configured. If an app is “bypassed” Rethink is
+still able to monitor/apply app-specific rules, whereas exclude removes the
+app from Rethink’s control entirely (last resort).&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;You can get more restrictive from here, but it will take some manual
