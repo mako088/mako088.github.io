@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "author": null,
+      "collection": null,
+      "date": "2026-01-04T19:10:21.302306322+00:00",
+      "description": "\n",
+      "draft": false,
+      "path": "index.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "index"
+    },
+    {
       "author": "saylesss88",
       "collection": "blog",
       "date": "2025-12-07T00:00:00+00:00",
@@ -29,17 +40,6 @@
       "title": "Encrypted DNS on Arch"
     },
     {
-      "author": null,
-      "collection": null,
-      "date": "2025-12-03T00:05:27.930343261+00:00",
-      "description": "\n",
-      "draft": false,
-      "path": "index.md",
-      "preview_html": "",
-      "tags": [],
-      "title": "index"
-    },
-    {
       "author": "saylesss88",
       "collection": "blog",
       "date": "2025-11-28T00:00:00+00:00",
@@ -52,20 +52,6 @@
         "networking"
       ],
       "title": "Hardening Networking"
-    },
-    {
-      "author": "saylesss88",
-      "collection": "blog",
-      "date": "2025-11-28T00:00:00+00:00",
-      "description": null,
-      "draft": false,
-      "path": "arch/enc_install.md",
-      "preview_html": "<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>",
-      "tags": [
-        "arch",
-        "security"
-      ],
-      "title": "Encrypted Arch Install"
     },
     {
       "author": "saylesss88",
@@ -94,6 +80,20 @@
         "security"
       ],
       "title": "Hardening Arch"
+    },
+    {
+      "author": "saylesss88",
+      "collection": "blog",
+      "date": "2025-11-28T00:00:00+00:00",
+      "description": null,
+      "draft": false,
+      "path": "arch/enc_install.md",
+      "preview_html": "<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>",
+      "tags": [
+        "arch",
+        "security"
+      ],
+      "title": "Encrypted Arch Install"
     }
   ]
 }
