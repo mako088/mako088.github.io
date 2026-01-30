@@ -2,8 +2,8 @@
   "version": "https://jsonfeed.org/version/1.1",
   "title": "privacy-book",
   "home_page_url": "https://mako088.github.io/",
-  "feed_url": "https://mako088.github.io/feed.json",
-  "description": "An mdBook-generated site",
+  "feed_url": "https://mako088.github.io//feed.json",
+  "description": "Description",
   "items": [
     {
       "id": "https://mako088.github.io/index.html",
