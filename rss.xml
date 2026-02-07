@@ -2502,7 +2502,7 @@ to save your changes.</p>
 <ol start="6">
 <li><strong>Encrypt the Root partition and Open it</strong>:</li>
 </ol>
-<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
+<pre><code class="language-bash">cryptsetup luksFormat --type luks2 /dev/nvme0n1p2
 cryptsetup open /dev/nvme0n1p2 cryptroot
 </code></pre>
 <p>Create a filesystem:</p>
