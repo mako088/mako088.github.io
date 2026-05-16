@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>Description</description><generator>mdbook-rss-feed 1.0.0</generator><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Sun, 4 Jan 2026 19:10:21 +0000</pubDate></item><item><title>RethinkDNS</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<h1>RethinkDNS</h1>
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>Description</description><generator>mdbook-rss-feed 1.0.0</generator><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Sat, 9 May 2026 19:47:23 +0000</pubDate></item><item><title>RethinkDNS</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<h1>RethinkDNS</h1>
 <details>
 <summary> ✔️ Table of Contents</summary>
 <!-- toc -->
@@ -897,16 +897,7 @@ least once since it was powered on, even if it is currently locked. The
 encryption keys are loaded into RAM, making the device’s stored data more
 accessible and increasing the potential attack surface compared to the BFU
 state.</p>
-<blockquote>
-<p>NOTE: Updated 2026-02-07: BFU won’t keep you safe on many devices and this is
-likely pointless on said devices, samsung being one of them. With celebrite
-pro, they are able to get in regardless of what you do.</p>
-</blockquote>
 <ul>
-<li>
-<p><a href="https://grapheneos.social/@GrapheneOS/112462758257739953">Cellebrite’s list of capabilities</a>.
-Note, Not supported doesn’t always mean they can’t get in.</p>
-</li>
 <li>
 <p>Set the Auto optimization (Auto Restart) to the shortest amount of time
 possible. When your phone first reboots it is in BFU mode which is Before
@@ -2317,27 +2308,6 @@ everyone.</p>
 </details>
 </details>
 <hr />
-<h2>SSH into the installer if installing in a VM</h2>
-<details>
-<summary> ✔️ SSH example for easy installation in a VM </summary>
-<ol>
-<li>
-<p>Run <code>passwd</code> and set a password.</p>
-</li>
-<li>
-<p>Add <code>PermitRootLogin yes</code> to <code>/etc/ssh/sshd_config</code></p>
-</li>
-<li>
-<p>Run <code>ip a</code> to get the IP Address</p>
-</li>
-<li>
-<p>On the <strong>Host</strong> run: <code>ssh root@192.168.122.xxx</code> and enter your password.</p>
-</li>
-<li>
-<p>You’re all set, you can now copy paste things in.</p>
-</li>
-</ol>
-</details>
 <ol>
 <li><strong>Connect to Wi-Fi</strong>:</li>
 </ol>
@@ -2361,8 +2331,7 @@ everyone.</p>
 <p>Save a backup of your current mirrorlist so we can safely update it:</p>
 <pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 </code></pre>
-<pre><code class="language-bash">pacman -S reflector
-reflector --list-countries
+<pre><code class="language-bash">reflector --list-countries
 # Example if you live in the US
 reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
 </code></pre>
@@ -2378,61 +2347,6 @@ both HTTP and HTTPS are used.</p>
 loadkeys &lt;chosen-map&gt;
 # Increase font size
 setfont ter-132b
-</code></pre>
-<pre><code class="language-bash">sudo pacman -S chrony
-</code></pre>
-<p><code>/etc/chrony.conf</code>:</p>
-<pre><code class="language-conf"># Copyright © 2014-2025 GrapheneOS
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-server time.cloudflare.com iburst nts
-server ntppool1.time.nl iburst nts
-server nts.netnod.se iburst nts
-server ptbtime1.ptb.de iburst nts
-server time.dfm.dk iburst nts
-server time.cifelli.xyz iburst nts
-
-minsources 3
-authselectmode require
-
-# EF
-dscp 46
-
-driftfile /var/lib/chrony/drift
-dumpdir /var/lib/chrony
-ntsdumpdir /var/lib/chrony
-
-leapseclist /usr/share/zoneinfo/leap-seconds.list
-makestep 1.0 3
-
-rtconutc
-rtcsync
-
-cmdport 0
-
-noclientlog
-</code></pre>
-<p>The above setup uses Network Time Security (NTS) and is a more modern safer way
-to synchronize time using chrony.</p>
-<pre><code class="language-bash">sudo systemctl disable --now systemd-timesyncd
-sudo systemctl enable --now chronyd
 </code></pre>
 <pre><code class="language-bash">timedatectl set-ntp true
 timedatectl list-timezones
@@ -2502,7 +2416,7 @@ to save your changes.</p>
 <ol start="6">
 <li><strong>Encrypt the Root partition and Open it</strong>:</li>
 </ol>
-<pre><code class="language-bash">cryptsetup luksFormat --type luks2 /dev/nvme0n1p2
+<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
 cryptsetup open /dev/nvme0n1p2 cryptroot
 </code></pre>
 <p>Create a filesystem:</p>
@@ -2547,9 +2461,12 @@ UUID=B88B-844F      	/boot     	vfat      	rw,relatime,fmask=0137,dmask=0027,cod
 <pre><code class="language-bash">chmod 700 /boot
 chmod 600 /boot/loader/random-seed
 </code></pre>
-<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn’t you’ll
-need to ensure both partitions are mounted and regenerate your fstab again with
-<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
+<blockquote class="markdown-alert-important">
+<p>The <code>fstab</code> should list both partitions, if it doesn’t you’ll need to ensure
+both partitions are mounted and regenerate your fstab again with <code>genfstab</code>.
+Also ensure that the root partition was mounted with
+compression.</p>
+</blockquote>
 <hr />
 <ol start="8">
 <li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
@@ -3055,7 +2972,7 @@ ipv6.dhcp-duid=stable-uuid
 <p>Find your device interface and check your current MAC address:</p>
 <pre><code class="language-bash"># find interface
 ip add
-sudo iplink show wlp3s0
+sudo ip link show wlp3s0
 </code></pre>
 <p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
 it:</p>
@@ -3065,6 +2982,7 @@ it:</p>
 </code></pre>
 <p>Install the <code>macchanger</code> package and run:</p>
 <pre><code class="language-bash">sudo macchanger -a wlp3s0
+sudo ip link set dev wlp3s0 up
 </code></pre>
 <ul>
 <li>
