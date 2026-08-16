@@ -1,9 +1,126 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>Description</description><generator>mdbook-rss-feed 1.5.0</generator><item><title>index</title><link>https://mako088.github.io/index.html</link><description><![CDATA[]]></description><guid>https://mako088.github.io/index.html</guid><pubDate>Thu, 16 Jul 2026 13:57:25 +0000</pubDate></item><item><title>RethinkDNS</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<h1>RethinkDNS</h1>
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>Description</description><generator>mdbook-rss-feed 1.10.0</generator><atom:link href="https://mako088.github.io/rss.xml" rel="self"></atom:link><item><title>Introduction</title><link>https://mako088.github.io/index.html</link><description><![CDATA[<!-- kanagawa landing -->
+<div class="wave-bg">
+<div class="wave"></div>
+<div class="wave"></div>
+<div class="wave"></div>
+</div>
+<div class="landing">
+<h1 class="title">privacy-book</h1>
+<p class="subtitle">Notes, posts, and more</p>
+<div class="grid grid-wide">
+  <div class="card">
+    <h2>Latest posts</h2>
+    <div id="latest-posts"><em>Loading...</em></div>
+  </div>
+  <div class="card">
+    <h2>Recent notes</h2>
+    <div id="recent-notes"><em>Loading...</em></div>
+  </div>
+  <div class="card">
+    <h2>Popular tags</h2>
+    <div id="tag-cloud" class="tag-cloud"></div>
+  </div>
+</div>
+</div>
+<script>
+  (function () {
+    if (!window.CONTENT_COLLECTIONS) {
+      console.warn("kanagawa-theme: window.CONTENT_COLLECTIONS not found; is mdbook-content-loader enabled?");
+      return;
+    }
+
+    var data = window.CONTENT_COLLECTIONS;
+    var entries = data.entries || [];
+    var collections = data.collections || {};
+
+    var link = function (p) {
+      return (p.path || "").replace(/\.md(?:own|arkdown)?$/i, ".html");
+    };
+
+  // Render latest posts into #latest-posts (used on load and when filtering)
+    function renderLatest(posts) {
+      var latestEl = document.getElementById("latest-posts");
+      if (!latestEl) return;
+
+      var list = posts.slice(0, 6);
+      latestEl.innerHTML = list.length
+        ? list.map(function (p) {
+            return (
+              '<div class="post-preview">' +
+                '<h3><a href="https://mako088.github.io/' + link(p) + '">' + (p.title || p.path) + '</a></h3>' +
+                (p.date ? '<time>' + new Date(p.date).toISOString().slice(0,10) + '</time>' : '') +
+                '<div class="preview">' + (p.preview_html || "") + "</div>" +
+              "</div>"
+            );
+          }).join("")
+        : "<p>No posts yet.</p>";
+    }
+
+    // Initial latest posts (blog, then fallback to posts)
+    var initialPosts = (collections.blog || collections.posts || []);
+    renderLatest(initialPosts);
+
+    // Notes
+    var notes = (collections.notes || []).slice(0, 8);
+    var notesEl = document.getElementById("recent-notes");
+    if (notesEl) {
+      notesEl.innerHTML = notes.length
+        ? notes.map(function (p) {
+            return '• <a href="https://mako088.github.io/' + link(p) + '">' + (p.title || p.path) + "</a><br>";
+          }).join("")
+        : "<p>No notes yet.</p>";
+    }
+
+    // Tag cloud
+    var tagCounts = {};
+    (entries || []).forEach(function (p) {
+      (p.tags || []).forEach(function (t) {
+        tagCounts[t] = (tagCounts[t] || 0) + 1;
+      });
+    });
+
+    var tags = Object.entries(tagCounts)
+      .sort(function (a, b) { return b[1] - a[1]; })
+      .slice(0, 15);
+
+    var tagEl = document.getElementById("tag-cloud");
+    if (tagEl) {
+      // Render tags as clickable buttons
+      tagEl.innerHTML = tags.map(function (pair) {
+        var tag = pair[0], n = pair[1];
+        return '<button class="tag-pill" type="button" data-tag="' + tag + '">' +
+                 tag + " (" + n + ")" +
+               "</button>";
+      }).join("");
+
+      // Clicking a tag filters "Latest posts" by that tag
+      tagEl.addEventListener("click", function (ev) {
+        var btn = ev.target.closest(".tag-pill");
+        if (!btn) return;
+        var tag = btn.getAttribute("data-tag");
+
+        var source = (collections.blog || collections.posts || []);
+        var filtered = source.filter(function (p) {
+          return (p.tags || []).includes(tag);
+        });
+
+        renderLatest(filtered.length ? filtered : source);
+      });
+    }
+  })();
+</script>
+<style>
+  .post-preview { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(126,156,216,0.2); }
+  .post-preview:last-child { border-bottom: none; }
+  .preview { margin-top: 0.5rem; opacity: 0.9; font-size: 0.95em; }
+</style>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/index.html</guid></item><item><title>RethinkDNS</title><link>https://mako088.github.io/android/RethinkDNS_Guide.html</link><description><![CDATA[<h1>RethinkDNS</h1>
 <details>
 <summary> ✔️ Table of Contents</summary>
 <!-- toc -->
 </details>
-<p><img src="../images/rethinkdns.cleaned.png" alt="RethinkDNS Logo" /></p>
+<p><img src="https://mako088.github.io/../images/rethinkdns.cleaned.png" alt="RethinkDNS Logo" /></p>
 <blockquote>
 <p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and
 privacy advocate.</p>
@@ -202,7 +319,7 @@ or domains you explicitly set trust rules for).</p>
 </ul>
 </details>
 <hr />
-<h2><a href="#rethinkdns-overview">RethinkDNS Overview</a></h2>
+<h2><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#rethinkdns-overview">RethinkDNS Overview</a></h2>
 <ul>
 <li>
 <p><code>Bypass DNS and Firewall</code>: Bypass the DNS and Firewall for this app, <strong>this
@@ -856,13 +973,13 @@ it was blocked.</p>
 different privacy categories.</li>
 </ul>
 <hr />
-<h3><a href="#duckduckgo">DuckDuckGo</a></h3>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#duckduckgo">DuckDuckGo</a></h3>
 <p>I also tested DuckDuckGo with its stock configuration and <code>dnsleaktest.com</code>
 showed that DDGs traffic was successfully tunneled through Rethink to Quad9s’
 servers.</p>
 <p><code>dnsleaktest.com</code> showed all <code>WoodyNet</code> ISPs indicating success.</p>
 <hr />
-<h4><a href="#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></h4>
+<h4><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#chromium-based-browsers-brave">Chromium Based Browsers (Brave)</a></h4>
 <p>For Brave, if you want your DNS routed through Rethink you have to turn
 <code>Use secure DNS</code> off.</p>
 <p>I also had to set Brave to <em>Bypass Universal</em></p>
@@ -871,7 +988,7 @@ servers.</p>
 can be opted out of.</p>
 </blockquote>
 <hr />
-<h3><a href="#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></h3>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#more-fine-grained-control--enhanced-privacy">More Fine Grained Control &amp; Enhanced Privacy</a></h3>
 <p>In this section we will switch from a default allow to a default deny; blocking
 network access to every app. We will then go through and only enable networking
 for the apps that we need and trust.</p>
@@ -996,7 +1113,7 @@ the Play ecosystem.</p>
 comes with uBlock installed by default which I recommend that you learn how to
 get the most out of. With Firefox fingerprint protection, a few about:config
 tweaks, and uBlock you can accomplish what used to take 6 extensions to do. See:
-<a href="#ublock-origin">uBlock Origin</a></p>
+<a href="https://mako088.github.io/android/RethinkDNS_Guide.html#ublock-origin">uBlock Origin</a></p>
 <p>For more compartmentalization, Brave Browser now has an F-Droid repository that
 can be added.</p>
 <p>Open F-Droid, in Settings click Repositories, click +, and for the Brave
@@ -1289,7 +1406,7 @@ from apps/browser. Without it, downloads stall.</p>
 </li>
 </ul>
 <hr />
-<h3><a href="#tor">Tor</a></h3>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#tor">Tor</a></h3>
 <p>Tor itself is a network and software that anonymizes traffic by encrypting it
 and bouncing it though a series of volunteer-operated relays around the world
 before reaching the destination. Orbot uses this Tor network to encrypt and
@@ -1351,8 +1468,8 @@ routine tasks. Every user adds valuable noise to the network, helping protect
 privacy and freedom for all.</p>
 </details>
 <hr />
-<h3><a href="#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></h3>
-<p><img src="../images/orbot.png" alt="Orbot Logo" /></p>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#setting-up-orbot-with-a-tcp-only-proxy">Setting up Orbot with a TCP-only Proxy</a></h3>
+<p><img src="https://mako088.github.io/../images/orbot.png" alt="Orbot Logo" /></p>
 <ul>
 <li>Helpful guide, <a href="https://thecyberexpress.com/what-is-orbot/">What is Orbot?</a></li>
 </ul>
@@ -1412,7 +1529,7 @@ can use your device as a bridge. This is a great way to give back!</p>
 </li>
 </ul>
 <hr />
-<h2><a href="#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></h2>
+<h2><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#setting-up-a-socks5-proxy">Setting up a SOCKS5 Proxy</a></h2>
 <p>If you have Orbot set up through auto mode, you’ll have to disable it.</p>
 <p>Open <code>Orbot -&gt; More</code>: Near the bottom of the screen you’ll see <code>HTTP: 8118</code>, and
 <code>SOCKS: 9050</code>, these are the Port numbers. We will compare these to Rethinks
@@ -1619,7 +1736,7 @@ you access to the <code>LOGS</code>.</p>
 rules the app. You can click the dropdown menu’s to set new Universal Firewall
 rules, as well as block/trust rules for IPs and domains.</p>
 <hr />
-<h3><a href="#logs">Logs</a></h3>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#logs">Logs</a></h3>
 <p>On-device logging is on by default. You can find it in <code>Configure -&gt; Settings</code>.
 From there, you can set the log level and choose a notification action.</p>
 <p>If anyone else uses your phone, it’s probably a good idea to enable app lock.</p>
@@ -1638,7 +1755,7 @@ that in the first dropdown box.</p>
 <p>The next drop down is <code>Block,trust this IP for this app</code> where you can set a
 rule to <code>Block</code> or <code>Trust</code>.</p>
 <hr />
-<h3><a href="#resources">Resources</a></h3>
+<h3><a href="https://mako088.github.io/android/RethinkDNS_Guide.html#resources">Resources</a></h3>
 <details>
 <summary>
 ✔️ Click to Expand Resources
@@ -1803,7 +1920,768 @@ state-of-the-art cryptography. –<a href="https://www.wireguard.com/">Wireguard
 </li>
 </ul>
 </details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/android/RethinkDNS_Guide.html</guid><pubDate>Sun, 7 Dec 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted DNS on Arch</title><link>https://mako088.github.io/arch/enc_dns.html</link><description><![CDATA[<h1>Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</h1>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/android/RethinkDNS_Guide.html</guid></item><item><title>Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<h1>Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</h1>
+<details>
+<summary> ✔️ Click to Expand Table of Contents</summary>
+<!-- toc -->
+</details>
+<p>The ultimate installation resource is always goint to be the:</p>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+</li>
+<li>
+<p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
+directory is just the same directory where your Arch Linux ISO file is stored.</p>
+</li>
+</ul>
+<blockquote>
+<p>Always review the Wiki and never just plug random things suggested by me or
+anyone else without first doing your own research.</p>
+</blockquote>
+<p>Edited: 09-25-25 Removed encrypted swap section. Big usability downside IMO.</p>
+<details>
+<summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
+<blockquote>
+<p>❗ NOTE: If you only want to verify the ISO once, you can temporarily import
+the public key, verify the signature, and then you don’t need to keep the key
+permanently in your keyring or sign it locally. This example is from the last
+release, but the process is the same.</p>
+</blockquote>
+<p>With <code>sequoia-sq</code>, you can get the Arch release signing key with:</p>
+<pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
+</code></pre>
+<p>Export the chosen key to a <code>.pgp</code> file:</p>
+<pre><code class="language-bash">sq cert export --keyring=release-key.pgp --cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp
+</code></pre>
+<p>Import into your keychain:</p>
+<pre><code class="language-bash">gpg --import pierre-archlinux.pgp
+gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
+gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
+gpg: next trustdb check due at 2026-08-23
+</code></pre>
+<ul>
+<li>Now, you should see <code>&lt;pierre@archlinux.org&gt;</code> and his keys when you run
+<code>gpg --list-keys</code></li>
+</ul>
+<p>Finally, verify the signature:</p>
+<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
+Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
+
+1 authenticated signature.
+</code></pre>
+<blockquote>
+<p>❗ To ensure the key is authentic and not spoofed, verify that the key
+fingerprint matches the official Arch Linux signing key fingerprint, which can
+is linked below and on the Arch website.</p>
+</blockquote>
+<p>This shows that the signature was made by the key with the ID
+<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz)</code></p>
+<p>You can check the keys fingerprint with:</p>
+<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
+</code></pre>
+<ul>
+<li>Verify it against the
+<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
+</ul>
+<p>Verify it against the Arch Linux master-keys</p>
+<p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
+that the key used to sign is trusted in our keyring.</p>
+<p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
+<p>We have successfully verified that the file was signed by Pierr’s official Arch
+Linux key and has not been tampered with.</p>
+<p>The following is only if you currently already have keys on your gpg keyring.</p>
+<details>
+<summary> ☑️ Click to expand Key Signing and Publishing Example </summary>
+<p>List your keys to get the arch keyID:</p>
+<pre><code class="language-bash">gpg --list-keys
+# ... snip ...
+pub   ed25519/0x76A5EF9054449A5C 2022-10-31 [SC] [expires: 2037-10-27]
+      Key fingerprint = 3E80 CA1A 8B89 F69C BA57  D98A 76A5 EF90 5444 9A5C
+uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.org&gt;
+uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.de&gt;
+sub   ed25519/0xD6D13C45BFCFBAFD 2022-10-31 [A] [expires: 2037-10-27]
+sub   cv25519/0x7F56ADE50CA3D899 2022-10-31 [E] [expires: 2037-10-27]
+</code></pre>
+<p>Sign the key:</p>
+<pre><code class="language-bash">gpg --sign-key 0x76A5EF9054449A5C
+</code></pre>
+<p>Now you can export and publish the new public key and send it to a keyserver:</p>
+<pre><code class="language-bash">gpg --export --armor 0x76A5EF9054449A5C &gt; archlinux-signed.asc
+gpg --send-keys 0x76A5EF9054449A5C
+</code></pre>
+<p>The more people that verify, sign, and re-export and publish their keys the
+better for the web of trust that gpg uses making the network more secure for
+everyone.</p>
+</details>
+</details>
+<hr />
+<ol>
+<li><strong>Connect to Wi-Fi</strong>:</li>
+</ol>
+<pre><code class="language-bash">iwctl
+[iwd]# device list
+[iwd]# station wlan0 scan
+[iwd]# station wlan0 connect NETGEAR80
+# Enter your Password
+# Check Connection
+[iwd]# station wlan0 show
+[iwd]# exit
+</code></pre>
+<pre><code class="language-bash">ping -c 3 archlinux.org
+</code></pre>
+<hr />
+<ol start="2">
+<li><strong>Update package databases and mirrorlist</strong>:</li>
+</ol>
+<pre><code class="language-bash">pacman -Syyu
+</code></pre>
+<p>Save a backup of your current mirrorlist so we can safely update it:</p>
+<pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+</code></pre>
+<pre><code class="language-bash">pacman -S reflector
+reflector --list-countries
+# Example if you live in the US
+reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
+</code></pre>
+<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
+both HTTP and HTTPS are used.</p>
+<p>NOTE: This can take a bit and you can expect some failures..</p>
+<hr />
+<ol start="3">
+<li><strong>Set keyboard layout, font, and system clock</strong>:</li>
+</ol>
+<p>Default keymap is US, if you need something different:</p>
+<pre><code class="language-bash">localectl list-keymaps
+loadkeys &lt;chosen-map&gt;
+# Increase font size
+setfont ter-132b
+</code></pre>
+<pre><code class="language-bash">sudo pacman -S chrony
+</code></pre>
+<p><code>/etc/chrony.conf</code>:</p>
+<pre><code class="language-conf"># Copyright © 2014-2025 GrapheneOS
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+server time.cloudflare.com iburst nts
+server ntppool1.time.nl iburst nts
+server nts.netnod.se iburst nts
+server ptbtime1.ptb.de iburst nts
+server time.dfm.dk iburst nts
+server time.cifelli.xyz iburst nts
+
+minsources 3
+authselectmode require
+
+# EF
+dscp 46
+
+driftfile /var/lib/chrony/drift
+dumpdir /var/lib/chrony
+ntsdumpdir /var/lib/chrony
+
+leapseclist /usr/share/zoneinfo/leap-seconds.list
+makestep 1.0 3
+
+rtconutc
+rtcsync
+
+cmdport 0
+
+noclientlog
+</code></pre>
+<p>The above setup uses Network Time Security (NTS) and is a more modern safer way
+to synchronize time using chrony.</p>
+<pre><code class="language-bash">sudo systemctl disable --now systemd-timesyncd
+sudo systemctl enable --now chronyd
+</code></pre>
+<pre><code class="language-bash">timedatectl set-ntp true
+timedatectl list-timezones
+# Example
+sudo timedatectl set-timezone America/New_York
+</code></pre>
+<hr />
+<ol start="4">
+<li><strong>Partition your Disk</strong>:</li>
+</ol>
+<p>The only required partitions are one for the root directory <code>/</code> (typically <code>1G</code>)
+and one for booting in UEFI mode, an EFI system partition (typically the rest of
+the space left).</p>
+<p>In this section, I’ll assume that you’re starting with a clean slate. If you’re
+not, you can use your existing partitions if they meet the above requirements or
+delete them.</p>
+<p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
+filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
+until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
+to save your changes.</p>
+<p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
+<pre><code class="language-bash">fdisk -l
+</code></pre>
+<pre><code class="language-bash">cfdisk /dev/nvme0n1
+</code></pre>
+<ul>
+<li>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
+<p>Select -&gt; <code>[ New ]</code></p>
+</li>
+<li>
+<p>Partition size: <code>1G</code></p>
+</li>
+<li>
+<p>Type -&gt; <code>EFI System</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>Select -&gt; <code>[ Free Space ]</code></p>
+<ul>
+<li>
+<p>Partition size: The rest of the space</p>
+</li>
+<li>
+<p>Type -&gt; <code>Linux filesystem</code></p>
+</li>
+<li>
+<p>Select -&gt; <code>[ Write ]</code></p>
+</li>
+<li>
+<p>Select -&gt; <code>[ Quit ]</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<ol start="5">
+<li><strong>Format the EFI partition as FAT32</strong>:</li>
+</ol>
+<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
+</code></pre>
+<p>Leave the root partition unformatted for the next step.</p>
+<hr />
+<ol start="6">
+<li><strong>Encrypt the Root partition and Open it</strong>:</li>
+</ol>
+<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup open /dev/nvme0n1p2 cryptroot
+</code></pre>
+<p>Create a filesystem:</p>
+<pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
+</code></pre>
+<p>If you mount the filesystem with compression before running <code>genfstab</code>, it will
+automatically add the chosen compression to the <code>fstab</code>.</p>
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot  # Mount EFI partition at /mnt/boot
+mount -o compress=zstd /dev/mapper/cryptroot /mnt
+</code></pre>
+<hr />
+<h2>Install the Base System on <code>/mnt</code> with <code>pacstrap</code></h2>
+<p>If you prefer Nvim or a hardened kernel, change it here.</p>
+<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr systemd-ukify
+</code></pre>
+<hr />
+<ol start="7">
+<li><strong>Generate the Filesystem Table</strong>:</li>
+</ol>
+<p>The EFI and root partitions need to be mounted before you generate the
+filesystem table in the next step.</p>
+<pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+#
+hx /mnt/etc/fstab
+cat /mnt/etc/fstab
+</code></pre>
+<p>Fix security hole and harden <code>/boot</code> permissions by adding
+<code>fmask=0137, dmask=0027</code>:</p>
+<pre><code class="language-bash">hx /mnt/etc/fstab
+</code></pre>
+<p>Example</p>
+<pre><code class="language-fstab"># Static information about the filesystems.
+# See fstab(5) for details.
+
+# &lt;file system&gt; &lt;dir&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;
+# /dev/mapper/cryptroot
+UUID=6d68a2bf-34ea-4adc-86d5-cb1d56de44a4	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/	0 0
+
+# /dev/nvme0n1p1
+UUID=B88B-844F      	/boot     	vfat      	rw,relatime,fmask=0137,dmask=0027,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
+</code></pre>
+<pre><code class="language-bash">chmod 700 /boot
+chmod 600 /boot/loader/random-seed
+</code></pre>
+<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn’t you’ll
+need to ensure both partitions are mounted and regenerate your fstab again with
+<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
+<hr />
+<ol start="8">
+<li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
+</ol>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<p>Create a user:</p>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
+passwd yourusername
+</code></pre>
+<p>Create an admin password:</p>
+<pre><code class="language-bash">passwd
+</code></pre>
+<p>Enable sudo for wheel group:</p>
+<p>In <code>/etc/sudoers</code> uncomment the line:</p>
+<pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
+</code></pre>
+<hr />
+<ol start="9">
+<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>sd-encrypt</code> hook
+before the <code>filesystems</code> attribute.</li>
+</ol>
+<ul>
+<li>
+<p>Locate the <code>HOOKS</code> line</p>
+</li>
+<li>
+<p>Insert <code>encrypt</code> <strong>before</strong> filesystems</p>
+</li>
+</ul>
+<pre><code class="language-bash">vim /etc/mkinitcpio.conf
+</code></pre>
+<p>To use <code>sd-encrypt</code>, it is necessary to replace <code>udev</code> with <code>systemd</code> and if you
+require a different keyboard layout from US <code>sd-vconsole</code> is needed.</p>
+<pre><code class="language-bash"># mkinitcpio.conf
+# *IF* you use an nvme drive
+MODULES=(nvme)
+FILES=(/etc/crypttab.initramfs /etc/vconsole.conf)
+# ... snip ...
+HOOKS=(base systemd autodetect microcode modconf kms keyboard keymap consolefont sd-vconsole block sd-encrypt filesystems fsck systemd-ukify)
+# ... snip ...
+</code></pre>
+<p>Create <code>/etc/crypttab.initramfs</code>:</p>
+<pre><code class="language-initramfs">cryptroot UUID=your-uuid none luks,discard
+</code></pre>
+<hr />
+<p>Create <code>/etc/vconsole.conf</code>:</p>
+<p>For example <code>KEYMAP=fr</code> is french</p>
+<pre><code class="language-conf">KEYMAP=us
+FONT=lat9w-16
+</code></pre>
+<hr />
+<p>Edit <code>/etc/mkinitcpio.d/linux-zen.preset</code>, this enables <code>mkinitcpio -P</code> to
+generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
+<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-zen' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-zen"
+
+PRESETS=('default' 'fallback')
+# PRESETS=('default')
+
+# default_config="/etc/mkinitcpio.conf"
+# default_image="/boot/initramfs-linux-zen.img"
+default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
+default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
+
+#fallback_config="/etc/mkinitcpio.conf"
+#fallback_image="/boot/initramfs-linux-zen-fallback.img"
+fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
+fallback_options="-S autodetect"
+</code></pre>
+<p>Generate the initial RAM Filesystem (initramfs) image.</p>
+<pre><code class="language-bash">mkinitcpio -P
+</code></pre>
+<blockquote>
+<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
+&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
+Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
+<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
+</blockquote>
+<hr />
+<ol start="10">
+<li><strong>Install systemd-boot and setup Unified Kernel Image</strong>, (while still in
+chroot environment):</li>
+</ol>
+<p>Ensure your UEFI variables are accessible:</p>
+<pre><code class="language-bash">efivar --list
+</code></pre>
+<p>This command won’t work if both partitions aren’t mounted, ensure they are both
+mounted and if it still doesn’t work you can use <code>--esp-path=/boot</code> or
+<code>--esp-path=/mnt/boot</code>.</p>
+<pre><code class="language-bash">bootctl install
+</code></pre>
+<p>Edit <code>/etc/kernel/cmdline</code> and add the output of <code>blkid</code> on your root partition.
+For example:</p>
+<pre><code class="language-bash">blkid /dev/nvme0n1p2 &gt; /tmp/uuid.txt
+</code></pre>
+<p>When you open <code>/etc/kernel/cmdline</code> in vim or helix, run <code>:r /tmp/uuid.txt</code> to
+read the UUID of your root partition into the file. You only need the numbers
+like so:</p>
+<pre><code class="language-cmdline">rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw
+</code></pre>
+<p>In the above example, <code>7b78e942-f4f7-4dde-a015-3a816305483f</code> is the UUID
+extracted from the <code>blkid</code> command.</p>
+<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
+<pre><code class="language-conf">title Arch Linux
+linux /vmlinuz-linux-zen
+initrd /initramfs-linux-zen.img
+options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw quiet
+</code></pre>
+<blockquote>
+<p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
+configured to autodetect the UKI. It doesn’t hurt to add it though and can
+prevent issues in the future. Ensure <code>rd.luks.name=</code> contains the UUID from
+the encrypted root partition. (e.g., <code>blkid /dev/nvme0n1p2</code>).</p>
+</blockquote>
+<p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">default arch.conf
+# default @saved  # return to last choice
+timeout 4
+console-mode auto
+auto-entries 1
+</code></pre>
+<pre><code class="language-bash">bootctl status
+</code></pre>
+<p>Set a password to protect <code>systemd-boot</code> with <code>systemd-boot-password</code>:</p>
+<pre><code class="language-bash">paru -S systemd-boot-password
+</code></pre>
+<pre><code class="language-bash">sudo sbpctl install /boot
+</code></pre>
+<p>You will now be prompted for your password before you can edit kernel
+parameters.</p>
+<hr />
+<p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
+<p>We already added <code>systemd-ukify</code> in the pacstrap command, let’s add a few more
+tools for this process:</p>
+<pre><code class="language-bash">sudo pacman -S sbsigntools efitools
+</code></pre>
+<p>Copy the existing template to <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-bash">cp /usr/lib/kernel/uki.conf /etc/kernel/uki.conf
+</code></pre>
+<p>Edit <code>/etc/kernel/uki.conf</code>:</p>
+<pre><code class="language-conf">[UKI]
+#Initrd=
+#Microcode=
+#Splash=
+#PCRPKey=
+#PCRBanks=
+#SecureBootSigningTool=
+SecureBootPrivateKey=/etc/kernel/secure-boot-private-key.pem
+SecureBootCertificate=/etc/kernel/secure-boot-certificate.pem
+#SecureBootCertificateDir=
+#SecureBootCertificateName=
+#SecureBootCertificateValidity=
+#SigningEngine=
+SignKernel=yes
+</code></pre>
+<p>Generate your signing keys:</p>
+<pre><code class="language-bash">ukify genkey --config /etc/kernel/uki.conf
+</code></pre>
+<p>The above command creates <code>/etc/kernel/secure-boot-certificate.pem</code> and
+<code>/etc/kernel/secure-boot-private-key.pem</code>.</p>
+<p>Building the UKIs:</p>
+<pre><code class="language-bash">mkdir -p /boot/EFI/Linux
+mkinitcpio -P
+# Output
+Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
+==&gt; Unified kernel image generation successful
+</code></pre>
+<p>Sign the boot loader with the new keys:</p>
+<pre><code class="language-bash">/usr/lib/systemd/systemd-sbsign sign \
+--private-key /etc/kernel/secure-boot-private-key.pem \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--output /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed \
+/usr/lib/systemd/boot/efi/systemd-bootx64.efi
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Wrote signed PE binary to /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
+</code></pre>
+<pre><code class="language-bash">sudo bootctl install --secure-boot-auto-enroll yes \
+--certificate /etc/kernel/secure-boot-certificate.pem \
+--private-key /etc/kernel/secure-boot-private-key.pem
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/systemd/systemd-bootx64.efi".
+    3 Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/BOOT/BOOTX64.EFI".
+    4 ⚠️  Mount point '/boot' which backs the random seed file is world accessible, which is a security hole!  ⚠️
+    5 ⚠️ Random seed file '/boot/loader/random-seed' is world accessible, which is a security hole! ⚠️
+    6 Random seed file /boot/loader/random-seed successfully refreshed (32 bytes).
+    7 Secure boot auto-enrollment file /boot/loader/keys/auto/PK.auth successfully written.
+    8 Secure boot auto-enrollment file /boot/loader/keys/auto/KEK.auth successfully written.
+    9 Secure boot auto-enrollment file /boot/loader/keys/auto/db.auth successfully written.
+   10 Created EFI boot entry "Linux Boot Manager".
+</code></pre>
+<p>Fix the security hole:</p>
+<pre><code class="language-bash">chmod 700 /boot
+</code></pre>
+<p>Add the following to your <code>/boot/loader/loader.conf</code>:</p>
+<pre><code class="language-conf">secure-boot-enroll force
+</code></pre>
+<p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
+your keys when the time runs out.</p>
+<p>After successful key enrollment, reboot into UEFI again, enable Secure Boot and
+reboot.</p>
+<p>When the desktop launches, check the output of <code>bootctl status</code> to ensure
+<code>Secure Boot: enabled (user)</code></p>
+<p>If your system doesn’t accept them, you may have to do some conversions. You can
+also add the keys manually which is what I did.</p>
+<details>
+<summary> ✔️ Click to Expand conversion Examples </summary>
+<pre><code class="language-bash"># Create workspace for certs and outputs
+mkdir -p ~/secureboot/output
+
+# Define certificate location
+CERT_PEM="/etc/kernel/secure-boot-certificate.pem"
+
+# Convert PEM cert to DER format for UEFI enrollment
+sudo openssl x509 -in $CERT_PEM -out ~/secureboot/output/db.cer -outform DER
+
+# Convert PEM cert to EFI Signature List
+cert-to-efi-sig-list $CERT_PEM ~/secureboot/output/db.esl
+
+# Sign the Signature List (run from wherever your private key is; do not copy it)
+sudo sign-efi-sig-list -k /etc/kernel/secure-boot-private-key.pem -c $CERT_PEM db \
+    ~/secureboot/output/db.esl ~/secureboot/output/db.auth
+</code></pre>
+<p>Manual Key Enrollment:</p>
+<ul>
+<li>
+<p><code>db.cer</code> -&gt; enroll in db (Trusted Signatures), Choose the desired drive, find
+the file and add it. Save as an <code>Authorized Signature</code> instead of <code>Public Key</code></p>
+</li>
+<li>
+<p><code>PK.cer</code> -&gt; enroll in <code>Platform Key</code>(PK)</p>
+</li>
+<li>
+<p>Keep your <code>secure-boot-private-key.pem</code> <strong>private</strong>, with the above commands
+we only use it when signing, and otherwise keep it protected.</p>
+</li>
+</ul>
+</details>
+<hr />
+<ol start="11">
+<li><strong>Enable LightDM and NetworkManager</strong></li>
+</ol>
+<pre><code class="language-bash">systemctl enable lightdm
+systemctl enable NetworkManager
+</code></pre>
+<blockquote>
+<p>❗️ NOTE: If you’re ever unable to run the above commands in the chroot
+environment, exit chroot and run:</p>
+<pre><code class="language-bash">systemctl --root=/mnt enable lightdm
+systemctl --root=/mnt enable NetworkManager
+</code></pre>
+</blockquote>
+<p>Configure LightDM greeter, edit <code>/etc/lightdm/lightdm.conf</code> to add:</p>
+<pre><code class="language-conf"># lightdm.conf
+[Seat:*]
+greeter-session=lightdm-gtk-greeter
+</code></pre>
+<p>Exit <code>arch-chroot</code> with <code>exit</code></p>
+<p>Unmount your partitions and reboot:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+</code></pre>
+<hr />
+<ol start="12">
+<li><strong>Reboot</strong></li>
+</ol>
+<pre><code class="language-bash">bootctl status
+System:
+      Firmware: UEFI 2.70 (American Megatrends)
+ Firmware Arch: x64
+   Secure Boot: enabled (user)
+  TPM2 Support: yes
+  Measured UKI: yes
+  Boot into FW: supported
+</code></pre>
+<hr />
+<h3>Creating a readonly snapshot of your root subvolume:</h3>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/System_backup">Arch Wiki System Backup</a></li>
+</ul>
+<details>
+<summary> ✔️ Click to Expand snapshot & Backup Example </summary>
+<ol>
+<li>Create readonly snapshot of root subvol:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume snapshot -r / /root-snapshot-$(date +%Y%m%d%H%M%S)
+</code></pre>
+<ol start="2">
+<li>Mount your external backup disk:</li>
+</ol>
+<pre><code class="language-bash">sudo mkdir -p /mnt/backup
+sudo mount /dev/sdc1 /mnt/backup
+</code></pre>
+<ol start="3">
+<li>Use rsync to copy the snapshot to the external drive:</li>
+</ol>
+<p>List the available snapshots and get the exact name:</p>
+<pre><code class="language-bash">sudo btrfs subvolume list /
+</code></pre>
+<pre><code class="language-bash">sudo rsync -aAXv --delete --progress /root-snapshot-20251002135000/ /mnt/backup/root-backup/
+</code></pre>
+<ol start="4">
+<li>Unmount the external drive:</li>
+</ol>
+<pre><code class="language-bash">sudo umount /mnt/backup
+</code></pre>
+<ol start="5">
+<li>Optionally, delete older snapshots to save space:</li>
+</ol>
+<pre><code class="language-bash">sudo btrfs subvolume delete /root-snapshot-OLD_TIMESTAMP
+</code></pre>
+<h3>Restoring from a Backup</h3>
+<p>For this, you mount the partitions but don’t need to <code>arch-chroot</code> in.</p>
+<ol>
+<li>
+<p>Boot from a live USB</p>
+</li>
+<li>
+<p>Mount your encrypted root partition (unlock if encrypted) and the external
+backup drive.</p>
+</li>
+<li>
+<p>Move or delete the corrupted data on the root partition.</p>
+</li>
+<li>
+<p>Use rsync to copy the backed-up snapshot from the external disk back to the
+root partition, preserving permissions and attributes.</p>
+</li>
+</ol>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-backup/ /
+</code></pre>
+<p>Or, the Wiki’s suggestion, (Much more efficient, Direct backup of a running
+system without the need for btrfs snapshots):</p>
+<pre><code class="language-bash">sudo rsync -aAXHv --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/tmp/*' --exclude='/run/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found/' / /path/to/backup
+</code></pre>
+<ul>
+<li>
+<p><code>/mnt/backup/root-backup/</code> is the path where the backup snapshot is mounted on
+the external disk.</p>
+</li>
+<li>
+<p><code>/</code> is the root partition mount point where you want to restore the files.</p>
+</li>
+<li>
+<p>The options:</p>
+<ul>
+<li>
+<p><code>-a</code> archive mode to preserve symbolic links, permissions, timestamps, etc.</p>
+</li>
+<li>
+<p><code>-A</code> preserve ACLs (access control lists).</p>
+</li>
+<li>
+<p><code>-X</code> preserve extended attributes.</p>
+</li>
+<li>
+<p><code>-v</code> verbose output.</p>
+</li>
+<li>
+<p><code>--delete</code> deletes files on the destination that don’t exist in the source,
+keeping an exact mirror.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>If you want to restore a specific snapshot directory (e.g.,
+<code>/root-snapshot-20251002135000</code>), replace the source path accordingly, like:</p>
+<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-snapshot-20251002135000/ /
+</code></pre>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Rsync#As_a_backup_utility">Arch Wiki rsync</a></li>
+</ul>
+<ol start="5">
+<li>
+<p>Reinstall the bootloader if necessary.</p>
+</li>
+<li>
+<p>Unmount everything and reboot.</p>
+</li>
+</ol>
+<h3>Automated backup</h3>
+<p>Create <code>/etc/cron.daily/backup</code>:</p>
+<pre><code class="language-backup">#!/bin/sh
+rsync -a --delete --quiet /path/to/backup /location/of/backup
+</code></pre>
+<p>Change <code>/path/to/backup</code> to what needs to be backed-up such as <code>/home</code> or <code>/</code></p>
+</details>
+<hr />
+<h3>arch-chroot</h3>
+<details>
+<summary>  ✔️ Click to Expand `arch-chroot` Example </summary>
+<p>Say you forgot something, like forgetting to add a user and password. You reboot
+and go to TTY into your system and are hit with a AHHH I can’t log in WTF!</p>
+<p>It’s as easy as repeating some of the steps above. Reboot into the Live
+environment, remount your partitions and <code>arch-chroot</code> back in:</p>
+<p>Open the encrypted root partition:</p>
+<pre><code class="language-bash">cryptsetup open /dev/nvme0n1p2 cryptroot
+</code></pre>
+<p>Mount the decrypted root:</p>
+<pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
+</code></pre>
+<p>Mount the EFI partition:</p>
+<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot
+</code></pre>
+<p>Chroot into your installed system:</p>
+<pre><code class="language-bash">arch-chroot /mnt
+</code></pre>
+<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername passwd yourusername
+</code></pre>
+<ul>
+<li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
+installed.</li>
+</ul>
+<p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
+<p>Exit chroot:</p>
+<pre><code class="language-bash">exit
+</code></pre>
+<p>Unmount and close LUKS:</p>
+<pre><code class="language-bash">umount /mnt/boot
+umount /mnt
+cryptsetup close cryptroot
+reboot
+</code></pre>
+</details>
+<h3>Resources</h3>
+<details>
+<summary> ✔️ Click to Expand Resources </summary>
+<ul>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki UKI/SecureBoot</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Unified_kernel_image">Wiki UKI</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/Systemd-boot">Wiki systemd-boot</a></p>
+</li>
+</ul>
+</details>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/arch/enc_install.html</guid></item><item><title>Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</title><link>https://mako088.github.io/arch/enc_dns.html</link><description><![CDATA[<h1>Encrypted DNS ArchLinux with dnscrypt-proxy &amp; dnsmasq</h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <!-- toc -->
@@ -2208,136 +3086,8 @@ net.ipv6.conf.wlp3s0.use_tempaddr = 2
 <pre><code class="language-conf">[connection]
 ipv6.ip6-privacy=2
 </code></pre>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_dns.html</guid><pubDate>Fri, 5 Dec 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<pre><code class="language-nix">2 + 2
-</code></pre>
-<h1>Hardening Networking</h1>
-<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
-Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p>
-<p>After editing a config file, apply the changes with:</p>
-<pre><code class="language-bash">sudo nmcli general reload
-</code></pre>
-<pre><code class="language-bash">sudo usermod -aG network $USER
-</code></pre>
-<h2>Investigate sockets</h2>
-<p>Display all TCP Sockets with service names:</p>
-<pre><code class="language-bash">ss -at
-</code></pre>
-<p>Display all TCP Sockets with port numbers:</p>
-<pre><code class="language-bash">ss -atn
-</code></pre>
-<p>Display all UDP Sockets:</p>
-<pre><code class="language-bash">ss -au
-</code></pre>
-<h2>Configure NetworkManager to use Quad9s DoT</h2>
-<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
-<pre><code class="language-.nmconnection">[connection]
-dns-over-tls=2
-
-[ipv4]
-dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
-ignore-auto-dns=true
-
-[ipv6]
-dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
-ignore-auto-dns=true
-</code></pre>
-<pre><code class="language-bash">sudo systemctl restart NetworkManager
-</code></pre>
-<p><strong>Wi-Fi MAC randomization</strong></p>
-<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
-<pre><code class="language-conf">[device-mac-randomization]
-# "yes" is already the default for scanning
-wifi.scan-rand-mac-address=yes
-
-[connection-mac-randomization]
-# Randomize MAC for every ethernet connection
-ethernet.cloned-mac-address=random
-# Generate a random MAC every time you connect to a wifi network
-wifi.cloned-mac-address=random
-</code></pre>
-<p><strong>Unique DUID per connection</strong></p>
-<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
-<pre><code class="language-conf">[connection]
-ipv6.dhcp-duid=stable-uuid
-</code></pre>
-<h2>MAC Address spoofing</h2>
-<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
-<p><strong>Manual MAC randomization with macchanger</strong></p>
-<p>Find your device interface and check your current MAC address:</p>
-<pre><code class="language-bash"># find interface
-ip add
-sudo iplink show wlp3s0
-</code></pre>
-<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
-it:</p>
-<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
-# or
-# sudo ifconfig wlp3s0 down
-</code></pre>
-<p>Install the <code>macchanger</code> package and run:</p>
-<pre><code class="language-bash">sudo macchanger -a wlp3s0
-</code></pre>
-<ul>
-<li>
-<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
-</li>
-<li>
-<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
-</li>
-</ul>
-<p><strong>Automatically with systemd &amp; macchanger</strong></p>
-<p>systemd unit setting a random address while preserving the original NIC vendor
-bytes.</p>
-<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
-<pre><code class="language-macspoof@.service">[Unit]
-Description=macchanger on %I
-Wants=network-pre.target
-Before=network-pre.target
-BindsTo=sys-subsystem-net-devices-%i.device
-After=sys-subsystem-net-devices-%i.device
-
-[Service]
-ExecStart=/usr/bin/macchanger -e %I
-Type=oneshot
-
-[Install]
-WantedBy=multi-user.target
-</code></pre>
-<ul>
-<li>
-<p>You can use <code>-r</code> to randomize everything but it’s important that the vendor
-bytes actually match something and aren’t just random numbers so it’s less
-recommended.</p>
-</li>
-<li>
-<p>The <code>@.service</code> pattern allows per-interface instantiation like
-<code>macspoof@wlp3s0.service</code>.</p>
-</li>
-<li>
-<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
-</li>
-<li>
-<p>You only need to append your interface name when enabling the service.</p>
-</li>
-</ul>
-<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
-</code></pre>
-<h2>Resources</h2>
-<ul>
-<li>
-<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
-</li>
-<li>
-<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
-</li>
-</ul>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_networking.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Firefox</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<h1>Hardening Firefox on Arch</h1>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/arch/enc_dns.html</guid></item><item><title>Hardening Firefox on Arch</title><link>https://mako088.github.io/arch/hardening_firefox.html</link><description><![CDATA[<h1>Hardening Firefox on Arch</h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <!-- toc -->
@@ -3226,7 +3976,8 @@ also lets you create phone number aliases that forward to your phone number.</p>
 </li>
 </ul>
 </details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_firefox.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Hardening Arch</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<h1>Hardening Arch Linux</h1>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/arch/hardening_firefox.html</guid></item><item><title>Hardening Arch Linux</title><link>https://mako088.github.io/arch/hardening_arch.html</link><description><![CDATA[<h1>Hardening Arch Linux</h1>
 <details>
 <summary> ✔️ Click to Expand Table of Contents</summary>
 <!-- toc -->
@@ -3409,7 +4160,7 @@ is a security feature that limits access in certain specific ways.</p>
 <ul>
 <li>When granting access to a resource, create a specific group and add only the
 necessary users to it, rather than granting broad access to all root or
-wheel users. Demonstrated in: <strong><a href="#doas-over-sudo">Doas over sudo</a></strong>.</li>
+wheel users. Demonstrated in: <strong><a href="https://mako088.github.io/arch/hardening_arch.html#doas-over-sudo">Doas over sudo</a></strong>.</li>
 </ul>
 </li>
 <li>
@@ -5413,763 +6164,533 @@ hardening.There are recommendations for hardening all kinds of software in the
 </li>
 </ul>
 </details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/hardening_arch.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item><item><title>Encrypted Arch Install</title><link>https://mako088.github.io/arch/enc_install.html</link><description><![CDATA[<h1>Encrypted Arch Install for UEFI Systems with UKI and Secure Boot</h1>
-<details>
-<summary> ✔️ Click to Expand Table of Contents</summary>
-<!-- toc -->
-</details>
-<p>The ultimate installation resource is always goint to be the:</p>
-<ul>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
-</li>
-<li>
-<p><a href="https://archlinux.org/download/#checksums">Verify PGP Signatures</a>, the ISO
-directory is just the same directory where your Arch Linux ISO file is stored.</p>
-</li>
-</ul>
-<blockquote>
-<p>Always review the Wiki and never just plug random things suggested by me or
-anyone else without first doing your own research.</p>
-</blockquote>
-<p>Edited: 09-25-25 Removed encrypted swap section. Big usability downside IMO.</p>
-<details>
-<summary> ✔️ Verifying Arch Linux ISO on Other Distributions </summary>
-<blockquote>
-<p>❗ NOTE: If you only want to verify the ISO once, you can temporarily import
-the public key, verify the signature, and then you don’t need to keep the key
-permanently in your keyring or sign it locally. This example is from the last
-release, but the process is the same.</p>
-</blockquote>
-<p>With <code>sequoia-sq</code>, you can get the Arch release signing key with:</p>
-<pre><code class="language-bash">sq network wkd search pierre@archlinux.org --output release-key.pgp
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/arch/hardening_arch.html</guid></item><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<pre><code class="language-nix">2 + 2
 </code></pre>
-<p>Export the chosen key to a <code>.pgp</code> file:</p>
-<pre><code class="language-bash">sq cert export --keyring=release-key.pgp --cert=3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C &gt; pierre-archlinux.pgp
+<h1>Hardening Networking</h1>
+<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
+Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p>
+<p>After editing a config file, apply the changes with:</p>
+<pre><code class="language-bash">sudo nmcli general reload
 </code></pre>
-<p>Import into your keychain:</p>
-<pre><code class="language-bash">gpg --import pierre-archlinux.pgp
-gpg: key 0x76A5EF9054449A5C: 9 signatures not checked due to missing keys
-gpg: key 0x76A5EF9054449A5C: public key "Pierre Schmitz &lt;pierre@archlinux.org&gt;" imported
-gpg: Total number processed: 1
-gpg:               imported: 1
-gpg: marginals needed: 3  completes needed: 1  trust model: pgp
-gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
-gpg: next trustdb check due at 2026-08-23
+<pre><code class="language-bash">sudo usermod -aG network $USER
 </code></pre>
-<ul>
-<li>Now, you should see <code>&lt;pierre@archlinux.org&gt;</code> and his keys when you run
-<code>gpg --list-keys</code></li>
-</ul>
-<p>Finally, verify the signature:</p>
-<pre><code class="language-bash">sq verify --signer-file release-key.pgp --signature-file archlinux-2025.08.01-x86_64.iso.sig archlinux-2025.08.01-x86_64.iso
-Authenticated signature made by 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz &lt;pierre@archlinux.org&gt;)
+<h2>Investigate sockets</h2>
+<p>Display all TCP Sockets with service names:</p>
+<pre><code class="language-bash">ss -at
+</code></pre>
+<p>Display all TCP Sockets with port numbers:</p>
+<pre><code class="language-bash">ss -atn
+</code></pre>
+<p>Display all UDP Sockets:</p>
+<pre><code class="language-bash">ss -au
+</code></pre>
+<h2>Configure NetworkManager to use Quad9s DoT</h2>
+<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
+<pre><code class="language-.nmconnection">[connection]
+dns-over-tls=2
 
-1 authenticated signature.
+[ipv4]
+dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
+ignore-auto-dns=true
+
+[ipv6]
+dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
+ignore-auto-dns=true
 </code></pre>
-<blockquote>
-<p>❗ To ensure the key is authentic and not spoofed, verify that the key
-fingerprint matches the official Arch Linux signing key fingerprint, which can
-is linked below and on the Arch website.</p>
-</blockquote>
-<p>This shows that the signature was made by the key with the ID
-<code>3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C (Pierre Schmitz)</code></p>
-<p>You can check the keys fingerprint with:</p>
-<pre><code class="language-bash">gpg --fingerprint 3E80CA1A8B89F69CBA57D98A76A5EF9054449A5C
+<pre><code class="language-bash">sudo systemctl restart NetworkManager
+</code></pre>
+<p><strong>Wi-Fi MAC randomization</strong></p>
+<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
+<pre><code class="language-conf">[device-mac-randomization]
+# "yes" is already the default for scanning
+wifi.scan-rand-mac-address=yes
+
+[connection-mac-randomization]
+# Randomize MAC for every ethernet connection
+ethernet.cloned-mac-address=random
+# Generate a random MAC every time you connect to a wifi network
+wifi.cloned-mac-address=random
+</code></pre>
+<p><strong>Unique DUID per connection</strong></p>
+<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
+<pre><code class="language-conf">[connection]
+ipv6.dhcp-duid=stable-uuid
+</code></pre>
+<h2>MAC Address spoofing</h2>
+<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
+<p><strong>Manual MAC randomization with macchanger</strong></p>
+<p>Find your device interface and check your current MAC address:</p>
+<pre><code class="language-bash"># find interface
+ip add
+sudo iplink show wlp3s0
+</code></pre>
+<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
+it:</p>
+<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
+# or
+# sudo ifconfig wlp3s0 down
+</code></pre>
+<p>Install the <code>macchanger</code> package and run:</p>
+<pre><code class="language-bash">sudo macchanger -a wlp3s0
 </code></pre>
 <ul>
-<li>Verify it against the
-<a href="https://archlinux.org/master-keys/">Arch Linux master-keys</a></li>
+<li>
+<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
+</li>
+<li>
+<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
+</li>
 </ul>
-<p>Verify it against the Arch Linux master-keys</p>
-<p>With the <code>sq verify</code> command GPG authenticated that the signature is valid and
-that the key used to sign is trusted in our keyring.</p>
-<p><code>1 authenticated signature</code> confirms the files integrity and authenticity.</p>
-<p>We have successfully verified that the file was signed by Pierr’s official Arch
-Linux key and has not been tampered with.</p>
-<p>The following is only if you currently already have keys on your gpg keyring.</p>
-<details>
-<summary> ☑️ Click to expand Key Signing and Publishing Example </summary>
-<p>List your keys to get the arch keyID:</p>
-<pre><code class="language-bash">gpg --list-keys
-# ... snip ...
-pub   ed25519/0x76A5EF9054449A5C 2022-10-31 [SC] [expires: 2037-10-27]
-      Key fingerprint = 3E80 CA1A 8B89 F69C BA57  D98A 76A5 EF90 5444 9A5C
-uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.org&gt;
-uid                   [  full  ] Pierre Schmitz &lt;pierre@archlinux.de&gt;
-sub   ed25519/0xD6D13C45BFCFBAFD 2022-10-31 [A] [expires: 2037-10-27]
-sub   cv25519/0x7F56ADE50CA3D899 2022-10-31 [E] [expires: 2037-10-27]
+<p><strong>Automatically with systemd &amp; macchanger</strong></p>
+<p>systemd unit setting a random address while preserving the original NIC vendor
+bytes.</p>
+<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
+<pre><code class="language-macspoof@.service">[Unit]
+Description=macchanger on %I
+Wants=network-pre.target
+Before=network-pre.target
+BindsTo=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+ExecStart=/usr/bin/macchanger -e %I
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
 </code></pre>
-<p>Sign the key:</p>
-<pre><code class="language-bash">gpg --sign-key 0x76A5EF9054449A5C
+<ul>
+<li>
+<p>You can use <code>-r</code> to randomize everything but it’s important that the vendor
+bytes actually match something and aren’t just random numbers so it’s less
+recommended.</p>
+</li>
+<li>
+<p>The <code>@.service</code> pattern allows per-interface instantiation like
+<code>macspoof@wlp3s0.service</code>.</p>
+</li>
+<li>
+<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
+</li>
+<li>
+<p>You only need to append your interface name when enabling the service.</p>
+</li>
+</ul>
+<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
 </code></pre>
-<p>Now you can export and publish the new public key and send it to a keyserver:</p>
-<pre><code class="language-bash">gpg --export --armor 0x76A5EF9054449A5C &gt; archlinux-signed.asc
-gpg --send-keys 0x76A5EF9054449A5C
-</code></pre>
-<p>The more people that verify, sign, and re-export and publish their keys the
-better for the web of trust that gpg uses making the network more secure for
-everyone.</p>
-</details>
-</details>
-<hr />
+<h2>Resources</h2>
+<ul>
+<li>
+<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
+</li>
+<li>
+<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
+</li>
+<li>
+<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
+</li>
+</ul>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/arch/hardening_networking.html</guid></item><item><title>Rust Clap Derive Tutorial</title><link>https://mako088.github.io/rust/clap_derive_tutorial.html</link><description><![CDATA[<h1>Rust Clap Derive Tutorial</h1>
+<h2>Understanding <code>clap</code> by Building It Yourself</h2>
+<p>Most tutorials start with <code>clap</code> and show you how to use it. This one starts
+without it.</p>
+<p>Before reaching for <a href="https://crates.io/crates/clap">clap</a>, it’s worth building
+the same thing by hand. Parsing arguments manually forces you to see exactly
+what <code>clap</code> is doing for you, and once you see that, the derive API stops
+feeling like magic and starts feeling obvious.</p>
+<p>We’ll build <code>echor</code> (Credit:
+<a href="https://github.com/kyclark/command-line-rust/tree/main/02_echor">Command-Line Rust</a>),
+a Rust implementation of the Unix <code>echo</code> command in three passes:</p>
 <ol>
-<li><strong>Connect to Wi-Fi</strong>:</li>
+<li><strong>Raw args</strong>: <code>env::args()</code> directly in main, no abstractions</li>
+<li><strong>Structured args</strong>: a typed struct with a <code>build</code> method, same shape <code>clap</code>
+uses</li>
+<li><strong>clap derive</strong>: replace <code>build()</code> with <code>#[derive(Parser)]</code> and watch how
+little changes</li>
 </ol>
-<pre><code class="language-bash">iwctl
-[iwd]# device list
-[iwd]# station wlan0 scan
-[iwd]# station wlan0 connect NETGEAR80
-# Enter your Password
-# Check Connection
-[iwd]# station wlan0 show
-[iwd]# exit
+<p>Then we’ll close by looking at what <code>clap</code> is actually doing internally, by
+implementing a naive version of its three-trait pipeline.</p>
+<h2>What problem does <code>clap</code> solve?</h2>
+<p>When a user runs your program, the OS hands it a flat list of strings:</p>
+<pre><code class="language-sh">cargo run -- hello world -n
+# the program receives: ["target/debug/echor", "hello", "world", "-n"]
 </code></pre>
-<pre><code class="language-bash">ping -c 3 archlinux.org
-</code></pre>
-<hr />
-<ol start="2">
-<li><strong>Update package databases and mirrorlist</strong>:</li>
-</ol>
-<pre><code class="language-bash">pacman -Syyu
-</code></pre>
-<p>Save a backup of your current mirrorlist so we can safely update it:</p>
-<pre><code class="language-bash">cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-</code></pre>
-<pre><code class="language-bash">pacman -S reflector
-reflector --list-countries
-# Example if you live in the US
-reflector -c US --protocol https --age 6 --fastest 5 --sort rate --save /etc/pacman.d/mirrorlist
-</code></pre>
-<p>This actually improves security by only providing <code>HTTPS</code> mirrors, by default
-both HTTP and HTTPS are used.</p>
-<p>NOTE: This can take a bit and you can expect some failures..</p>
-<hr />
-<ol start="3">
-<li><strong>Set keyboard layout, font, and system clock</strong>:</li>
-</ol>
-<p>Default keymap is US, if you need something different:</p>
-<pre><code class="language-bash">localectl list-keymaps
-loadkeys &lt;chosen-map&gt;
-# Increase font size
-setfont ter-132b
-</code></pre>
-<pre><code class="language-bash">sudo pacman -S chrony
-</code></pre>
-<p><code>/etc/chrony.conf</code>:</p>
-<pre><code class="language-conf"># Copyright © 2014-2025 GrapheneOS
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-server time.cloudflare.com iburst nts
-server ntppool1.time.nl iburst nts
-server nts.netnod.se iburst nts
-server ptbtime1.ptb.de iburst nts
-server time.dfm.dk iburst nts
-server time.cifelli.xyz iburst nts
-
-minsources 3
-authselectmode require
-
-# EF
-dscp 46
-
-driftfile /var/lib/chrony/drift
-dumpdir /var/lib/chrony
-ntsdumpdir /var/lib/chrony
-
-leapseclist /usr/share/zoneinfo/leap-seconds.list
-makestep 1.0 3
-
-rtconutc
-rtcsync
-
-cmdport 0
-
-noclientlog
-</code></pre>
-<p>The above setup uses Network Time Security (NTS) and is a more modern safer way
-to synchronize time using chrony.</p>
-<pre><code class="language-bash">sudo systemctl disable --now systemd-timesyncd
-sudo systemctl enable --now chronyd
-</code></pre>
-<pre><code class="language-bash">timedatectl set-ntp true
-timedatectl list-timezones
-# Example
-sudo timedatectl set-timezone America/New_York
-</code></pre>
-<hr />
-<ol start="4">
-<li><strong>Partition your Disk</strong>:</li>
-</ol>
-<p>The only required partitions are one for the root directory <code>/</code> (typically <code>1G</code>)
-and one for booting in UEFI mode, an EFI system partition (typically the rest of
-the space left).</p>
-<p>In this section, I’ll assume that you’re starting with a clean slate. If you’re
-not, you can use your existing partitions if they meet the above requirements or
-delete them.</p>
-<p>To delete existing partitions with <code>cfdisk</code>, you launch it on the target
-filesystem, select the partition you want to delete and Select -&gt; <code>[ Delete ]</code>
-until all you see is <code>Free space</code> and a clean slate and <code>[ Write ]</code> &amp; <code>[ Quit ]</code>
-to save your changes.</p>
-<p>Identify your target disk (e.g., <code>/dev/nvme0n1</code>):</p>
-<pre><code class="language-bash">fdisk -l
-</code></pre>
-<pre><code class="language-bash">cfdisk /dev/nvme0n1
-</code></pre>
-<ul>
-<li>
-<p>Select -&gt; <code>[ Free Space ]</code></p>
-<ul>
-<li>
-<p>Select -&gt; <code>[ New ]</code></p>
-</li>
-<li>
-<p>Partition size: <code>1G</code></p>
-</li>
-<li>
-<p>Type -&gt; <code>EFI System</code></p>
-</li>
-</ul>
-</li>
-<li>
-<p>Select -&gt; <code>[ Free Space ]</code></p>
-<ul>
-<li>
-<p>Partition size: The rest of the space</p>
-</li>
-<li>
-<p>Type -&gt; <code>Linux filesystem</code></p>
-</li>
-<li>
-<p>Select -&gt; <code>[ Write ]</code></p>
-</li>
-<li>
-<p>Select -&gt; <code>[ Quit ]</code></p>
-</li>
-</ul>
-</li>
-</ul>
-<hr />
-<ol start="5">
-<li><strong>Format the EFI partition as FAT32</strong>:</li>
-</ol>
-<pre><code class="language-bash">mkfs.fat -F32 /dev/nvme0n1p1
-</code></pre>
-<p>Leave the root partition unformatted for the next step.</p>
-<hr />
-<ol start="6">
-<li><strong>Encrypt the Root partition and Open it</strong>:</li>
-</ol>
-<pre><code class="language-bash">cryptsetup luksFormat /dev/nvme0n1p2
-cryptsetup open /dev/nvme0n1p2 cryptroot
-</code></pre>
-<p>Create a filesystem:</p>
-<pre><code class="language-bash">mkfs.btrfs /dev/mapper/cryptroot
-</code></pre>
-<p>If you mount the filesystem with compression before running <code>genfstab</code>, it will
-automatically add the chosen compression to the <code>fstab</code>.</p>
-<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot  # Mount EFI partition at /mnt/boot
-mount -o compress=zstd /dev/mapper/cryptroot /mnt
-</code></pre>
-<hr />
-<h2>Install the Base System on <code>/mnt</code> with <code>pacstrap</code></h2>
-<p>If you prefer Nvim or a hardened kernel, change it here.</p>
-<pre><code class="language-bash">pacstrap -K /mnt base linux-zen linux-zen-headers linux-firmware networkmanager helix lightdm lightdm-gtk-greeter btrfs-progs cryptsetup sudo base-devel efibootmgr systemd-ukify
-</code></pre>
-<hr />
-<ol start="7">
-<li><strong>Generate the Filesystem Table</strong>:</li>
-</ol>
-<p>The EFI and root partitions need to be mounted before you generate the
-filesystem table in the next step.</p>
-<pre><code class="language-bash">genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
-#
-hx /mnt/etc/fstab
-cat /mnt/etc/fstab
-</code></pre>
-<p>Fix security hole and harden <code>/boot</code> permissions by adding
-<code>fmask=0137, dmask=0027</code>:</p>
-<pre><code class="language-bash">hx /mnt/etc/fstab
-</code></pre>
-<p>Example</p>
-<pre><code class="language-fstab"># Static information about the filesystems.
-# See fstab(5) for details.
-
-# &lt;file system&gt; &lt;dir&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;
-# /dev/mapper/cryptroot
-UUID=6d68a2bf-34ea-4adc-86d5-cb1d56de44a4	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache=v2,subvol=/	0 0
-
-# /dev/nvme0n1p1
-UUID=B88B-844F      	/boot     	vfat      	rw,relatime,fmask=0137,dmask=0027,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
-</code></pre>
-<pre><code class="language-bash">chmod 700 /boot
-chmod 600 /boot/loader/random-seed
-</code></pre>
-<p><strong>Important</strong>: The <code>fstab</code> should list both partitions, if it doesn’t you’ll
-need to ensure both partitions are mounted and regenerate your fstab again with
-<code>genfstab</code>. Also ensure that the root partition was mounted with compression.</p>
-<hr />
-<ol start="8">
-<li><strong>Change Root (<code>chroot</code>) into the New Installation</strong></li>
-</ol>
-<pre><code class="language-bash">arch-chroot /mnt
-</code></pre>
-<p>Create a user:</p>
-<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername
-passwd yourusername
-</code></pre>
-<p>Create an admin password:</p>
-<pre><code class="language-bash">passwd
-</code></pre>
-<p>Enable sudo for wheel group:</p>
-<p>In <code>/etc/sudoers</code> uncomment the line:</p>
-<pre><code class="language-bash">%wheel ALL=(ALL:All) ALL
-</code></pre>
-<hr />
-<ol start="9">
-<li>Edit <code>/etc/mkinitcpio.conf</code> in the new system to add an <code>sd-encrypt</code> hook
-before the <code>filesystems</code> attribute.</li>
-</ol>
-<ul>
-<li>
-<p>Locate the <code>HOOKS</code> line</p>
-</li>
-<li>
-<p>Insert <code>encrypt</code> <strong>before</strong> filesystems</p>
-</li>
-</ul>
-<pre><code class="language-bash">vim /etc/mkinitcpio.conf
-</code></pre>
-<p>To use <code>sd-encrypt</code>, it is necessary to replace <code>udev</code> with <code>systemd</code> and if you
-require a different keyboard layout from US <code>sd-vconsole</code> is needed.</p>
-<pre><code class="language-bash"># mkinitcpio.conf
-# *IF* you use an nvme drive
-MODULES=(nvme)
-FILES=(/etc/crypttab.initramfs /etc/vconsole.conf)
-# ... snip ...
-HOOKS=(base systemd autodetect microcode modconf kms keyboard keymap consolefont sd-vconsole block sd-encrypt filesystems fsck systemd-ukify)
-# ... snip ...
-</code></pre>
-<p>Create <code>/etc/crypttab.initramfs</code>:</p>
-<pre><code class="language-initramfs">cryptroot UUID=your-uuid none luks,discard
-</code></pre>
-<hr />
-<p>Create <code>/etc/vconsole.conf</code>:</p>
-<p>For example <code>KEYMAP=fr</code> is french</p>
-<pre><code class="language-conf">KEYMAP=us
-FONT=lat9w-16
-</code></pre>
-<hr />
-<p>Edit <code>/etc/mkinitcpio.d/linux-zen.preset</code>, this enables <code>mkinitcpio -P</code> to
-generate a UKI in <code>/boot/EFI/Linux/</code>:</p>
-<pre><code class="language-preset"># mkinitcpio preset file for the 'linux-zen' package
-
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-zen"
-
-PRESETS=('default' 'fallback')
-# PRESETS=('default')
-
-# default_config="/etc/mkinitcpio.conf"
-# default_image="/boot/initramfs-linux-zen.img"
-default_uki="/boot/EFI/Linux/arch-linux-zen.efi"
-default_options="--splash /usr/share/systemd/bootctl/splash-arch.bmp"
-
-#fallback_config="/etc/mkinitcpio.conf"
-#fallback_image="/boot/initramfs-linux-zen-fallback.img"
-fallback_uki="/boot/EFI/Linux/arch-linux-zen-fallback.efi"
-fallback_options="-S autodetect"
-</code></pre>
-<p>Generate the initial RAM Filesystem (initramfs) image.</p>
-<pre><code class="language-bash">mkinitcpio -P
-</code></pre>
-<blockquote>
-<p>❗️ TIP: If <code>mkinitcpio -P</code> fails, exit <code>arch-chroot</code> and ensure both the boot
-&amp; root partitions are mounted. <code>arch-chroot</code> back into <code>/mnt</code> and try again.
-Ensure that <code>/boot/EFI/Linux/arch-linux-zen.efi</code> and
-<code>/boot/EFI/Linux/arch-linux-zen-fallback.efi</code> exist for your kernel of choice.</p>
-</blockquote>
-<hr />
-<ol start="10">
-<li><strong>Install systemd-boot and setup Unified Kernel Image</strong>, (while still in
-chroot environment):</li>
-</ol>
-<p>Ensure your UEFI variables are accessible:</p>
-<pre><code class="language-bash">efivar --list
-</code></pre>
-<p>This command won’t work if both partitions aren’t mounted, ensure they are both
-mounted and if it still doesn’t work you can use <code>--esp-path=/boot</code> or
-<code>--esp-path=/mnt/boot</code>.</p>
-<pre><code class="language-bash">bootctl install
-</code></pre>
-<p>Edit <code>/etc/kernel/cmdline</code> and add the output of <code>blkid</code> on your root partition.
-For example:</p>
-<pre><code class="language-bash">blkid /dev/nvme0n1p2 &gt; /tmp/uuid.txt
-</code></pre>
-<p>When you open <code>/etc/kernel/cmdline</code> in vim or helix, run <code>:r /tmp/uuid.txt</code> to
-read the UUID of your root partition into the file. You only need the numbers
-like so:</p>
-<pre><code class="language-cmdline">rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw
-</code></pre>
-<p>In the above example, <code>7b78e942-f4f7-4dde-a015-3a816305483f</code> is the UUID
-extracted from the <code>blkid</code> command.</p>
-<p>Create a <code>/boot/loader/entries/arch.conf</code> with the following:</p>
-<pre><code class="language-conf">title Arch Linux
-linux /vmlinuz-linux-zen
-initrd /initramfs-linux-zen.img
-options rd.luks.name=7b78e942-f4f7-4dde-a015-3a816305483f=cryptroot root=/dev/mapper/cryptroot rw quiet
-</code></pre>
-<blockquote>
-<p>❗️ NOTE: The <code>arch.conf</code> here is redundant because <code>systemd-boot</code> is
-configured to autodetect the UKI. It doesn’t hurt to add it though and can
-prevent issues in the future. Ensure <code>rd.luks.name=</code> contains the UUID from
-the encrypted root partition. (e.g., <code>blkid /dev/nvme0n1p2</code>).</p>
-</blockquote>
-<p>And finally, a <code>/boot/loader/loader.conf</code>:</p>
-<pre><code class="language-conf">default arch.conf
-# default @saved  # return to last choice
-timeout 4
-console-mode auto
-auto-entries 1
-</code></pre>
-<pre><code class="language-bash">bootctl status
-</code></pre>
-<p>Set a password to protect <code>systemd-boot</code> with <code>systemd-boot-password</code>:</p>
-<pre><code class="language-bash">paru -S systemd-boot-password
-</code></pre>
-<pre><code class="language-bash">sudo sbpctl install /boot
-</code></pre>
-<p>You will now be prompted for your password before you can edit kernel
-parameters.</p>
-<hr />
-<p><strong>systemd-ukify and the Unified Kernel Image</strong>:</p>
-<p>We already added <code>systemd-ukify</code> in the pacstrap command, let’s add a few more
-tools for this process:</p>
-<pre><code class="language-bash">sudo pacman -S sbsigntools efitools
-</code></pre>
-<p>Copy the existing template to <code>/etc/kernel/uki.conf</code>:</p>
-<pre><code class="language-bash">cp /usr/lib/kernel/uki.conf /etc/kernel/uki.conf
-</code></pre>
-<p>Edit <code>/etc/kernel/uki.conf</code>:</p>
-<pre><code class="language-conf">[UKI]
-#Initrd=
-#Microcode=
-#Splash=
-#PCRPKey=
-#PCRBanks=
-#SecureBootSigningTool=
-SecureBootPrivateKey=/etc/kernel/secure-boot-private-key.pem
-SecureBootCertificate=/etc/kernel/secure-boot-certificate.pem
-#SecureBootCertificateDir=
-#SecureBootCertificateName=
-#SecureBootCertificateValidity=
-#SigningEngine=
-SignKernel=yes
-</code></pre>
-<p>Generate your signing keys:</p>
-<pre><code class="language-bash">ukify genkey --config /etc/kernel/uki.conf
-</code></pre>
-<p>The above command creates <code>/etc/kernel/secure-boot-certificate.pem</code> and
-<code>/etc/kernel/secure-boot-private-key.pem</code>.</p>
-<p>Building the UKIs:</p>
-<pre><code class="language-bash">mkdir -p /boot/EFI/Linux
-mkinitcpio -P
-# Output
-Wrote signed /boot/EFI/Linux/arch-linux-zen.efi
-==&gt; Unified kernel image generation successful
-</code></pre>
-<p>Sign the boot loader with the new keys:</p>
-<pre><code class="language-bash">/usr/lib/systemd/systemd-sbsign sign \
---private-key /etc/kernel/secure-boot-private-key.pem \
---certificate /etc/kernel/secure-boot-certificate.pem \
---output /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed \
-/usr/lib/systemd/boot/efi/systemd-bootx64.efi
-</code></pre>
-<p>Output:</p>
-<pre><code class="language-text">Wrote signed PE binary to /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed
-</code></pre>
-<pre><code class="language-bash">sudo bootctl install --secure-boot-auto-enroll yes \
---certificate /etc/kernel/secure-boot-certificate.pem \
---private-key /etc/kernel/secure-boot-private-key.pem
-</code></pre>
-<p>Output:</p>
-<pre><code class="language-text">Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/systemd/systemd-bootx64.efi".
-    3 Copied "/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" to "/boot/EFI/BOOT/BOOTX64.EFI".
-    4 ⚠️  Mount point '/boot' which backs the random seed file is world accessible, which is a security hole!  ⚠️
-    5 ⚠️ Random seed file '/boot/loader/random-seed' is world accessible, which is a security hole! ⚠️
-    6 Random seed file /boot/loader/random-seed successfully refreshed (32 bytes).
-    7 Secure boot auto-enrollment file /boot/loader/keys/auto/PK.auth successfully written.
-    8 Secure boot auto-enrollment file /boot/loader/keys/auto/KEK.auth successfully written.
-    9 Secure boot auto-enrollment file /boot/loader/keys/auto/db.auth successfully written.
-   10 Created EFI boot entry "Linux Boot Manager".
-</code></pre>
-<p>Fix the security hole:</p>
-<pre><code class="language-bash">chmod 700 /boot
-</code></pre>
-<p>Add the following to your <code>/boot/loader/loader.conf</code>:</p>
-<pre><code class="language-conf">secure-boot-enroll force
-</code></pre>
-<p>Reboot into setup-mode and it will start an automatic countdown where it enrolls
-your keys when the time runs out.</p>
-<p>After successful key enrollment, reboot into UEFI again, enable Secure Boot and
-reboot.</p>
-<p>When the desktop launches, check the output of <code>bootctl status</code> to ensure
-<code>Secure Boot: enabled (user)</code></p>
-<p>If your system doesn’t accept them, you may have to do some conversions. You can
-also add the keys manually which is what I did.</p>
-<details>
-<summary> ✔️ Click to Expand conversion Examples </summary>
-<pre><code class="language-bash"># Create workspace for certs and outputs
-mkdir -p ~/secureboot/output
-
-# Define certificate location
-CERT_PEM="/etc/kernel/secure-boot-certificate.pem"
-
-# Convert PEM cert to DER format for UEFI enrollment
-sudo openssl x509 -in $CERT_PEM -out ~/secureboot/output/db.cer -outform DER
-
-# Convert PEM cert to EFI Signature List
-cert-to-efi-sig-list $CERT_PEM ~/secureboot/output/db.esl
-
-# Sign the Signature List (run from wherever your private key is; do not copy it)
-sudo sign-efi-sig-list -k /etc/kernel/secure-boot-private-key.pem -c $CERT_PEM db \
-    ~/secureboot/output/db.esl ~/secureboot/output/db.auth
-</code></pre>
-<p>Manual Key Enrollment:</p>
-<ul>
-<li>
-<p><code>db.cer</code> -&gt; enroll in db (Trusted Signatures), Choose the desired drive, find
-the file and add it. Save as an <code>Authorized Signature</code> instead of <code>Public Key</code></p>
-</li>
-<li>
-<p><code>PK.cer</code> -&gt; enroll in <code>Platform Key</code>(PK)</p>
-</li>
-<li>
-<p>Keep your <code>secure-boot-private-key.pem</code> <strong>private</strong>, with the above commands
-we only use it when signing, and otherwise keep it protected.</p>
-</li>
-</ul>
-</details>
-<hr />
-<ol start="11">
-<li><strong>Enable LightDM and NetworkManager</strong></li>
-</ol>
-<pre><code class="language-bash">systemctl enable lightdm
-systemctl enable NetworkManager
-</code></pre>
-<blockquote>
-<p>❗️ NOTE: If you’re ever unable to run the above commands in the chroot
-environment, exit chroot and run:</p>
-<pre><code class="language-bash">systemctl --root=/mnt enable lightdm
-systemctl --root=/mnt enable NetworkManager
-</code></pre>
-</blockquote>
-<p>Configure LightDM greeter, edit <code>/etc/lightdm/lightdm.conf</code> to add:</p>
-<pre><code class="language-conf"># lightdm.conf
-[Seat:*]
-greeter-session=lightdm-gtk-greeter
-</code></pre>
-<p>Exit <code>arch-chroot</code> with <code>exit</code></p>
-<p>Unmount your partitions and reboot:</p>
-<pre><code class="language-bash">umount /mnt/boot
-umount /mnt
-cryptsetup close cryptroot
-</code></pre>
-<hr />
-<ol start="12">
-<li><strong>Reboot</strong></li>
-</ol>
-<pre><code class="language-bash">bootctl status
-System:
-      Firmware: UEFI 2.70 (American Megatrends)
- Firmware Arch: x64
-   Secure Boot: enabled (user)
-  TPM2 Support: yes
-  Measured UKI: yes
-  Boot into FW: supported
-</code></pre>
-<hr />
-<h3>Creating a readonly snapshot of your root subvolume:</h3>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/System_backup">Arch Wiki System Backup</a></li>
-</ul>
-<details>
-<summary> ✔️ Click to Expand snapshot & Backup Example </summary>
+<p>Your program has to:</p>
 <ol>
-<li>Create readonly snapshot of root subvol:</li>
+<li><strong>Parse</strong>: decode what each string means (is <code>-n</code> a flag? is <code>hello</code>
+positional text?)</li>
+<li><strong>Validate</strong>: check the result makes sense (did the user provide any text at
+all?)</li>
+<li><strong>Run</strong>: use the validated result</li>
 </ol>
-<pre><code class="language-bash">sudo btrfs subvolume snapshot -r / /root-snapshot-$(date +%Y%m%d%H%M%S)
+<p><code>clap</code> handles steps one and two automatically. By the time your <code>main</code> logic
+runs, you’re guaranteed a valid, typed <code>Args</code> struct. That guarantee, and the
+help text, error messages, and type coercion you get for free. (is the entire
+value proposition).</p>
+<h2>Pass 1: Raw args in <code>main</code></h2>
+<p><code>echo</code> takes literal text arguments and an optional <code>-n</code> flag to suppress the
+trailing newline. Let’s implement it with nothing but the standard library:</p>
+<pre><code class="language-rs">use std::env;
+
+fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
+
+    let mut omit_newline = false;
+    let mut text: Vec&lt;String&gt; = Vec::new();
+
+    // parsing: decide where each arg goes
+    for arg in args.iter().skip(1) {
+        if arg == "-n" {
+            omit_newline = true;
+        } else {
+            text.push(arg.clone());
+        }
+    }
+
+    // validation: checks that the result is usable
+    if text.is_empty() {
+        eprintln!("error: at least one argument required");
+        std::process::exit(1);
+    }
+
+    // logic: use the validated result
+    print!("{}{}", text.join(" "), if omit_newline { "" } else { "\n" });
+}
 </code></pre>
-<ol start="2">
-<li>Mount your external backup disk:</li>
-</ol>
-<pre><code class="language-bash">sudo mkdir -p /mnt/backup
-sudo mount /dev/sdc1 /mnt/backup
-</code></pre>
-<ol start="3">
-<li>Use rsync to copy the snapshot to the external drive:</li>
-</ol>
-<p>List the available snapshots and get the exact name:</p>
-<pre><code class="language-bash">sudo btrfs subvolume list /
-</code></pre>
-<pre><code class="language-bash">sudo rsync -aAXv --delete --progress /root-snapshot-20251002135000/ /mnt/backup/root-backup/
-</code></pre>
-<ol start="4">
-<li>Unmount the external drive:</li>
-</ol>
-<pre><code class="language-bash">sudo umount /mnt/backup
-</code></pre>
-<ol start="5">
-<li>Optionally, delete older snapshots to save space:</li>
-</ol>
-<pre><code class="language-bash">sudo btrfs subvolume delete /root-snapshot-OLD_TIMESTAMP
-</code></pre>
-<h3>Restoring from a Backup</h3>
-<p>For this, you mount the partitions but don’t need to <code>arch-chroot</code> in.</p>
-<ol>
-<li>
-<p>Boot from a live USB</p>
-</li>
-<li>
-<p>Mount your encrypted root partition (unlock if encrypted) and the external
-backup drive.</p>
-</li>
-<li>
-<p>Move or delete the corrupted data on the root partition.</p>
-</li>
-<li>
-<p>Use rsync to copy the backed-up snapshot from the external disk back to the
-root partition, preserving permissions and attributes.</p>
-</li>
-</ol>
-<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-backup/ /
-</code></pre>
-<p>Or, the Wiki’s suggestion, (Much more efficient, Direct backup of a running
-system without the need for btrfs snapshots):</p>
-<pre><code class="language-bash">sudo rsync -aAXHv --exclude='/dev/*' --exclude='/proc/*' --exclude='/sys/*' --exclude='/tmp/*' --exclude='/run/*' --exclude='/mnt/*' --exclude='/media/*' --exclude='/lost+found/' / /path/to/backup
-</code></pre>
+<p>Walking through the pieces:</p>
 <ul>
-<li>
-<p><code>/mnt/backup/root-backup/</code> is the path where the backup snapshot is mounted on
-the external disk.</p>
-</li>
-<li>
-<p><code>/</code> is the root partition mount point where you want to restore the files.</p>
-</li>
-<li>
-<p>The options:</p>
-<ul>
-<li>
-<p><code>-a</code> archive mode to preserve symbolic links, permissions, timestamps, etc.</p>
-</li>
-<li>
-<p><code>-A</code> preserve ACLs (access control lists).</p>
-</li>
-<li>
-<p><code>-X</code> preserve extended attributes.</p>
-</li>
-<li>
-<p><code>-v</code> verbose output.</p>
-</li>
-<li>
-<p><code>--delete</code> deletes files on the destination that don’t exist in the source,
-keeping an exact mirror.</p>
-</li>
+<li><code>env::args().collect()</code> gives you every string the OS passed in, including
+<code>args[0]</code> which is always the binary path, not user input</li>
+<li><code>.skip(1)</code> drops that binary name so the loop only sees actual arguments</li>
+<li><code>omit_newline</code> is a bool because <code>-n</code> is either present or not</li>
+<li><code>text</code> is a <code>Vec&lt;String&gt;</code> because echo can take multiple words. Every non-flag
+arg gets pushed in</li>
+<li><code>text.join(" ")</code> collapses the vec back into a single string:
+<code>["hello", "world"]</code> → “hello world”</li>
 </ul>
-</li>
-</ul>
-<p>If you want to restore a specific snapshot directory (e.g.,
-<code>/root-snapshot-20251002135000</code>), replace the source path accordingly, like:</p>
-<pre><code class="language-bash">sudo rsync -aAXv --delete /mnt/backup/root-snapshot-20251002135000/ /
+<pre><code class="language-bash">cargo run -- hello world
+# args[0] = "target/debug/echor"  (skipped)
+# args[1] = "hello"               → text
+# args[2] = "world"               → text
+# Output: hello world
 </code></pre>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/Rsync#As_a_backup_utility">Arch Wiki rsync</a></li>
-</ul>
-<ol start="5">
-<li>
-<p>Reinstall the bootloader if necessary.</p>
-</li>
-<li>
-<p>Unmount everything and reboot.</p>
-</li>
-</ol>
-<h3>Automated backup</h3>
-<p>Create <code>/etc/cron.daily/backup</code>:</p>
-<pre><code class="language-backup">#!/bin/sh
-rsync -a --delete --quiet /path/to/backup /location/of/backup
+<p>This works, but everything lives in <code>main</code>: the parsing variables, the loop, the
+validation, and the output logic are all tangled together. That three-phase
+structure: parse, validate, run is implicit. The next pass makes it explicit.</p>
+<h2>Pass 2: Typed struct with <code>build()</code></h2>
+<p>The same logic, reorganized around a struct:</p>
+<pre><code class="language-rs">use std::{env, process};
+
+#[derive(Debug)]
+struct Args {
+    /// The text values to be printed to standard output
+    text: Vec&lt;String&gt;,
+    /// Flag indicating whether the trailing newline (`\n`) should be omitted
+    omit_newline: bool,
+}
+
+impl Args {
+    /// Parses and validates cli arguments manually from `env::args()`
+    ///
+    /// # Errors
+    /// Returns a string slice error message if no text arguments are provided
+    fn build() -&gt; Result&lt;Args, &amp;'static str&gt; {
+        let mut args = Args {
+            text: Vec::new(),
+            omit_newline: false,
+        };
+
+        // Skip the first argument (the binary path) &amp; iterate through user inputs
+        for arg in env::args().skip(1) {
+            if arg == "-n" {
+                args.omit_newline = true;
+            } else {
+                args.text.push(arg);
+            }
+        }
+
+        // Validate that required arguments are present
+        if args.text.is_empty() {
+            return Err("error: at least one argument required");
+        }
+
+        Ok(args)
+    }
+}
+
+fn main() {
+    // Parse arguments and handle validation errors
+    let args = Args::build().unwrap_or_else(|err| {
+        eprintln!("{err}");
+        process::exit(1);
+    });
+    // Print the joined text, appending a newline unless `-n` was specified
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    )
+}
 </code></pre>
-<p>Change <code>/path/to/backup</code> to what needs to be backed-up such as <code>/home</code> or <code>/</code></p>
-</details>
+<p>The code does exactly the same thing as Pass 1. What changed is the structure:</p>
+<ul>
+<li>The shape of valid input is now explicit. <code>Args</code> documents what the program
+expects just by existing</li>
+<li><code>build()</code> returns <code>Result</code>, so errors are values your program can handle
+rather than panics or silent failures</li>
+<li><code>main</code> is now only responsible for error handling and output. The three phases
+are cleanly separated</li>
+</ul>
+<p>Notice that main now receives a clean <code>Args</code> value with no <code>Option</code> or <code>Result</code>
+to unwrap. This is the pattern <code>clap</code> enforces: by the time you reach your
+logic, parsing and validation are already done.</p>
+<h2>Pass 3: <code>clap</code> derive</h2>
+<p>Now replace <code>build</code> with <code>#[derive(Parser)]</code>:</p>
+<pre><code class="language-rs">use clap::Parser;
+
+/// Rust version of `echo`
+#[derive(Debug, Parser)]
+#[command(author, version, about)]
+struct Args {
+    /// Input text
+    text: Vec&lt;String&gt;,
+
+    /// Do not print newline
+    #[arg(short('n'))]
+    omit_newline: bool,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    );
+}
+</code></pre>
+<p>The struct is identical. <code>main</code> is identical. The only things that disappeared
+are <code>build()</code> and the <code>unwrap_or_else</code>, <code>clap</code> handles both. What you get in
+exchange:</p>
+<ul>
+<li>Automatic <code>--help</code> and <code>--version</code> flags</li>
+<li>Typed error messages with usage hints when the user passes bad input</li>
+<li>Type coercion (<code>"42"</code> → <code>u32</code>, paths validated as <code>PathBuf</code>, etc.)</li>
+<li>Short and long flag variants for free (<code>-n</code> / <code>--omit-newline</code>)</li>
+</ul>
+<p>The mapping from struct fields to argument types is direct:</p>
+<table><thead><tr><th style="text-align: left"><strong>Field type</strong></th><th style="text-align: left"><strong>What clap expects</strong></th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>String</code></td><td style="text-align: left">exactly one positional value</td></tr>
+<tr><td style="text-align: left"><code>Vec&lt;String&gt;</code></td><td style="text-align: left">one or more positional values, collected</td></tr>
+<tr><td style="text-align: left"><code>bool</code></td><td style="text-align: left">a flag, present = true, absent = false</td></tr>
+<tr><td style="text-align: left"><code>Option&lt;String&gt;</code></td><td style="text-align: left">one optional value, absent = None</td></tr>
+<tr><td style="text-align: left"><code>Option&lt;PathBuf&gt;</code></td><td style="text-align: left">one optional path, absent = None</td></tr>
+<tr><td style="text-align: left"><code>u8</code> with <code>ArgAction::Count</code></td><td style="text-align: left">how many times the flag was passed</td></tr>
+</tbody></table>
+<p>The <code>#[arg(...)]</code> attributes are overrides on top of those defaults. Without
+<code>#[arg(short('n'))]</code>, <code>clap</code> would infer the flag name from the field name
+(<code>--omit-newline</code>). The attribute pins it to <code>-n</code>.</p>
+<h2>Command-Line Argument Types</h2>
+<p>Before going further, it’s worth naming the categories clap works with, because
+the derive attributes map directly to them.</p>
+<ul>
+<li><a href="https://docs.rs/clap/latest/clap/_concepts/index.html"><code>clap</code> CLI concepts</a></li>
+</ul>
+<p><strong>Positional arguments</strong>: identified by their position, not a name. Order
+matters.</p>
+<pre><code class="language-sh">cp source.txt dest.txt
+#   ^^^^^^^^^^ ^^^^^^^^
+#   position 1  position 2
+</code></pre>
+<p><strong>Flags</strong>: boolean switches, either present or not. Order doesn’t matter.</p>
+<pre><code class="language-sh">echo -n hello
+ls -l
+ls --long    # same as -l, long form
+</code></pre>
+<p>Short flags use a single dash and one character <code>-n</code>. Long flags use double dash
+and a word <code>--number</code>. They’re typically the same flag, just two ways to write
+it.</p>
+<p><strong>Options</strong>: like flags but take a value after them:</p>
+<pre><code class="language-sh">cargo run --example myexample
+#          ^^^^^^^^ ^^^^^^^^^
+#           option     value
+cut -d "," -f 1
+#      ^^^    ^
+#      value  value
+</code></pre>
+<p><strong>Subcommands</strong>: a word that selects a mode, then has its own args:</p>
+<pre><code class="language-sh">cargo build --release
+#     ^^^^^
+jj desc -m "message"
+#  ^^^^^^
+</code></pre>
+<p>In a clap struct the field type and attributes map directly to these categories:</p>
+<table><thead><tr><th style="text-align: left"><strong>Arg type</strong></th><th style="text-align: left"><strong>Clap representation</strong></th></tr></thead><tbody>
+<tr><td style="text-align: left">Positional</td><td style="text-align: left">field with no <code>short</code>/<code>long</code>, e.g. <code>text: Vec&lt;String&gt;</code></td></tr>
+<tr><td style="text-align: left">Flag</td><td style="text-align: left"><code>bool</code> field with <code>short</code>/<code>long</code></td></tr>
+<tr><td style="text-align: left">Option</td><td style="text-align: left"><code>Option&lt;T&gt;</code> field with <code>short</code>/<code>long</code></td></tr>
+<tr><td style="text-align: left">Subcommand</td><td style="text-align: left"><code>#[command(subcommand)]</code> enum field</td></tr>
+</tbody></table>
 <hr />
-<h3>arch-chroot</h3>
-<details>
-<summary>  ✔️ Click to Expand `arch-chroot` Example </summary>
-<p>Say you forgot something, like forgetting to add a user and password. You reboot
-and go to TTY into your system and are hit with a AHHH I can’t log in WTF!</p>
-<p>It’s as easy as repeating some of the steps above. Reboot into the Live
-environment, remount your partitions and <code>arch-chroot</code> back in:</p>
-<p>Open the encrypted root partition:</p>
-<pre><code class="language-bash">cryptsetup open /dev/nvme0n1p2 cryptroot
-</code></pre>
-<p>Mount the decrypted root:</p>
-<pre><code class="language-bash">mount /dev/mapper/cryptroot /mnt
-</code></pre>
-<p>Mount the EFI partition:</p>
-<pre><code class="language-bash">mount /dev/nvme0n1p1 /mnt/boot
-</code></pre>
-<p>Chroot into your installed system:</p>
-<pre><code class="language-bash">arch-chroot /mnt
-</code></pre>
-<pre><code class="language-bash">useradd -m -G wheel -s /bin/bash yourusername passwd yourusername
-</code></pre>
+<h3>What <code>clap</code> is actually doing: a naive implementation</h3>
 <ul>
-<li>The <code>-s /bin/bash</code> sets your default shell, you can use zsh if you have it
-installed.</li>
+<li><a href="https://github.com/clap-rs/clap/blob/master/clap_builder/src/derive.rs#L31">clap/clap_builder/src/derive.rs</a></li>
 </ul>
-<p>Uncomment the line <code>%wheel ALL=(ALL:All) ALL</code> in <code>/etc/sudoers</code></p>
-<p>Exit chroot:</p>
-<pre><code class="language-bash">exit
+<p><code>clap</code>’s derive macro generates implementations of three traits. Here’s what
+each one does, translated into plain code without the macro:</p>
+<pre><code class="language-rs">use std::env;
+
+#[derive(Debug)]
+struct Args {
+    text: Vec&lt;String&gt;,
+    omit_newline: bool,
+}
+
+impl Args {
+    // equivalent of CommandFactory::command()
+    // collects raw argv, skipping the binary name
+    // In real clap this builds a Command schema first,
+    // then parses argv against it, producing ArgMatches.
+    // Here we skip the schema and return raw strings directly.
+    fn command() -&gt; Vec&lt;String&gt; {
+        env::args().skip(1).collect()
+    }
+
+    // FromArgMatches::from_arg_matches_mut()
+    // Takes the parsed input and maps it onto struct fields.
+    // In real clap the input is an ArgMatches (typed map of name → value).
+    // Here we're working directly with raw strings.
+    fn from_matches(raw: Vec&lt;String&gt;) -&gt; Result&lt;Self, String&gt; {
+        let mut text = Vec::new();
+        let mut omit_newline = false;
+
+        for arg in raw {
+            if arg == "-n" {
+                omit_newline = true;
+            } else if arg.starts_with('-') {
+                return Err(format!("unknown flag: {}", arg));
+            } else {
+                text.push(arg);
+            }
+        }
+
+        // validation
+        if text.is_empty() {
+            return Err("error: at least one argument required".to_string());
+        }
+
+        Ok(Args { text, omit_newline })
+    }
+
+    // Parser::parse()
+    // orchestrates the pipeline and handles errors
+    fn parse() -&gt; Self {
+        let raw = Self::command();
+        match Self::from_matches(raw) {
+            Ok(args) =&gt; args,
+            Err(e) =&gt; {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
+    }
+}
+
+fn main() {
+    let args = Args::parse();
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    );
+}
 </code></pre>
-<p>Unmount and close LUKS:</p>
-<pre><code class="language-bash">umount /mnt/boot
-umount /mnt
-cryptsetup close cryptroot
-reboot
+<p>Real <code>clap</code>’s pipeline has one more step our version compresses out:</p>
+<pre><code class="language-sh">argv
+  → CommandFactory::command()     builds a schema, parses argv into ArgMatches
+  → ArgMatches                    a generic typed map of name → value
+  → FromArgMatches::from_arg_matches_mut()   maps ArgMatches onto your struct
+  → Args
 </code></pre>
-</details>
+<p>Ours goes straight from raw strings to <code>Args</code>, skipping <code>ArgMatches</code>. The reason
+<code>clap</code> separates these is flexibility, you can use <code>ArgMatches</code> directly without
+a struct if you want, or implement <code>FromArgMatches</code> on your own type. The derive
+macro just generates all three trait implementations from your struct
+definition.</p>
+<p>The traits <code>clap</code> splits this across:</p>
+<ul>
+<li><a href="https://docs.rs/clap/latest/clap/trait.CommandFactory.html">CommandFactory</a>:
+builds the Command schema</li>
+<li><a href="https://docs.rs/clap/latest/clap/trait.FromArgMatches.html">FromArgMatches</a>:
+converts <code>ArgMatches</code> into your struct</li>
+<li><a href="https://docs.rs/clap/latest/clap/trait.Parser.html">Parser</a>: orchestrates
+both and handles errors</li>
+</ul>
+<hr />
+<h3>Structs vs enums: choosing the right shape</h3>
+<p>Use a struct when your program has one mode and all arguments apply to every run
+(<code>echo</code>, <code>cat</code>, <code>ls</code>).</p>
+<p>Use an enum when your program has multiple modes with different arguments per
+mode:</p>
+<pre><code class="language-rs">#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option&lt;Commands&gt;,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Add a file
+    Add { path: PathBuf },
+    /// Remove a file
+    Remove { path: PathBuf, #[arg(short)] force: bool },
+    /// List files
+    List,
+}
+</code></pre>
+<p><code>Add</code>, <code>Remove</code>, and <code>List</code> each have different arguments. You can’t represent
+this cleanly in a flat struct because a struct implies all fields exist for
+every invocation. An enum variant is exclusive: only one runs at a time.</p>
+<p>Then in <code>main</code> you match on it:</p>
+<pre><code class="language-rs">match cli.command {
+    Commands::Add { path } =&gt; { ... }
+    Commands::Remove { path, force } =&gt; { ... }
+    Commands::List =&gt; { ... }
+}
+</code></pre>
+<p>Most real tools combine both. A top-level struct for global flags (like
+<code>--verbose</code>, <code>--config</code>) with an enum field inside it for the subcommand,
+exactly like the example above.</p>
+<hr />
 <h3>Resources</h3>
-<details>
-<summary> ✔️ Click to Expand Resources </summary>
 <ul>
 <li>
-<p><a href="https://wiki.archlinux.org/title/Installation_guide">Arch Wiki Installation Guide</a></p>
+<p><a href="https://docs.rs/clap/latest/clap/index.html">docs.rs clap</a></p>
 </li>
 <li>
-<p><a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot">Arch Wiki UKI/SecureBoot</a></p>
+<p><a href="https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html">derive tutorial</a></p>
 </li>
 <li>
-<p><a href="https://wiki.archlinux.org/title/Unified_kernel_image">Wiki UKI</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/Systemd-boot">Wiki systemd-boot</a></p>
+<p><a href="https://docs.rs/clap/latest/clap/_tutorial/index.html">builder tutorial</a></p>
 </li>
 </ul>
-</details>
-]]></description><author>saylesss88</author><guid>https://mako088.github.io/arch/enc_install.html</guid><pubDate>Fri, 28 Nov 2025 00:00:00 +0000</pubDate></item></channel></rss>
+<p><strong>Looking at tools you’re familiar with can help drive concepts home</strong></p>
+<ul>
+<li>
+<p><a href="https://docs.rs/clap/latest/clap/_cookbook/git_derive/index.html">Example: git-like CLI (Derive API)</a></p>
+</li>
+<li>
+<p><a href="https://docs.rs/clap/latest/clap/_cookbook/pacman/index.html">Example: pacman-like CLI (Derive API)</a></p>
+</li>
+<li>
+<p><a href="https://betterdev.blog/command-line-arguments-anatomy-explained/">betterdev cli arguments anatomy</a></p>
+</li>
+</ul>
+<footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;"><p><a href="https://github.com/saylesss88/mdbook-kanagawa-theme">Made with mdbook-kanagawa-theme</a></p></footer>
+]]></description><guid>https://mako088.github.io/rust/clap_derive_tutorial.html</guid></item></channel></rss>

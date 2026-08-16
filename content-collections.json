@@ -3,7 +3,18 @@
     {
       "author": null,
       "collection": null,
-      "date": "2026-07-16T13:57:25.363536256+00:00",
+      "date": "2026-08-16T17:33:20.179841331+00:00",
+      "description": null,
+      "draft": false,
+      "path": "rust/clap_derive_tutorial.md",
+      "preview_html": "<p>Use a struct when your program has one mode and all arguments apply to every run\n(<code>echo</code>, <code>cat</code>, <code>ls</code>).</p><p>Use an enum when your program has multiple modes with different arguments per\nmode:</p><pre><code class=\"language-rs\">#[derive(Parser)]\nstruct Cli {\n    #[command(subcommand)]\n    command: Option&lt;Commands&gt;,\n}\n\n#[derive(Subcommand)]\nenum Commands {\n    /// Add a file\n    Add { path: PathBuf },\n    /// Remove a file\n    Remove { path: PathBuf, #[arg(short)] force: bool },\n    /// List files\n    List,\n}\n</code></pre>\n<p><code>Add</code>, <code>Remove</code>, and <code>List</code> each have different arguments. You can’t represent\nthis cleanly in a flat struct because a struct implies all fields exist for\nevery invocation. An enum variant is ex",
+      "tags": [],
+      "title": "clap_derive_tutorial"
+    },
+    {
+      "author": null,
+      "collection": null,
+      "date": "2026-08-16T17:31:09.212253039+00:00",
       "description": null,
       "draft": false,
       "path": "index.md",
@@ -18,7 +29,7 @@
       "description": null,
       "draft": false,
       "path": "android/RethinkDNS_Guide.md",
-      "preview_html": "\\u003cp\\u003e\\u003cimg src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /\\u003e\\u003c/p\\u003e\\u003cp\\u003eI’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.\\u003c/p\\u003e\\u003cp\\u003e\\u003cstrong\\u003eHTTP\\u003c/strong\\u003e (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.\\u003c/p\\u003e",
+      "preview_html": "<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>",
       "tags": [
         "android",
         "privacy"
@@ -32,7 +43,7 @@
       "description": null,
       "draft": false,
       "path": "arch/enc_dns.md",
-      "preview_html": "\\u003cp\\u003e❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.\\u003c/p\\u003e\\u003cpre\\u003e\\u003ccode class=\"language-bash\"\\u003esudo pacman -S dnscrypt-proxy\n\\u003c/code\\u003e\\u003c/pre\\u003e\n\\u003cblockquote\\u003e\n\\u003cp\\u003eNOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.\\u003c/p\\u003e\\u003cp\\u003e\\u003ca href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\"\\u003eArch Wiki dnscrypt-proxy\\u003c/a\\u003e\\u003c/p\\u003e",
+      "preview_html": "<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>",
       "tags": [
         "arch",
         "security"
@@ -46,7 +57,7 @@
       "description": null,
       "draft": false,
       "path": "arch/hardening_networking.md",
-      "preview_html": "\\u003cp\\u003eNetworkManagers global config is \\u003ccode\\u003e/etc/NetworkManager/NetworkManager.conf\\u003c/code\\u003e.\nAdditional config files can be placed in \\u003ccode\\u003e/etc/NetworkManager/conf.d\\u003c/code\\u003e.\\u003c/p\\u003e\\u003cp\\u003eAfter editing a config file, apply the changes with:\\u003c/p\\u003e\\u003cpre\\u003e\\u003ccode class=\"language-bash\"\\u003esudo nmcli general reload\n\\u003c/code\\u003e\\u003c/pre\\u003e\n\\u003cpre\\u003e\\u003ccode class=\"language-bash\"\\u003esudo usermod -aG network $USER\n\\u003c/code\\u003e\\u003c/pre\\u003e\n\\u003ch2\\u003eInvestigate sockets\\u003c/h2\\u003e\n\\u003cp\\u003eDisplay all TCP Sockets with service names:\\u003c/p\\u003e",
+      "preview_html": "<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>",
       "tags": [
         "security",
         "networking"
@@ -60,7 +71,7 @@
       "description": null,
       "draft": false,
       "path": "arch/hardening_firefox.md",
-      "preview_html": "\\u003cp\\u003e\\u003cstrong\\u003eBrowser hardening\\u003c/strong\\u003e focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.\\u003c/p\\u003e\\u003cp\\u003e\\u003cstrong\\u003eFingerprint protection\\u003c/strong\\u003e, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.\\u003c/p\\u003e\\u003cp\\u003e\\u003cstrong\\u003eBrowser compartmentalization\\u003c/strong\\u003e is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou",
+      "preview_html": "<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou",
       "tags": [
         "browsers",
         "security"
@@ -74,7 +85,7 @@
       "description": null,
       "draft": false,
       "path": "arch/hardening_arch.md",
-      "preview_html": "\\u003cp\\u003e⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.\\u003c/p\\u003e\\u003cp\\u003eMuch of this guide draws inspiration or recommendations from the well-known\n\\u003ca href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\"\\u003eLinux Hardening Guide\\u003c/a\\u003e\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o",
+      "preview_html": "<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o",
       "tags": [
         "arch",
         "security"
@@ -88,7 +99,7 @@
       "description": null,
       "draft": false,
       "path": "arch/enc_install.md",
-      "preview_html": "\\u003cp\\u003eThe ultimate installation resource is always goint to be the:\\u003c/p\\u003e\\u003cp\\u003e\\u003ca href=\"https://wiki.archlinux.org/title/Installation_guide\"\\u003eArch Wiki Installation Guide\\u003c/a\\u003e\\u003c/p\\u003e\\u003cp\\u003e\\u003ca href=\"https://archlinux.org/download/#checksums\"\\u003eVerify PGP Signatures\\u003c/a\\u003e, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.\\u003c/p\\u003e",
+      "preview_html": "<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>",
       "tags": [
         "arch",
         "security"

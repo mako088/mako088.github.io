@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Hardening Networking - privacy-book</title>
+        <title>Rust Clap Derive Tutorial - privacy-book</title>
 
 
         <!-- Custom HTML head -->
@@ -181,133 +181,415 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <script>window.CONTENT_COLLECTIONS = {"collections":{"blog":[{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"}],"posts":[{"author":null,"collection":null,"date":"2026-08-16T17:33:20.179841331+00:00","description":null,"draft":false,"path":"rust/clap_derive_tutorial.md","preview_html":"<p>Use a struct when your program has one mode and all arguments apply to every run\n(<code>echo</code>, <code>cat</code>, <code>ls</code>).</p><p>Use an enum when your program has multiple modes with different arguments per\nmode:</p><pre><code class=\"language-rs\">#[derive(Parser)]\nstruct Cli {\n    #[command(subcommand)]\n    command: Option&lt;Commands&gt;,\n}\n\n#[derive(Subcommand)]\nenum Commands {\n    /// Add a file\n    Add { path: PathBuf },\n    /// Remove a file\n    Remove { path: PathBuf, #[arg(short)] force: bool },\n    /// List files\n    List,\n}\n</code></pre>\n<p><code>Add</code>, <code>Remove</code>, and <code>List</code> each have different arguments. You can’t represent\nthis cleanly in a flat struct because a struct implies all fields exist for\nevery invocation. An enum variant is ex","tags":[],"title":"clap_derive_tutorial"},{"author":null,"collection":null,"date":"2026-08-16T17:31:09.212253039+00:00","description":null,"draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"}]},"entries":[{"author":null,"collection":null,"date":"2026-08-16T17:33:20.179841331+00:00","description":null,"draft":false,"path":"rust/clap_derive_tutorial.md","preview_html":"<p>Use a struct when your program has one mode and all arguments apply to every run\n(<code>echo</code>, <code>cat</code>, <code>ls</code>).</p><p>Use an enum when your program has multiple modes with different arguments per\nmode:</p><pre><code class=\"language-rs\">#[derive(Parser)]\nstruct Cli {\n    #[command(subcommand)]\n    command: Option&lt;Commands&gt;,\n}\n\n#[derive(Subcommand)]\nenum Commands {\n    /// Add a file\n    Add { path: PathBuf },\n    /// Remove a file\n    Remove { path: PathBuf, #[arg(short)] force: bool },\n    /// List files\n    List,\n}\n</code></pre>\n<p><code>Add</code>, <code>Remove</code>, and <code>List</code> each have different arguments. You can’t represent\nthis cleanly in a flat struct because a struct implies all fields exist for\nevery invocation. An enum variant is ex","tags":[],"title":"clap_derive_tutorial"},{"author":null,"collection":null,"date":"2026-08-16T17:31:09.212253039+00:00","description":null,"draft":false,"path":"index.md","preview_html":"","tags":[],"title":"index"},{"author":"saylesss88","collection":"blog","date":"2025-12-07T00:00:00+00:00","description":null,"draft":false,"path":"android/RethinkDNS_Guide.md","preview_html":"<p><img src=\"../images/rethinkdns.cleaned.png\" alt=\"RethinkDNS Logo\" /></p><p>I’m not affiliated with RethinkDNS in any way, I’m just a technologist and\nprivacy advocate.</p><p><strong>HTTP</strong> (HyperText Transfer Protocol): The standard protocol used by web\nbrowsers and servers to transfer web pages and related resources over the\ninternet.</p>","tags":["android","privacy"],"title":"RethinkDNS"},{"author":"saylesss88","collection":"blog","date":"2025-12-05T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_dns.md","preview_html":"<p>❗ NOTE: There are many other ways for someone monitoring your traffic to see\nwhat domain you looked up via DNS that it’s effectiveness is questionable\nwithout also using Tor or a VPN. Encrypted DNS will not help you hide any of\nyour browsing activity.</p><pre><code class=\"language-bash\">sudo pacman -S dnscrypt-proxy\n</code></pre>\n<blockquote>\n<p>NOTE: udp is required for dnscrypt protocol, keep this in mind when\nconfiguring your servers if your output chain is a default drop.</p><p><a href=\"https://wiki.archlinux.org/title/Dnscrypt-proxy\">Arch Wiki dnscrypt-proxy</a></p>","tags":["arch","security"],"title":"Encrypted DNS on Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_networking.md","preview_html":"<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.\nAdditional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p><p>After editing a config file, apply the changes with:</p><pre><code class=\"language-bash\">sudo nmcli general reload\n</code></pre>\n<pre><code class=\"language-bash\">sudo usermod -aG network $USER\n</code></pre>\n<h2>Investigate sockets</h2>\n<p>Display all TCP Sockets with service names:</p>","tags":["security","networking"],"title":"Hardening Networking"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_firefox.md","preview_html":"<p><strong>Browser hardening</strong> focuses on reducing attack surface and blocking tracking\nby disabling or restricting features like JavaScript, cookies, telemetry, and\nthird-party scripts.</p><p><strong>Fingerprint protection</strong>, on the other hand, aims to make your browser\nindistinguishable from others. Instead of just blocking data collection, it\nensures that your browser’s configuration; screen size, fonts, user agent,\netc. matches a large group of users, so you blend in.</p><p><strong>Browser compartmentalization</strong> is a technique where different browsers are\ndedicated to distinct online activities to isolate cookies, trackers, and\nbrowsing data. For example, Mullvad Browser can be used solely for activities\nwhere fingerprinting resistance is critical, such as anonymou","tags":["browsers","security"],"title":"Hardening Firefox"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/hardening_arch.md","preview_html":"<p>⚠️ Warning: I am not a security expert. This guide presents various options\nfor hardening Arch Linux, but it is your responsibility to evaluate whether\neach adjustment suits your specific needs and environment. Security hardening\nand process isolation can introduce stability challenges, compatibility\nissues, or unexpected behavior. Additionally, these protections often come\nwith performance tradeoffs. Always conduct thorough research, there are no\nplug and play one size fits all security solutions.</p><p>Much of this guide draws inspiration or recommendations from the well-known\n<a href=\"https://madaidans-insecurities.github.io/guides/linux-hardening.html\">Linux Hardening Guide</a>\nby Madaidan’s Insecurities and the Arch Wiki. Arch is great but when anonymity\ntruly matters, use Whonix o","tags":["arch","security"],"title":"Hardening Arch"},{"author":"saylesss88","collection":"blog","date":"2025-11-28T00:00:00+00:00","description":null,"draft":false,"path":"arch/enc_install.md","preview_html":"<p>The ultimate installation resource is always goint to be the:</p><p><a href=\"https://wiki.archlinux.org/title/Installation_guide\">Arch Wiki Installation Guide</a></p><p><a href=\"https://archlinux.org/download/#checksums\">Verify PGP Signatures</a>, the ISO\ndirectory is just the same directory where your Arch Linux ISO file is stored.</p>","tags":["arch","security"],"title":"Encrypted Arch Install"}],"generated_at":"2026-08-16T17:36:14.537223749+00:00"};</script>
-<pre><code class="language-nix repl">2 + 2
+<h1 id="rust-clap-derive-tutorial"><a class="header" href="#rust-clap-derive-tutorial">Rust Clap Derive Tutorial</a></h1>
+<h2 id="understanding-clap-by-building-it-yourself"><a class="header" href="#understanding-clap-by-building-it-yourself">Understanding <code>clap</code> by Building It Yourself</a></h2>
+<p>Most tutorials start with <code>clap</code> and show you how to use it. This one starts
+without it.</p>
+<p>Before reaching for <a href="https://crates.io/crates/clap">clap</a>, it’s worth building
+the same thing by hand. Parsing arguments manually forces you to see exactly
+what <code>clap</code> is doing for you, and once you see that, the derive API stops
+feeling like magic and starts feeling obvious.</p>
+<p>We’ll build <code>echor</code> (Credit:
+<a href="https://github.com/kyclark/command-line-rust/tree/main/02_echor">Command-Line Rust</a>),
+a Rust implementation of the Unix <code>echo</code> command in three passes:</p>
+<ol>
+<li><strong>Raw args</strong>: <code>env::args()</code> directly in main, no abstractions</li>
+<li><strong>Structured args</strong>: a typed struct with a <code>build</code> method, same shape <code>clap</code>
+uses</li>
+<li><strong>clap derive</strong>: replace <code>build()</code> with <code>#[derive(Parser)]</code> and watch how
+little changes</li>
+</ol>
+<p>Then we’ll close by looking at what <code>clap</code> is actually doing internally, by
+implementing a naive version of its three-trait pipeline.</p>
+<h2 id="what-problem-does-clap-solve"><a class="header" href="#what-problem-does-clap-solve">What problem does <code>clap</code> solve?</a></h2>
+<p>When a user runs your program, the OS hands it a flat list of strings:</p>
+<pre><code class="language-sh">cargo run -- hello world -n
+# the program receives: ["target/debug/echor", "hello", "world", "-n"]
 </code></pre>
-<h1 id="hardening-networking"><a class="header" href="#hardening-networking">Hardening Networking</a></h1>
-<p>NetworkManagers global config is <code>/etc/NetworkManager/NetworkManager.conf</code>.
-Additional config files can be placed in <code>/etc/NetworkManager/conf.d</code>.</p>
-<p>After editing a config file, apply the changes with:</p>
-<pre><code class="language-bash">sudo nmcli general reload
-</code></pre>
-<pre><code class="language-bash">sudo usermod -aG network $USER
-</code></pre>
-<h2 id="investigate-sockets"><a class="header" href="#investigate-sockets">Investigate sockets</a></h2>
-<p>Display all TCP Sockets with service names:</p>
-<pre><code class="language-bash">ss -at
-</code></pre>
-<p>Display all TCP Sockets with port numbers:</p>
-<pre><code class="language-bash">ss -atn
-</code></pre>
-<p>Display all UDP Sockets:</p>
-<pre><code class="language-bash">ss -au
-</code></pre>
-<h2 id="configure-networkmanager-to-use-quad9s-dot"><a class="header" href="#configure-networkmanager-to-use-quad9s-dot">Configure NetworkManager to use Quad9s DoT</a></h2>
-<p>Create <code>/etc/NetworkManager/system-connections/Wi-Fi.nmconnection</code>:</p>
-<pre><code class="language-.nmconnection">[connection]
-dns-over-tls=2
+<p>Your program has to:</p>
+<ol>
+<li><strong>Parse</strong>: decode what each string means (is <code>-n</code> a flag? is <code>hello</code>
+positional text?)</li>
+<li><strong>Validate</strong>: check the result makes sense (did the user provide any text at
+all?)</li>
+<li><strong>Run</strong>: use the validated result</li>
+</ol>
+<p><code>clap</code> handles steps one and two automatically. By the time your <code>main</code> logic
+runs, you’re guaranteed a valid, typed <code>Args</code> struct. That guarantee, and the
+help text, error messages, and type coercion you get for free. (is the entire
+value proposition).</p>
+<h2 id="pass-1-raw-args-in-main"><a class="header" href="#pass-1-raw-args-in-main">Pass 1: Raw args in <code>main</code></a></h2>
+<p><code>echo</code> takes literal text arguments and an optional <code>-n</code> flag to suppress the
+trailing newline. Let’s implement it with nothing but the standard library:</p>
+<pre><code class="language-rs">use std::env;
 
-[ipv4]
-dns=9.9.9.9#dns.quad9.net;149.112.112.112#dns.quad9.net;
-ignore-auto-dns=true
+fn main() {
+    let args: Vec&lt;String&gt; = env::args().collect();
 
-[ipv6]
-dns=2620:fe::fe#dns.quad9.net;2620:fe::9#dns.quad9.net;
-ignore-auto-dns=true
-</code></pre>
-<pre><code class="language-bash">sudo systemctl restart NetworkManager
-</code></pre>
-<p><strong>Wi-Fi MAC randomization</strong></p>
-<p>Add the following to <code>/etc/NetworkManager/conf.d/wifi_rand_mac.conf</code>:</p>
-<pre><code class="language-conf">[device-mac-randomization]
-# "yes" is already the default for scanning
-wifi.scan-rand-mac-address=yes
+    let mut omit_newline = false;
+    let mut text: Vec&lt;String&gt; = Vec::new();
 
-[connection-mac-randomization]
-# Randomize MAC for every ethernet connection
-ethernet.cloned-mac-address=random
-# Generate a random MAC every time you connect to a wifi network
-wifi.cloned-mac-address=random
+    // parsing: decide where each arg goes
+    for arg in args.iter().skip(1) {
+        if arg == "-n" {
+            omit_newline = true;
+        } else {
+            text.push(arg.clone());
+        }
+    }
+
+    // validation: checks that the result is usable
+    if text.is_empty() {
+        eprintln!("error: at least one argument required");
+        std::process::exit(1);
+    }
+
+    // logic: use the validated result
+    print!("{}{}", text.join(" "), if omit_newline { "" } else { "\n" });
+}
 </code></pre>
-<p><strong>Unique DUID per connection</strong></p>
-<p>Create <code>/etc/NetworkManager/conf.d/duid.conf</code>:</p>
-<pre><code class="language-conf">[connection]
-ipv6.dhcp-duid=stable-uuid
+<p>Walking through the pieces:</p>
+<ul>
+<li><code>env::args().collect()</code> gives you every string the OS passed in, including
+<code>args[0]</code> which is always the binary path, not user input</li>
+<li><code>.skip(1)</code> drops that binary name so the loop only sees actual arguments</li>
+<li><code>omit_newline</code> is a bool because <code>-n</code> is either present or not</li>
+<li><code>text</code> is a <code>Vec&lt;String&gt;</code> because echo can take multiple words. Every non-flag
+arg gets pushed in</li>
+<li><code>text.join(" ")</code> collapses the vec back into a single string:
+<code>["hello", "world"]</code> → “hello world”</li>
+</ul>
+<pre><code class="language-bash">cargo run -- hello world
+# args[0] = "target/debug/echor"  (skipped)
+# args[1] = "hello"               → text
+# args[2] = "world"               → text
+# Output: hello world
 </code></pre>
-<h2 id="mac-address-spoofing"><a class="header" href="#mac-address-spoofing">MAC Address spoofing</a></h2>
-<p>This section demonstrates how to spoof your Media Access Control (MAC) address.</p>
-<p><strong>Manual MAC randomization with macchanger</strong></p>
-<p>Find your device interface and check your current MAC address:</p>
-<pre><code class="language-bash"># find interface
-ip add
-sudo iplink show wlp3s0
+<p>This works, but everything lives in <code>main</code>: the parsing variables, the loop, the
+validation, and the output logic are all tangled together. That three-phase
+structure: parse, validate, run is implicit. The next pass makes it explicit.</p>
+<h2 id="pass-2-typed-struct-with-build"><a class="header" href="#pass-2-typed-struct-with-build">Pass 2: Typed struct with <code>build()</code></a></h2>
+<p>The same logic, reorganized around a struct:</p>
+<pre><code class="language-rs">use std::{env, process};
+
+#[derive(Debug)]
+struct Args {
+    /// The text values to be printed to standard output
+    text: Vec&lt;String&gt;,
+    /// Flag indicating whether the trailing newline (`\n`) should be omitted
+    omit_newline: bool,
+}
+
+impl Args {
+    /// Parses and validates cli arguments manually from `env::args()`
+    ///
+    /// # Errors
+    /// Returns a string slice error message if no text arguments are provided
+    fn build() -&gt; Result&lt;Args, &amp;'static str&gt; {
+        let mut args = Args {
+            text: Vec::new(),
+            omit_newline: false,
+        };
+
+        // Skip the first argument (the binary path) &amp; iterate through user inputs
+        for arg in env::args().skip(1) {
+            if arg == "-n" {
+                args.omit_newline = true;
+            } else {
+                args.text.push(arg);
+            }
+        }
+
+        // Validate that required arguments are present
+        if args.text.is_empty() {
+            return Err("error: at least one argument required");
+        }
+
+        Ok(args)
+    }
+}
+
+fn main() {
+    // Parse arguments and handle validation errors
+    let args = Args::build().unwrap_or_else(|err| {
+        eprintln!("{err}");
+        process::exit(1);
+    });
+    // Print the joined text, appending a newline unless `-n` was specified
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    )
+}
 </code></pre>
-<p>The address following <code>"link/ether"</code> is your MAC, bring it down so we can change
-it:</p>
-<pre><code class="language-bash">sudo ip link set dev wlp3s0 down
-# or
-# sudo ifconfig wlp3s0 down
+<p>The code does exactly the same thing as Pass 1. What changed is the structure:</p>
+<ul>
+<li>The shape of valid input is now explicit. <code>Args</code> documents what the program
+expects just by existing</li>
+<li><code>build()</code> returns <code>Result</code>, so errors are values your program can handle
+rather than panics or silent failures</li>
+<li><code>main</code> is now only responsible for error handling and output. The three phases
+are cleanly separated</li>
+</ul>
+<p>Notice that main now receives a clean <code>Args</code> value with no <code>Option</code> or <code>Result</code>
+to unwrap. This is the pattern <code>clap</code> enforces: by the time you reach your
+logic, parsing and validation are already done.</p>
+<h2 id="pass-3-clap-derive"><a class="header" href="#pass-3-clap-derive">Pass 3: <code>clap</code> derive</a></h2>
+<p>Now replace <code>build</code> with <code>#[derive(Parser)]</code>:</p>
+<pre><code class="language-rs">use clap::Parser;
+
+/// Rust version of `echo`
+#[derive(Debug, Parser)]
+#[command(author, version, about)]
+struct Args {
+    /// Input text
+    text: Vec&lt;String&gt;,
+
+    /// Do not print newline
+    #[arg(short('n'))]
+    omit_newline: bool,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    );
+}
 </code></pre>
-<p>Install the <code>macchanger</code> package and run:</p>
-<pre><code class="language-bash">sudo macchanger -a wlp3s0
+<p>The struct is identical. <code>main</code> is identical. The only things that disappeared
+are <code>build()</code> and the <code>unwrap_or_else</code>, <code>clap</code> handles both. What you get in
+exchange:</p>
+<ul>
+<li>Automatic <code>--help</code> and <code>--version</code> flags</li>
+<li>Typed error messages with usage hints when the user passes bad input</li>
+<li>Type coercion (<code>"42"</code> → <code>u32</code>, paths validated as <code>PathBuf</code>, etc.)</li>
+<li>Short and long flag variants for free (<code>-n</code> / <code>--omit-newline</code>)</li>
+</ul>
+<p>The mapping from struct fields to argument types is direct:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left"><strong>Field type</strong></th><th style="text-align: left"><strong>What clap expects</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>String</code></td><td style="text-align: left">exactly one positional value</td></tr>
+<tr><td style="text-align: left"><code>Vec&lt;String&gt;</code></td><td style="text-align: left">one or more positional values, collected</td></tr>
+<tr><td style="text-align: left"><code>bool</code></td><td style="text-align: left">a flag, present = true, absent = false</td></tr>
+<tr><td style="text-align: left"><code>Option&lt;String&gt;</code></td><td style="text-align: left">one optional value, absent = None</td></tr>
+<tr><td style="text-align: left"><code>Option&lt;PathBuf&gt;</code></td><td style="text-align: left">one optional path, absent = None</td></tr>
+<tr><td style="text-align: left"><code>u8</code> with <code>ArgAction::Count</code></td><td style="text-align: left">how many times the flag was passed</td></tr>
+</tbody>
+</table>
+</div>
+<p>The <code>#[arg(...)]</code> attributes are overrides on top of those defaults. Without
+<code>#[arg(short('n'))]</code>, <code>clap</code> would infer the flag name from the field name
+(<code>--omit-newline</code>). The attribute pins it to <code>-n</code>.</p>
+<h2 id="command-line-argument-types"><a class="header" href="#command-line-argument-types">Command-Line Argument Types</a></h2>
+<p>Before going further, it’s worth naming the categories clap works with, because
+the derive attributes map directly to them.</p>
+<ul>
+<li><a href="https://docs.rs/clap/latest/clap/_concepts/index.html"><code>clap</code> CLI concepts</a></li>
+</ul>
+<p><strong>Positional arguments</strong>: identified by their position, not a name. Order
+matters.</p>
+<pre><code class="language-sh">cp source.txt dest.txt
+#   ^^^^^^^^^^ ^^^^^^^^
+#   position 1  position 2
 </code></pre>
+<p><strong>Flags</strong>: boolean switches, either present or not. Order doesn’t matter.</p>
+<pre><code class="language-sh">echo -n hello
+ls -l
+ls --long    # same as -l, long form
+</code></pre>
+<p>Short flags use a single dash and one character <code>-n</code>. Long flags use double dash
+and a word <code>--number</code>. They’re typically the same flag, just two ways to write
+it.</p>
+<p><strong>Options</strong>: like flags but take a value after them:</p>
+<pre><code class="language-sh">cargo run --example myexample
+#          ^^^^^^^^ ^^^^^^^^^
+#           option     value
+cut -d "," -f 1
+#      ^^^    ^
+#      value  value
+</code></pre>
+<p><strong>Subcommands</strong>: a word that selects a mode, then has its own args:</p>
+<pre><code class="language-sh">cargo build --release
+#     ^^^^^
+jj desc -m "message"
+#  ^^^^^^
+</code></pre>
+<p>In a clap struct the field type and attributes map directly to these categories:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left"><strong>Arg type</strong></th><th style="text-align: left"><strong>Clap representation</strong></th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left">Positional</td><td style="text-align: left">field with no <code>short</code>/<code>long</code>, e.g. <code>text: Vec&lt;String&gt;</code></td></tr>
+<tr><td style="text-align: left">Flag</td><td style="text-align: left"><code>bool</code> field with <code>short</code>/<code>long</code></td></tr>
+<tr><td style="text-align: left">Option</td><td style="text-align: left"><code>Option&lt;T&gt;</code> field with <code>short</code>/<code>long</code></td></tr>
+<tr><td style="text-align: left">Subcommand</td><td style="text-align: left"><code>#[command(subcommand)]</code> enum field</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h3 id="what-clap-is-actually-doing-a-naive-implementation"><a class="header" href="#what-clap-is-actually-doing-a-naive-implementation">What <code>clap</code> is actually doing: a naive implementation</a></h3>
+<ul>
+<li><a href="https://github.com/clap-rs/clap/blob/master/clap_builder/src/derive.rs#L31">clap/clap_builder/src/derive.rs</a></li>
+</ul>
+<p><code>clap</code>’s derive macro generates implementations of three traits. Here’s what
+each one does, translated into plain code without the macro:</p>
+<pre><code class="language-rs">use std::env;
+
+#[derive(Debug)]
+struct Args {
+    text: Vec&lt;String&gt;,
+    omit_newline: bool,
+}
+
+impl Args {
+    // equivalent of CommandFactory::command()
+    // collects raw argv, skipping the binary name
+    // In real clap this builds a Command schema first,
+    // then parses argv against it, producing ArgMatches.
+    // Here we skip the schema and return raw strings directly.
+    fn command() -&gt; Vec&lt;String&gt; {
+        env::args().skip(1).collect()
+    }
+
+    // FromArgMatches::from_arg_matches_mut()
+    // Takes the parsed input and maps it onto struct fields.
+    // In real clap the input is an ArgMatches (typed map of name → value).
+    // Here we're working directly with raw strings.
+    fn from_matches(raw: Vec&lt;String&gt;) -&gt; Result&lt;Self, String&gt; {
+        let mut text = Vec::new();
+        let mut omit_newline = false;
+
+        for arg in raw {
+            if arg == "-n" {
+                omit_newline = true;
+            } else if arg.starts_with('-') {
+                return Err(format!("unknown flag: {}", arg));
+            } else {
+                text.push(arg);
+            }
+        }
+
+        // validation
+        if text.is_empty() {
+            return Err("error: at least one argument required".to_string());
+        }
+
+        Ok(Args { text, omit_newline })
+    }
+
+    // Parser::parse()
+    // orchestrates the pipeline and handles errors
+    fn parse() -&gt; Self {
+        let raw = Self::command();
+        match Self::from_matches(raw) {
+            Ok(args) =&gt; args,
+            Err(e) =&gt; {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
+    }
+}
+
+fn main() {
+    let args = Args::parse();
+    print!(
+        "{}{}",
+        args.text.join(" "),
+        if args.omit_newline { "" } else { "\n" }
+    );
+}
+</code></pre>
+<p>Real <code>clap</code>’s pipeline has one more step our version compresses out:</p>
+<pre><code class="language-sh">argv
+  → CommandFactory::command()     builds a schema, parses argv into ArgMatches
+  → ArgMatches                    a generic typed map of name → value
+  → FromArgMatches::from_arg_matches_mut()   maps ArgMatches onto your struct
+  → Args
+</code></pre>
+<p>Ours goes straight from raw strings to <code>Args</code>, skipping <code>ArgMatches</code>. The reason
+<code>clap</code> separates these is flexibility, you can use <code>ArgMatches</code> directly without
+a struct if you want, or implement <code>FromArgMatches</code> on your own type. The derive
+macro just generates all three trait implementations from your struct
+definition.</p>
+<p>The traits <code>clap</code> splits this across:</p>
+<ul>
+<li><a href="https://docs.rs/clap/latest/clap/trait.CommandFactory.html">CommandFactory</a>:
+builds the Command schema</li>
+<li><a href="https://docs.rs/clap/latest/clap/trait.FromArgMatches.html">FromArgMatches</a>:
+converts <code>ArgMatches</code> into your struct</li>
+<li><a href="https://docs.rs/clap/latest/clap/trait.Parser.html">Parser</a>: orchestrates
+both and handles errors</li>
+</ul>
+<hr>
+<h3 id="structs-vs-enums-choosing-the-right-shape"><a class="header" href="#structs-vs-enums-choosing-the-right-shape">Structs vs enums: choosing the right shape</a></h3>
+<p>Use a struct when your program has one mode and all arguments apply to every run
+(<code>echo</code>, <code>cat</code>, <code>ls</code>).</p>
+<p>Use an enum when your program has multiple modes with different arguments per
+mode:</p>
+<pre><code class="language-rs">#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option&lt;Commands&gt;,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Add a file
+    Add { path: PathBuf },
+    /// Remove a file
+    Remove { path: PathBuf, #[arg(short)] force: bool },
+    /// List files
+    List,
+}
+</code></pre>
+<p><code>Add</code>, <code>Remove</code>, and <code>List</code> each have different arguments. You can’t represent
+this cleanly in a flat struct because a struct implies all fields exist for
+every invocation. An enum variant is exclusive: only one runs at a time.</p>
+<p>Then in <code>main</code> you match on it:</p>
+<pre><code class="language-rs">match cli.command {
+    Commands::Add { path } =&gt; { ... }
+    Commands::Remove { path, force } =&gt; { ... }
+    Commands::List =&gt; { ... }
+}
+</code></pre>
+<p>Most real tools combine both. A top-level struct for global flags (like
+<code>--verbose</code>, <code>--config</code>) with an enum field inside it for the subcommand,
+exactly like the example above.</p>
+<hr>
+<h3 id="resources"><a class="header" href="#resources">Resources</a></h3>
 <ul>
 <li>
-<p><code>-a</code>, <code>--another</code>: Set random vendor MAC of the same kind.</p>
+<p><a href="https://docs.rs/clap/latest/clap/index.html">docs.rs clap</a></p>
 </li>
 <li>
-<p><code>-r</code>, <code>--random</code>: Set fully random MAC.</p>
+<p><a href="https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html">derive tutorial</a></p>
+</li>
+<li>
+<p><a href="https://docs.rs/clap/latest/clap/_tutorial/index.html">builder tutorial</a></p>
 </li>
 </ul>
-<p><strong>Automatically with systemd &amp; macchanger</strong></p>
-<p>systemd unit setting a random address while preserving the original NIC vendor
-bytes.</p>
-<p>Create <code>/etc/systemd/system/macspoof@.service</code>:</p>
-<pre><code class="language-macspoof@.service">[Unit]
-Description=macchanger on %I
-Wants=network-pre.target
-Before=network-pre.target
-BindsTo=sys-subsystem-net-devices-%i.device
-After=sys-subsystem-net-devices-%i.device
-
-[Service]
-ExecStart=/usr/bin/macchanger -e %I
-Type=oneshot
-
-[Install]
-WantedBy=multi-user.target
-</code></pre>
+<p><strong>Looking at tools you’re familiar with can help drive concepts home</strong></p>
 <ul>
 <li>
-<p>You can use <code>-r</code> to randomize everything but it’s important that the vendor
-bytes actually match something and aren’t just random numbers so it’s less
-recommended.</p>
+<p><a href="https://docs.rs/clap/latest/clap/_cookbook/git_derive/index.html">Example: git-like CLI (Derive API)</a></p>
 </li>
 <li>
-<p>The <code>@.service</code> pattern allows per-interface instantiation like
-<code>macspoof@wlp3s0.service</code>.</p>
+<p><a href="https://docs.rs/clap/latest/clap/_cookbook/pacman/index.html">Example: pacman-like CLI (Derive API)</a></p>
 </li>
 <li>
-<p>The <code>%I</code> variable automatically resolves to your interface name.</p>
-</li>
-<li>
-<p>You only need to append your interface name when enabling the service.</p>
-</li>
-</ul>
-<pre><code class="language-bash">sudo systemctl enable macspoof@wlp3s0.service
-</code></pre>
-<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
-<ul>
-<li>
-<p><a href="https://www.kicksecure.com/wiki/MAC_Address">KickSecure MAC_address</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/MAC_address_spoofing">Arch Wiki MAC address spoofing</a></p>
-</li>
-<li>
-<p><a href="https://tldp.org/LDP/nag2/index.html">Linux Network Admin Guide</a></p>
-</li>
-<li>
-<p><a href="https://wiki.archlinux.org/title/NetworkManager">Arch Wiki NetworkManager</a></p>
+<p><a href="https://betterdev.blog/command-line-arguments-anatomy-explained/">betterdev cli arguments anatomy</a></p>
 </li>
 </ul>
 <footer id="kanagawa-support-footer" style="text-align:center; margin-top: 3rem; font-size: 0.85em; opacity: 0.75;">
@@ -317,13 +599,10 @@ recommended.</p>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../arch/hardening_arch.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../arch/hardening_networking.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../rust/clap_derive_tutorial.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -331,13 +610,10 @@ recommended.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../arch/hardening_arch.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../arch/hardening_networking.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../rust/clap_derive_tutorial.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
-                    </a>
             </nav>
 
         </div>
