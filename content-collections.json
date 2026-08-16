@@ -3,7 +3,7 @@
     {
       "author": null,
       "collection": null,
-      "date": "2026-08-16T17:33:20.179841331+00:00",
+      "date": "2026-08-16T17:48:35.266057889+00:00",
       "description": null,
       "draft": false,
       "path": "rust/clap_derive_tutorial.md",
@@ -14,13 +14,24 @@
     {
       "author": null,
       "collection": null,
-      "date": "2026-08-16T17:31:09.212253039+00:00",
+      "date": "2026-08-16T17:48:35.265734056+00:00",
       "description": null,
       "draft": false,
       "path": "index.md",
       "preview_html": "",
       "tags": [],
       "title": "index"
+    },
+    {
+      "author": null,
+      "collection": null,
+      "date": "2026-08-16T17:47:45.009318250+00:00",
+      "description": null,
+      "draft": false,
+      "path": "chapter_1.md",
+      "preview_html": "",
+      "tags": [],
+      "title": "chapter_1"
     },
     {
       "author": "saylesss88",
