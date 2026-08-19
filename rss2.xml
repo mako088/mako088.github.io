@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>privacy-book</title><link>https://mako088.github.io/</link><description>Description</description><generator>mdbook-rss-feed 1.10.1</generator><atom:link href="https://mako088.github.io/rss2.xml" rel="self"></atom:link><atom:link href="https://mako088.github.io/rss.xml" rel="prev"></atom:link><item><title>Hardening Networking</title><link>https://mako088.github.io/arch/hardening_networking.html</link><description><![CDATA[<div class="mdbook-draw-container">
 <p class="mdbook-draw-title">My Diagram</p>
-<canvas
-    id="my-diagram"
-    class="mdbook-draw-canvas"
-    width="600"
-    height="400"
-    data-background="#ffcccc"
-    style="border:1px solid #ccc; cursor:crosshair; background:#ffcccc;">
-  </canvas>
-<div class="mdbook-draw-toolbar" data-canvas-id="my-diagram">
-<button data-tool="pencil">✏️ Pencil</button><button data-tool="line">╱ Line</button><button data-tool="circle">○ Circle</button><button data-tool="text">T Text</button><button data-tool="eraser">🧹 Eraser</button><input type="color" data-role="color" value="#000000" title="Color"><input type="range" data-role="size" min="1" max="30" value="4" title="Brush size"><button data-tool="clear">🗑️ Clear</button><button data-role="save">💾 Save</button><button data-role="export-png">🖼️ Export PNG</button></div>
+<img src="https://mako088.github.io/../drawings/draw.png" width="600" height="400" class="mdbook-draw-canvas" style="border:1px solid #ccc;">
 </div>
 <pre><code class="language-nix">2 + 2
 </code></pre>
